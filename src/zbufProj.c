@@ -1,55 +1,61 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
 #include "zbufGlobal.h"
 
+/* SRW */
+void image(face**, int, line**, int, double*, double, double*);
+void initFaces(face**, int, double*);
+void flatten(face**, int, line**, int, double, double, double*, double*);
+void makePos(face**, int, line**, int);
+void scale2d(face**, int, line**, int, double, double*);
+double *getAvg(face**, int, line**, int, int);
+double getSphere(double*, face**, int, line**, int);
+double getNormal(double*, double, double*, double*, double);
+
+
 /*
   takes a list of 3d lines and returns a list of 3d lines mapped onto a plane
   given by a normal when projected back to the given view point
 */
-void image(faces, numfaces, lines, numlines, normal, rhs, view)
-face **faces;
-line **lines;
-int numfaces, numlines;
-double *normal;
-double rhs;			/* rhs of the plane's equation */
-double *view;
+void image(face **faces, int numfaces, line **lines, int numlines,
+    double *normal, double rhs, double *view)
+/* double rhs;			rhs of the plane's equation */
 {
   int i, j, k;
-  double alpha, dot(), temp[3];
+  double alpha, temp[3];
   extern double ***axes;
   extern int x_;
 
@@ -67,7 +73,7 @@ double *view;
 		i,temp[0],temp[1],temp[2],normal[0],normal[1],normal[2],
 		view[0],view[1],view[2]);
 	fprintf(stderr, " rhs = %g\n", rhs);
-	exit(0);*/
+	exit(1);*/
       }
       for(k = 0; k < 3; k++) axes[i][j][k] = view[k]+alpha*temp[k];
     }
@@ -87,7 +93,7 @@ double *view;
 		i,temp[0],temp[1],temp[2],normal[0],normal[1],normal[2],
 		view[0],view[1],view[2]);
 	fprintf(stderr, " rhs = %g\n", rhs);
-	exit(0);
+	exit(1);
       }
       for(k = 0; k < 3; k++) (faces[i]->c)[j][k] = view[k]+alpha*temp[k];
     }
@@ -106,7 +112,7 @@ double *view;
 	      i,temp[0],temp[1],temp[2],normal[0],normal[1],normal[2],
 	      view[0],view[1],view[2]);
       fprintf(stderr, " rhs = %g\n", rhs);
-      exit(0);
+      exit(1);
     }
     for(k = 0; k < 3; k++) (lines[i]->from)[k] = view[k]+alpha*temp[k];
     for(k = 0; k < 3; k++) temp[k] = (lines[i]->to)[k]-view[k];
@@ -120,7 +126,7 @@ double *view;
 	      i,temp[0],temp[1],temp[2],normal[0],normal[1],normal[2],
 	      view[0],view[1],view[2]);
       fprintf(stderr, " rhs = %g\n", rhs);
-      exit(0);
+      exit(1);
     }
     for(k = 0; k < 3; k++) (lines[i]->to)[k] = view[k]+alpha*temp[k];
   }
@@ -130,13 +136,9 @@ double *view;
 /*
   makes sure normals point toward view point for all faces
 */
-void initFaces(faces, numfaces, view)
-face **faces;
-int numfaces;
-double *view;
+void initFaces(face **faces, int numfaces, double *view)
 {
   int f, i;
-  double dot();
 
   /* substitue the view point into each face's plane equation
      - if it's negative then normal points twrd object => used negative nrml*/
@@ -154,16 +156,12 @@ double *view;
   a 2d coordinate system in the plane 
   - sets up y axis in plane || to 1st line rotated according to rotation arg
 */
-void flatten(faces, numfaces, lines, numlines, rhs, rotation, normal, view)
-face **faces;
-line **lines;
-int numfaces, numlines;
-double *view, *normal;
-double rhs;
-double rotation;		/* rotation of image y axis rel to 1st line */
+void flatten(face **faces, int numfaces, line **lines, int numlines,
+    double rhs, double rotation, double *normal, double *view)
+/* double rotation;		rotation of image y axis rel to 1st line */
 {
   int i, j, k;
-  double dot(), temp, tvec[3], tvec1[3], crot, srot, alpha;
+  double temp, tvec[3], tvec1[3], crot, srot, alpha;
   double y[3], x[3], z[3];		/* unit vectors */
   double origin[3], sinth, costh, theta;
   extern double ***axes;
@@ -266,10 +264,7 @@ double rotation;		/* rotation of image y axis rel to 1st line */
 /*
   translates a list of 2d faces, lines to make all the coordinates positive
 */
-void makePos(faces, numfaces, lines, numlines)
-face **faces;
-line **lines;
-int numfaces, numlines;
+void makePos(face **faces, int numfaces, line **lines, int numlines)
 {
   int i,j;
   double minx, miny, trans[2];
@@ -342,11 +337,8 @@ int numfaces, numlines;
   - the global defines OFFSETX/Y set the offset
   - assumes smallest x and y coordinates are zero (called after makePos())
 */
-void scale2d(faces, numfaces, lines, numlines, scale, offset)
-face **faces;
-line **lines;
-int numfaces, numlines;
-double scale, *offset;
+void scale2d(face **faces, int numfaces, line **lines, int numlines,
+    double scale, double *offset)
 {
   int i, j;
   double ymax, xmax, xscale, yscale, master;
@@ -377,7 +369,7 @@ double scale, *offset;
   if(xmax <= MARGIN || ymax <= MARGIN) {
     fprintf(stderr, "\nscale2d: strange xmax = %g or ymax = %g\n",
 	    xmax, ymax);
-    exit(0);
+    exit(1);
   }
 
   /* find the x and y scales that would make those dimensions dead on */
@@ -417,11 +409,8 @@ double scale, *offset;
 /*
   returns the center of a rectangular prism contianing all the face corners
 */
-double *getAvg(faces, numfaces, lines, numlines, flag)
-face **faces;
-line **lines;
-int numfaces, numlines;
-int flag;			/* ON => include axes */
+double *getAvg(face **faces, int numfaces, line **lines, int numlines, int flag)
+/* int flag;			ON => include axes */
 {
   double *avg, max[3], min[3];
   int i, j, k;
@@ -483,13 +472,10 @@ int flag;			/* ON => include axes */
   returns the radius of the smallest sphere with center at avg that
   encloses all the faces given in faces, all lines and axes, if required
 */
-double getSphere(avg, faces, numfaces, lines, numlines)
-face **faces;
-line **lines;
-double *avg;
-int numfaces, numlines;
+double getSphere(double *avg, face **faces, int numfaces, line **lines,
+    int numlines)
 {
-  double radius = 0.0, dot(), temp[3];
+  double radius = 0.0, temp[3];
   int i, j, k, l;
   extern int x_;
   extern double ***axes;
@@ -528,11 +514,11 @@ int numfaces, numlines;
   - also change axes lengths so that they are smaller than view distance
     (ie so they won't cross the view plane)
 */
-double getNormal(normal, radius, avg, view, distance)
-double *normal, radius, *avg, *view, distance;
+double getNormal(double *normal, double radius, double *avg, double *view,
+    double distance)
 {
   int i, k, j, axes_too_big, first;
-  double rhs, dot(), norm, anorm, max_anorm;
+  double rhs, norm, anorm, max_anorm;
   extern int x_;
   extern double ***axes;
 

@@ -1,0 +1,20 @@
+#! /bin/sh
+
+# Run the tests.  Have to copy down some needed things.  Run here to
+# avoid adding junk to the examples directory.
+
+cp ../*.qui .
+cp ../*.neu .
+cp ../*.lst .
+../ramgen.sh
+
+for a in *.lst; do
+    ../../bin/fastcap -l$a 2>&1 |tee `basename $a lst`out
+done
+
+for a in ../*.neu; do
+    ../../bin/fastcap $a 2>&1 |tee `basename $a neu`out
+done
+
+# Clean up, keep only the output.
+rm -f *.qui *.neu *.lst

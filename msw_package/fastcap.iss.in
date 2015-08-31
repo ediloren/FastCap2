@@ -1,0 +1,38 @@
+
+[Setup]
+
+AppName=FastCap
+AppVerName=FastCap-VERSION
+AppVersion=VERSION
+AppPublisher=Whiteley Research Inc.
+AppPublisherURL=http://www.wrcad.com
+
+OutputBaseFilename=fastcap-VERSION-setup
+
+Compression=lzma
+
+DefaultDirName=c:\usr\local
+DirExistsWarning=no
+
+PrivilegesRequired=admin
+
+UninstallFilesDir={app}\share\fastcap\uninstall
+UninstallDisplayIcon={app}\bin\fastcap.exe
+
+[Files]
+
+Source: "data\bin\*.exe"; DestDir: "{app}\bin"
+Source: "data\share\fastcap\examples\*"; DestDir: "{app}\share\fastcap\examples"
+Source: "data\share\fastcap\docs\*"; DestDir: "{app}\share\fastcap\docs"
+
+[code]
+
+function InitializeSetup(): Boolean;
+begin
+  Result := True;
+  if RegKeyExists(HKLM, 'SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\fastcap') then begin
+    MsgBox('There is an installed fastcap present from the old' #13 'install tool.  You must uninstall fastcap before proceeding.', mbInformation, MB_OK);
+    Result := False;
+  end;
+end;
+

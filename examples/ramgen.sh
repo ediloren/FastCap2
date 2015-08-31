@@ -6,7 +6,18 @@
 #  -d (no discretization)
 #  -nX (set number of panels per edge to at least X (default = 3))
 #
-set exe = ../bin
+
+# Make this script work in the examples directory, and sub-directories.
+if ( -d ../bin ) then
+    set exe = ../bin
+else if ( -d ../../bin ) then
+    set exe = ../../bin
+else
+    echo bin not found
+    exit
+endif
+endif
+
 set dest = .
 set cgen = ${exe}/cubegen
 set pgen = ${exe}/pipedgen

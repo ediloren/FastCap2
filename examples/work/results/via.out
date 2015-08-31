@@ -1,0 +1,59 @@
+placeq: Warning, removing identical quadrilateral panel
+  rmved ctr = (-0.4375 3.43333 1.2) surf = `via.neu' trans = (0 0 0)
+  saved ctr = (-0.4375 3.43333 1.2) surf = `via.neu' trans = (0 0 0)
+placeq: Warning, removing identical quadrilateral panel
+  rmved ctr = (-0.4375 3.3 1.2) surf = `via.neu' trans = (0 0 0)
+  saved ctr = (-0.4375 3.3 1.2) surf = `via.neu' trans = (0 0 0)
+placeq: Warning, removing identical quadrilateral panel
+  rmved ctr = (-0.4375 3.16667 1.2) surf = `via.neu' trans = (0 0 0)
+  saved ctr = (-0.4375 3.16667 1.2) surf = `via.neu' trans = (0 0 0)
+placeq: Warning, removing identical quadrilateral panel
+  rmved ctr = (-0.3125 3.43333 1.2) surf = `via.neu' trans = (0 0 0)
+  saved ctr = (-0.3125 3.43333 1.2) surf = `via.neu' trans = (0 0 0)
+placeq: Warning, removing identical quadrilateral panel
+  rmved ctr = (-0.3125 3.3 1.2) surf = `via.neu' trans = (0 0 0)
+  saved ctr = (-0.3125 3.3 1.2) surf = `via.neu' trans = (0 0 0)
+placeq: Warning, removing identical quadrilateral panel
+  rmved ctr = (-0.3125 3.16667 1.2) surf = `via.neu' trans = (0 0 0)
+  saved ctr = (-0.3125 3.16667 1.2) surf = `via.neu' trans = (0 0 0)
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../via.neu
+Surface ../via.neu has 6126 quads and 0 tris
+  Input surfaces:
+   GROUP1
+    via.neu, conductor
+      title: `VIA EXAMPLE'
+      outer permittivity: 1
+      number of panels: 6126
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 16:25:42 2014
+  Host: poe
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 5
+  Overall permittivity factor: 1
+  Total number of panels: 6120
+    Number of conductor panels: 6120
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 4
+Percentage of multiplies done by multipole: 96.1%
+
+ITERATION DATA
+Starting on column 1 (GROUND_PLANE%GROUP1)
+1 2 3 4 5 6 7 8 9 10 
+Starting on column 2 (POWER_PLANE%GROUP1)
+1 2 3 4 5 6 7 8 9 10 
+Starting on column 3 (SIGNAL_2%GROUP1)
+1 2 3 4 5 6 7 8 9 10 
+Starting on column 4 (SIGNAL_1%GROUP1)
+1 2 3 4 5 6 7 8 9 10 
+
+CAPACITANCE MATRIX, picofarads
+                              1          2          3          4 
+GROUND_PLANE%GROUP1 1      516.6     -157.2       -141     -140.8
+POWER_PLANE%GROUP1  2     -157.2      634.8     -210.4     -210.4
+SIGNAL_2%GROUP1     3       -141     -210.4      424.4     -24.94
+SIGNAL_1%GROUP1     4     -140.8     -210.4     -24.94      424.2

@@ -1,0 +1,100 @@
+#! /bin/sh
+
+program=fastcap
+version="2.0wr"
+
+# The inno packager exeutable.
+inno="/inno-5.5.1/iscc"
+
+topdir=data
+
+rm -rf $topdir
+mkdir $topdir
+
+bin=$topdir/bin
+share=$topdir/share
+lib=$share/fastcap
+docs=$lib/docs
+examples=$lib/examples
+
+srcbin=../bin
+srclib=..
+
+mkdir $bin
+mkdir $share
+mkdir $lib
+mkdir $docs
+mkdir $examples
+
+echo copying $srcbin
+install -sc -m 0755 -o Administrator -g None $srcbin/fastcap.exe $bin
+install -sc -m 0755 -o Administrator -g None $srcbin/busgen.exe $bin
+install -sc -m 0755 -o Administrator -g None $srcbin/capgen.exe $bin
+install -sc -m 0755 -o Administrator -g None $srcbin/cubegen.exe $bin
+install -sc -m 0755 -o Administrator -g None $srcbin/pipedgen.exe $bin
+install -sc -m 0755 -o Administrator -g None $srcbin/pyragen.exe $bin
+
+echo copying $srclib/examples
+cp $srclib/examples/1x1bus.lst $examples
+cp $srclib/examples/1x1coarse.neu $examples
+cp $srclib/examples/1x1fine.neu $examples
+cp $srclib/examples/1x1nonuni.neu $examples
+cp $srclib/examples/README $examples
+cp $srclib/examples/big_sphere1.neu $examples
+cp $srclib/examples/coated_sph.lst $examples
+cp $srclib/examples/cond_air_1x1.qui $examples
+cp $srclib/examples/cond_dielec_1x1.qui $examples
+cp $srclib/examples/connector2.sh $examples
+cp $srclib/examples/connector3.sh $examples
+cp $srclib/examples/connector4.sh $examples
+cp $srclib/examples/cubeeg.fig $examples
+cp $srclib/examples/dielec_face.neu $examples
+cp $srclib/examples/dielec_sides.neu $examples
+cp $srclib/examples/dielec_sides_2x2.neu $examples
+cp $srclib/examples/dielec_topbot.neu $examples
+cp $srclib/examples/pin $examples
+cp $srclib/examples/pipeeg.fig $examples
+cp $srclib/examples/ramcell.lst $examples
+cp $srclib/examples/ramcell.out $examples
+cp $srclib/examples/ramcell_bitl.neu $examples
+cp $srclib/examples/ramcell_botd.neu $examples
+cp $srclib/examples/ramcell_cond.neu $examples
+cp $srclib/examples/ramcell_gnd.neu $examples
+cp $srclib/examples/ramcell_test.neu $examples
+cp $srclib/examples/ramcell_topd.neu $examples
+cp $srclib/examples/ramgen.sh $examples
+cp $srclib/examples/sphere1.neu $examples
+cp $srclib/examples/sphere2.neu $examples
+cp $srclib/examples/sphere3.neu $examples
+cp $srclib/examples/testgen.sh $examples
+cp $srclib/examples/testrun.sh $examples
+cp $srclib/examples/via.neu $examples
+u2d $examples/*
+rm -f $examples/*~
+
+echo copying $srclib/doc
+cp $srclib/README $docs
+cp $srclib/README.mit $docs
+cp $srclib/doc/FastCapsuppl.pdf $docs
+cp $srclib/doc/mtt.ps $docs
+cp $srclib/doc/tcad.ps $docs
+cp $srclib/doc/ug.ps $docs
+u2d $docs/README
+u2d $docs/README.mit
+rm -f $docs/*~
+
+echo Completed copying files to data directory
+
+sed -e s/VERSION/$version/ < $program.iss.in > $program.iss
+u2d $program.iss
+
+$inno $program.iss > build.log
+if [ $? != 0 ]; then
+    echo Compile failed!
+    exit 1
+fi
+
+mv Output/*.exe .
+rmdir Output
+echo Done
+

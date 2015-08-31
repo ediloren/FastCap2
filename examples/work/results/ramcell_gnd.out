@@ -1,0 +1,33 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../ramcell_gnd.neu
+Surface ../ramcell_gnd.neu has 16 quads and 276 tris
+  Input surfaces:
+   GROUP1
+    ramcell_gnd.neu, conductor
+      title: `RAM CELL, GROUND PLANE PIT'
+      outer permittivity: 1
+      number of panels: 292
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 16:25:42 2014
+  Host: poe
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 292
+    Number of conductor panels: 292
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 3 (lowest)
+Percentage of multiplies done by multipole: 58.3%
+
+ITERATION DATA
+Starting on column 1 (GND_PLANE%GROUP1)
+1 2 3 
+
+CAPACITANCE MATRIX, nanofarads
+                           1 
+GND_PLANE%GROUP1 1      0.146

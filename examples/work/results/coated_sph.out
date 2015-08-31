@@ -1,0 +1,41 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: coated_sph.lst
+Surface sphere2.neu has 0 quads and 768 tris
+Surface big_sphere1.neu has 0 quads and 432 tris
+  Input surfaces:
+   GROUP1
+    sphere2.neu, conductor
+      title: `SPHERE, RADIUS 1, ELEM LEN = 0.2'
+      outer permittivity: 2
+      number of panels: 768
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+   GROUP2
+    big_sphere1.neu, dielectric interface
+      title: `SPHERE, RADIUS 2, ELEM LEN = 0.5'
+      permittivities: 2 (inner) 1 (outer)
+      number of panels: 432
+      number of extra evaluation points: 864
+      translation: (0 0 0)
+  Date: Wed Jan  8 16:25:34 2014
+  Host: poe
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 4
+  Overall permittivity factor: 1
+  Total number of panels: 1200
+    Number of conductor panels: 768
+    Number of dielectric interface panels: 432
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 4 (lowest)
+Percentage of multiplies done by multipole: 90.7%
+
+ITERATION DATA
+Starting on column 1 (SPHERE%GROUP1)
+1 2 3 
+
+CAPACITANCE MATRIX, nanofarads
+                        1 
+SPHERE%GROUP1 1     0.1484

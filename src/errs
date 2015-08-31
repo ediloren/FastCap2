@@ -1,0 +1,43 @@
+cc -O -DOTHER   -c -o mulGlobal.o mulGlobal.c
+cc -O -DOTHER   -c -o mulSetup.o mulSetup.c
+cc -O -DOTHER   -c -o mulMats.o mulMats.c
+cc -O -DOTHER   -c -o mulDo.o mulDo.c
+cc -O -DOTHER   -c -o mulDisplay.o mulDisplay.c
+cc -O -DOTHER   -c -o mulMulti.o mulMulti.c
+cc -O -DOTHER   -c -o mulLocal.o mulLocal.c
+cc -O -DOTHER   -c -o direct.o direct.c
+cc -O -DOTHER   -c -o calcp.o calcp.c
+cc -O -DOTHER   -c -o fastcap.o fastcap.c
+cc -O -DOTHER   -c -o blkDirect.o blkDirect.c
+cc -O -DOTHER   -c -o uglyalloc.o uglyalloc.c
+cc -O -DOTHER   -c -o patran.o patran.c
+cc -O -DOTHER   -c -o quickif.o quickif.c
+cc -O -DOTHER   -c -o electric.o electric.c
+cc -O -DOTHER   -c -o input.o input.c
+cc -O -DOTHER   -c -o psMatDisplay.o psMatDisplay.c
+cc -O -DOTHER   -c -o capsolve.o capsolve.c
+cc -O -DOTHER   -c -o savemat_mod.o savemat_mod.c
+cc -O -DOTHER   -c -o zbufInOut.o zbufInOut.c
+cc -O -DOTHER   -c -o zbuf2fastcap.o zbuf2fastcap.c
+cc -O -DOTHER   -c -o zbufProj.o zbufProj.c
+cc -O -DOTHER   -c -o zbufSort.o zbufSort.c
+cc -o temp.out -O -DOTHER ./mulGlobal.o ./mulSetup.o ./mulMats.o ./mulDo.o ./mulDisplay.o ./mulMulti.o ./mulLocal.o ./direct.o ./calcp.o ./fastcap.o ./blkDirect.o ./uglyalloc.o ./patran.o ./quickif.o ./electric.o ./input.o ./psMatDisplay.o ./capsolve.o ./savemat_mod.o ./zbufInOut.o ./zbuf2fastcap.o ./zbufProj.o ./zbufSort.o -lm
+mv temp.out ../bin/fastcap
+cc -O -DOTHER   -c -o busgen.o busgen.c
+cc -O -DOTHER   -c -o disrect.o disrect.c
+cc -O -DOTHER   -c -o epsilon.o epsilon.c
+cc -o temp.out -O -DOTHER ./busgen.o ./disrect.o ./epsilon.o -lm
+mv temp.out ../bin/busgen
+cc -O -DOTHER   -c -o pltcapgen.o pltcapgen.c
+cc -o temp.out -O -DOTHER ./pltcapgen.o ./disrect.o ./epsilon.o -lm
+mv temp.out ../bin/capgen
+cc -O -DOTHER   -c -o cubegen.o cubegen.c
+cc -o temp.out -O -DOTHER ./cubegen.o ./disrect.o ./epsilon.o -lm
+mv temp.out ../bin/cubegen
+cc -O -DOTHER   -c -o teragen.o teragen.c
+cc -O -DOTHER   -c -o distri.o distri.c
+cc -o temp.out -O -DOTHER ./teragen.o ./disrect.o ./distri.o ./epsilon.o -lm
+mv temp.out ../bin/pyragen
+cc -O -DOTHER   -c -o pipedgen.o pipedgen.c
+cc -o temp.out -O -DOTHER ./pipedgen.o ./disrect.o ./epsilon.o -lm
+mv temp.out ../bin/pipedgen

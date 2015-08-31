@@ -1,36 +1,35 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
@@ -45,12 +44,27 @@ double *Beta, *Betam;		/* beta and beta*m array */
 double *tleg;		/* Temporary Legendre storage. */
 double **factFac;		/* factorial factor array: (n-m+1)...(n+m) */
 
+/* SRW */
+int multerms(int);
+int costerms(int);
+int sinterms(int);
+void xyz2sphere(double, double, double, double, double, double, double*,
+    double*, double*);
+double iPwr(int);
+double fact(int);
+void evalFactFac(double**, int);
+void mulMultiAlloc(int, int, int);
+void evalLegendre(double, double*, int);
+double **mulQ2Multi(charge**, int*, int, double, double, double, int);
+double **mulMulti2Multi(double, double, double, double, double, double, int);
+double **mulMulti2P(double, double, double, charge**, int, int);
+
+
 /* 
    Used various places.  Returns number of coefficients in the multipole 
    expansion. 
 */
-int multerms(order)
-int order;
+int multerms(int order)
 {
   return(costerms(order) + sinterms(order));
 }
@@ -58,8 +72,7 @@ int order;
 /*
   returns number of cos(m*phi)-weighted terms in the real (not cmpx) multi exp
 */
-int costerms(order)
-int order;
+int costerms(int order)
 {
   return(((order + 1) * (order + 2)) / 2);
 }
@@ -67,8 +80,7 @@ int order;
 /*
   returns number of sin(m*phi)-weighted terms in the real (not cmpx) multi exp
 */
-int sinterms(order)
-int order;
+int sinterms(int order)
 {
   return((((order + 1) * (order + 2)) / 2) - (order+1));
 }
@@ -77,8 +89,8 @@ int order;
 /*
   takes two sets of cartesian absolute coordinates; finds rel. spherical coor.
 */
-void xyz2sphere(x, y, z, x0, y0, z0, rho, cosA, beta)
-double x, y, z, x0, y0, z0, *rho, *cosA, *beta;
+void xyz2sphere(double x, double y, double z, double x0, double y0, double z0,
+    double *rho, double *cosA, double *beta)
 {
   /* get relative coordinates */
   x -= x0;			/* "0" coordinates play the role of origin */
@@ -105,16 +117,15 @@ double x, y, z, x0, y0, z0, *rho, *cosA, *beta;
 
 #if TRUE == FALSE
 
-int index(n, m)
-int n, m;
+int index(int n, int m)
 {
   if(m > n) {
     fprintf(stderr, "index: m = %d > n = %d\n", m, n);
-    exit(0);
+    exit(1);
   }
   if(n < 0 || m < 0) {
     fprintf(stderr, "index: n = %d or m = %d negative\n", n, m);
-    exit(0);
+    exit(1);
   }
   return(m + (n*(n+1))/2);
 }
@@ -126,20 +137,20 @@ int n, m;
   assumed entry order: (n,m) = (1,1) (2,1) (2,2) (3,1) (3,2) (3,3) (4,1)...
 */
 /* REPLACED BY MACRO SINDEX(N, M, CTERMS) 24July91 */
-int sindex(n, m, cterms)
-int n, m, cterms;		/* cterms is costerms(order) */
+int sindex(int n, int m, int cterms)
+/* int n, m, cterms;		cterms is costerms(order) */
 {
   if(m > n) {
     fprintf(stderr, "sindex: m = %d > n = %d\n", m, n);
-    exit(0);
+    exit(1);
   }
   if(n < 0 || m < 0) {
     fprintf(stderr, "sindex: n = %d or m = %d negative\n", n, m);
-    exit(0);
+    exit(1);
   }
   if(m == 0) {
     fprintf(stderr, "sindex: attempt to index M%d^0\n", n);
-    exit(0);
+    exit(1);
   }
   return(cterms + m + (n*(n+1))/2 - (n+1));
 }
@@ -149,13 +160,13 @@ int n, m, cterms;		/* cterms is costerms(order) */
 /*
   returns i = sqrt(-1) to the power of the argument
 */
-double iPwr(e)
-int e;				/* exponent, computes i^e */
+double iPwr(int e)
+/* int e;				exponent, computes i^e */
 {
   if(e == 0) return(1.0);
   if(e % 2 != 0) {
     fprintf(stderr, "iPwr: odd exponent %d\n", e);
-    exit(0);
+    exit(1);
   }
   else {
     e = e/2;			/* get power of negative 1 */
@@ -167,14 +178,13 @@ int e;				/* exponent, computes i^e */
 /*
   returns factorial of the argument (x!)
 */
-double fact(x)
-int x;
+double fact(int x)
 {
   double ret = 1.0;
   if(x == 0 || x == 1) return(1.0);
   else if(x < 0) {
     fprintf(stderr, "fact: attempt to take factorial of neg no. %d\n", x);
-    exit(0);
+    exit(1);
   }
   else {
     while(x > 1) {
@@ -188,9 +198,7 @@ int x;
 /*
   produces factorial factor array for mulMulti2P
 */
-void evalFactFac(array, order)
-int order;
-double **array;
+void evalFactFac(double **array, int order)
 {
   int n, m;			/* array[n][m] = (m+n)!/(n-m)! */
 
@@ -216,8 +224,7 @@ double **array;
 /*
   Allocates space for temporary vectors.
 */
-void mulMultiAlloc(maxchgs, order, depth)
-int maxchgs, order, depth;
+void mulMultiAlloc(int maxchgs, int order, int depth)
 {
   int x;
 
@@ -298,9 +305,7 @@ int maxchgs, order, depth;
   n and m have maximum value order
   vector entries correspond to (n,m) = (0,0) (1,0) (1,1) (2,0) (2,1)...
 */
-void evalLegendre(cosA, vector, order)
-double cosA, *vector;
-int order;
+void evalLegendre(double cosA, double *vector, int order)
 {
   int x;
   int n, m;			/* as in Pn^m, both <= order */
@@ -348,10 +353,8 @@ int order;
   Returns a matrix which gives a cube's multipole expansion when *'d by chg vec
   OPTIMIZATIONS USING is_dummy HAVE NOT BEEN COMPLETELY IMPLEMENTED
 */
-double **mulQ2Multi(chgs, is_dummy, numchgs, x, y, z, order)
-double x, y, z; 
-charge **chgs;
-int numchgs, order, *is_dummy;
+double **mulQ2Multi(charge **chgs, int *is_dummy, int numchgs, double x,
+    double y, double z, int order)
 {
   double **mat;
   double cosA;			/* cosine of elevation coordinate */
@@ -441,12 +444,11 @@ int numchgs, order, *is_dummy;
   return(mat);
 }
 
-double **mulMulti2Multi(x, y, z, xp, yp, zp, order)
-double x, y, z, xp, yp, zp;	/* cube center, parent cube center */
-int order;
+double **mulMulti2Multi(double x, double y, double z, double xp, double yp,
+    double zp, int order)
+/* double x, y, z, xp, yp, zp;	cube center, parent cube center */
 {
   double **mat, rho, rhoPwr, cosA, beta, mBeta, temp1, temp2; 
-  double iPwr(), fact();
   int r, j, k, m, n, c;
   int cterms = costerms(order), sterms = sinterms(order);
   int terms = cterms + sterms;
@@ -545,10 +547,9 @@ int order;
 /* 
   builds multipole evaluation matrix; used only for fake downward pass 
 */
-double **mulMulti2P(x, y, z, chgs, numchgs, order)
-double x, y, z;			/* multipole expansion origin */
-charge **chgs;
-int numchgs, order;
+double **mulMulti2P(double x, double y, double z, charge **chgs, int numchgs,
+    int order)
+/* double x, y, z;			multipole expansion origin */
 {
   double **mat;
   double cosTh;			/* cosine of elevation coordinate */

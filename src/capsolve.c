@@ -1,47 +1,57 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
+#include "zbufGlobal.h"
+
+/* SRW */
+int capsolve(double***, ssystem*, charge*, int, int, int, Name*);
+int oldgcr(ssystem*, double*, double*, double*, double*, double**, double**,
+    int, int, int, double, charge*);
+void oldcomputePsi(ssystem*, charge*);
+int gcr(ssystem*, double*, double*, double*, double*, double**, double**,
+    int, int, double, charge*);
+int gmres(ssystem*, double*, double*, double*, double*, double**, double**,
+    int, int, double, charge*);
+void computePsi(ssystem*, double*, double*, int, charge*);
+
 
 /* This routine takes the cube data struct and computes capacitances. */
-int capsolve(capmat, sys, chglist, size, real_size, numconds, name_list)
-double ***capmat;		/* pointer to capacitance matrix */
-ssystem *sys;
-charge *chglist;
-Name *name_list;
-int size, numconds, real_size;	/* real_size = total #panels, incl dummies */
+int capsolve(double ***capmat, ssystem *sys, charge *chglist, int size,
+    int real_size, int numconds, Name *name_list)
+/* double ***capmat;		pointer to capacitance matrix */
+/* int size, numconds, real_size;	real_size = total #panels, incl dummies */
 {
   int i, cond, iter, maxiter = MAXITER, ttliter = 0;
   charge *nq;
@@ -50,7 +60,6 @@ int size, numconds, real_size;	/* real_size = total #panels, incl dummies */
   extern double fullsoltime;
   surface *surf;
   extern ITER *kill_num_list, *kinp_num_list;
-  char *getConductorName();
   extern double iter_tol;
 
 #if CAPVEW == ON
@@ -98,7 +107,10 @@ int size, numconds, real_size;	/* real_size = total #panels, incl dummies */
     
     /* skip conductors in the -rs and the -ri kill list */
     if(want_this_iter(kill_num_list, cond)
-       || want_this_iter(kinp_num_list)) continue;
+/* SRW -- error
+       || want_this_iter(kinp_num_list)) continue; */
+       || want_this_iter(kinp_num_list, cond)) continue;
+/* end fix */
 
     fprintf(stdout, "\nStarting on column %d (%s)\n", cond, 
 	    getConductorName(cond, &name_list));
@@ -134,13 +146,13 @@ int size, numconds, real_size;	/* real_size = total #panels, incl dummies */
     if((iter = gmres(sys,q,p,r,ap,bp,bap,size,maxiter,iter_tol,chglist)) 
        > maxiter) {
       fprintf(stderr, "NONCONVERGENCE AFTER %d ITERATIONS\n", maxiter);
-      exit(0);
+      exit(1);
     }
 #else
     if((iter = gcr(sys,q,p,r,ap,bp,bap,size,maxiter,iter_tol,chglist)) 
        > maxiter) {
       fprintf(stderr, "NONCONVERGENCE AFTER %d ITERATIONS\n", maxiter);
-      exit(0);
+      exit(1);
     }
 #endif				/* ITRTYP == GMRES */
     ttliter += iter;
@@ -194,12 +206,9 @@ int size, numconds, real_size;	/* real_size = total #panels, incl dummies */
 /* 
 Unpreconditioned Generalized Conjugate Residuals.
 */
-int oldgcr(sys, q, p, r, ap, bp, bap, size, real_size, maxiter, tol, chglist)
-ssystem *sys;
-double *q, *p, *ap, *r, tol;
-double **bp, **bap;
-charge *chglist;
-int size, maxiter, real_size;
+int oldgcr(ssystem *sys, double *q, double *p, double *r, double *ap,
+    double **bp, double **bap, int size, int real_size, int maxiter,
+    double tol, charge *chglist)
 {
   int iter, i, j;
   double norm, beta, alpha, maxnorm;
@@ -236,7 +245,10 @@ int size, maxiter, real_size;
     blkExpandVector(ap+1, size, real_size);
     blkExpandVector(r+1, size, real_size);
 #else
-    computePsi(sys, chglist);
+/* SRW -- error
+    computePsi(sys, chglist); */
+    oldcomputePsi(sys, chglist);
+/* end fix */
 #endif
 
     starttimer;
@@ -305,9 +317,7 @@ set up and that the potential vector has been zeroed.  ARBITRARY
 VECTORS CAN NOT BE USED!
 */
 /* ultimately should not need to pass in chglist after E field rtn is fixed */
-oldcomputePsi(sys, chglist)
-ssystem *sys;
-charge *chglist;
+void oldcomputePsi(ssystem *sys, charge *chglist)
 {
   extern double dirtime, uptime, downtime, evaltime;
 
@@ -357,7 +367,7 @@ charge *chglist;
 #if OPCNT == ON
   fprintf(stderr, "compile option OPCNT not implemented\n");
   printops();
-  exit(0);
+  exit(1);
 #endif
 }
 
@@ -366,12 +376,9 @@ charge *chglist;
 /* 
 Preconditioned(possibly) Generalized Conjugate Residuals.
 */
-int gcr(sys, q, p, r, ap, bp, bap, size, maxiter, tol, chglist)
-ssystem *sys;
-double *q, *p, *ap, *r, tol;
-double **bp, **bap;
-int size, maxiter;
-charge *chglist;
+int gcr(ssystem *sys, double *q, double *p, double *r, double *ap,
+    double **bp, double **bap, int size, int maxiter, double tol,
+    charge *chglist)
 {
   int iter, i, j;
   double norm, beta, alpha, maxnorm;
@@ -469,12 +476,9 @@ charge *chglist;
 /* 
   Preconditioned(possibly) Generalized Minimum Residual. 
   */
-int gmres(sys, q, p, r, ap, bv, bh, size, maxiter, tol, chglist)
-ssystem *sys;
-double *q, *p, *ap, *r, tol;
-double **bv, **bh;
-int size, maxiter;
-charge *chglist;
+int gmres(ssystem *sys, double *q, double *p, double *r, double *ap,
+    double **bv, double **bh, int size, int maxiter, double tol,
+    charge *chglist)
 {
   int iter, i, j;
   double rnorm, norm, maxnorm=10.0;
@@ -641,11 +645,7 @@ charge and potential have already been set up and that the potential
 vector has been zeroed.  ARBITRARY VECTORS CAN NOT BE USED.
 */
 
-computePsi(sys, q, p, size, chglist)
-ssystem *sys;
-double *q, *p;
-int size;
-charge *chglist;
+void computePsi(ssystem *sys, double *q, double *p, int size, charge *chglist)
 {
   extern double dirtime, uptime, downtime, evaltime, prectime;
   extern int real_size;

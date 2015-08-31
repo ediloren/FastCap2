@@ -1,47 +1,58 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
 #include "quickif.h"
+#include <ctype.h>
+
+/* SRW */
+int alias_match(Name*, char*);
+int alias_match_name(Name*, char*);
+void add_to_alias(Name*, char*);
+char *last_alias(Name*);
+int getConductorNum(char*, Name**, int*);
+int getConductorNumNoAdd(char*, Name*);
+char *getConductorName(int, Name**);
+int oldrenameConductor(char*, char*, Name**, int*);
+int renameConductor(char*, char*, Name**, int*);
+charge *quickif(FILE*, char*, char*, int, double*, int*, Name**, char*);
+
 
 /*
   tells if any conductor name alias matches a string
 */
-int alias_match(cur_name, name)
-char *name;
-Name *cur_name;
+int alias_match(Name *cur_name, char *name)
 {
   Name *cur_alias;
 
@@ -55,9 +66,7 @@ Name *cur_name;
 /*
   tells if any conductor name alias matches a string only up to length(name)
 */
-int alias_match_name(cur_name, name)
-char *name;
-Name *cur_name;
+int alias_match_name(Name *cur_name, char *name)
 {
   Name *cur_alias;
   char name_frag[BUFSIZ];
@@ -77,9 +86,7 @@ Name *cur_name;
 /*
   adds an alias 
 */
-void add_to_alias(cur_name, new_name)
-Name *cur_name;
-char *new_name;
+void add_to_alias(Name *cur_name, char *new_name)
 {
   Name *last_alias = NULL, *cur_alias;
 
@@ -103,8 +110,7 @@ char *new_name;
 /*
   return pointer to last alias string (= current name for conductor)
 */
-char *last_alias(cur_name)
-Name *cur_name;
+char *last_alias(Name *cur_name)
 {
   Name *cur_alias, *last_alias;
 
@@ -121,13 +127,10 @@ Name *cur_name;
 /*
   manages the conductor name list
 */
-int getConductorNum(name, name_list, num_cond)
-char *name;
-Name **name_list;
-int *num_cond;
+int getConductorNum(char *name, Name **name_list, int *num_cond)
 {
   Name *cur_name, *prev_name;
-  int i, alias_match();
+  int i;
 
   /* if this is the very first name, make and load struct on *name_list */
   if(*num_cond == 0) {
@@ -163,12 +166,10 @@ int *num_cond;
   - returns NOTFND if name not found
   - name must have group name appended
 */
-int getConductorNumNoAdd(name, name_list)
-char *name;
-Name *name_list;
+int getConductorNumNoAdd(char *name, Name *name_list)
 {
   Name *cur_name, *prev_name;
-  int i, alias_match();
+  int i;
 
   /* check to see if name is present */
   for(cur_name = name_list, i = 1; cur_name != NULL;
@@ -184,12 +185,9 @@ Name *name_list;
 /*
   gets the name (aliases are ignored) corresponding to a conductor number
 */
-char *getConductorName(cond_num, name_list)
-Name **name_list;
-int cond_num;
+char *getConductorName(int cond_num, Name **name_list)
 {
   Name *cur_name;
-  char *last_alias();
   int i;
 
   /* check to see if conductor number is present */
@@ -207,10 +205,8 @@ int cond_num;
 /*
   renames a conductor
 */
-int oldrenameConductor(old_name, new_name, name_list, num_cond)
-char *old_name, *new_name;
-int *num_cond;
-Name **name_list;
+int oldrenameConductor(char *old_name, char *new_name, Name **name_list,
+    int *num_cond)
 {
   Name *cur_name, *cur_name2, *prev_name;
   int i, j;
@@ -248,13 +244,10 @@ Name **name_list;
 /*
   renames a conductor
 */
-int renameConductor(old_name, new_name, name_list, num_cond)
-char *old_name, *new_name;
-int *num_cond;
-Name **name_list;
+int renameConductor(char *old_name, char *new_name, Name **name_list,
+    int *num_cond)
 {
   Name *cur_name, *cur_name2, *prev_name;
-  int alias_match();
   int i, j;
 
   /* check to see if old name is present in names or their aliases */
@@ -284,16 +277,14 @@ Name **name_list;
   N <cond name string> <Rename string>
   * <Comment string>
 */
-charge *quickif(fp, line, title, surf_type, trans, num_cond, name_list,
-		name_suffix)
-int surf_type, *num_cond;
-char *line, *title, *name_suffix; /* suffix for all cond names read */
-double *trans;
-Name *name_list;		/* name list pointer */
-FILE *fp;
+/* SRW -- error fixed here: Name* -> Name** */
+charge *quickif(FILE *fp, char *line, char *title, int surf_type,
+    double *trans, int *num_cond, Name **name_list, char *name_suffix)
+/* char *line, *title, *name_suffix; suffix for all cond names read */
+/* Name *name_list;		name list pointer */
 {
   int linecnt = 2, i, cond;
-  char *delcr(), temp[BUFSIZ], temp2[BUFSIZ], line1[BUFSIZ], *cp, *strtok();
+  char temp[BUFSIZ], temp2[BUFSIZ], line1[BUFSIZ], *cp;
   char condstr[BUFSIZ];
   double x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4;
   quadl *fstquad = NULL, *curquad;
@@ -316,7 +307,7 @@ FILE *fp;
 	 != 14) {
 	fprintf(stderr, "quickif: bad quad format, line %d:\n%s\n", 
 		linecnt, line1);
-	exit(0);
+	exit(1);
       }
 
       /* add suffix */
@@ -357,7 +348,7 @@ FILE *fp;
 	 != 11) {
 	fprintf(stderr, "quickif: bad tri format, line %d:\n%s\n", 
 		linecnt, line1);
-	exit(0);
+	exit(1);
       }
 
       /* allocate tri struct */
@@ -376,7 +367,8 @@ FILE *fp;
       /* load tri struct */
       if(surf_type == CONDTR || surf_type == BOTH)
 	  curtri->cond = getConductorNum(condstr, name_list, num_cond);
-      else curquad->cond = 0;
+/* SRW -- Fixed bug here.      else curquad->cond = 0; */
+      else curtri->cond = 0;
       curtri->x1 = x1 + trans[0];
       curtri->x2 = x2 + trans[0];
       curtri->x3 = x3 + trans[0];
@@ -393,7 +385,7 @@ FILE *fp;
       if(sscanf(line1, "%s %s %s", temp, condstr, temp2) != 3) {
 	fprintf(stderr, "quickif: bad rename format, line %d:\n%s\n", 
 		linecnt, line1);
-	exit(0);
+	exit(1);
       }
 
       if(surf_type != DIELEC) {
@@ -404,18 +396,30 @@ FILE *fp;
 	strcat(condstr, name_suffix);
 	strcat(temp2, name_suffix);
 
-	if(renameConductor(condstr, temp2, name_list, num_cond) == FALSE) 
-	    exit(0);
+	if(renameConductor(condstr, temp2, name_list, num_cond) == FALSE)
+	    exit(1);
       }
 
       linecnt++;
     }
     else if(line1[0] == '%' || line1[0] == '*' ||
 	    line1[0] == '#') linecnt++; /* ignore comments */
+#if SINGLE_FILE_INPUT == ON
+    else if (line1[0] == 'E' || line1[0] == 'e')
+        break;
+#endif
     else {
-      fprintf(stderr, "quickif: bad line format, line %d:\n%s\n", 
+      /* SRW -- Added this test to allow blank lines. */
+      char *s = line;
+      while (isspace(*s))
+        s++;
+      if (!*s)
+        linecnt++;
+      else {
+        fprintf(stderr, "quickif: bad line format, line %d:\n%s\n", 
 		linecnt, line1);
-      exit(0);
+        exit(1);
+      }
     }
   }
 	

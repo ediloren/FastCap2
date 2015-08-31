@@ -1,0 +1,56 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../ramcell_test.neu
+Surface ../ramcell_test.neu has 722 quads and 282 tris
+  Input surfaces:
+   GROUP1
+    ramcell_test.neu, conductor
+      title: `RAM CELL TEST'
+      outer permittivity: 1
+      number of panels: 1004
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 16:25:42 2014
+  Host: poe
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 5
+  Overall permittivity factor: 1
+  Total number of panels: 1004
+    Number of conductor panels: 1004
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 6
+Percentage of multiplies done by multipole: 64.7%
+
+ITERATION DATA
+Starting on column 1 (BIT_LINE%GROUP1)
+1 2 3 4 5 
+Starting on column 2 (GND_PLANE%GROUP1)
+1 2 3 4 5 6 
+Starting on column 3 (SINI_TOP%GROUP1)
+1 2 3 4 5 
+Starting on column 4 (SINI_BR%GROUP1)
+1 2 3 4 5 
+Starting on column 5 (SINI_BC%GROUP1)
+1 2 3 4 5 
+Starting on column 6 (SINI_BL%GROUP1)
+1 2 3 4 5 
+mksCapDump: Warning - capacitance matrix is not strictly diagonally dominant
+  due to row 1
+
+mksCapDump: Warning - capacitance matrix is not strictly diagonally dominant
+  due to row 4
+
+mksCapDump: Warning - capacitance matrix is not strictly diagonally dominant
+  due to row 5
+
+
+CAPACITANCE MATRIX, picofarads
+                           1          2          3          4          5          6 
+BIT_LINE%GROUP1  1      291.8     -139.7     -8.245     -139.4     -4.894    -0.1424
+GND_PLANE%GROUP1 2     -139.7       2094     -204.4     -61.78     -62.51     -74.49
+SINI_TOP%GROUP1  3     -8.245     -204.4      588.8       -174     -70.87     -121.1
+SINI_BR%GROUP1   4     -139.4     -61.78       -174      385.1     -11.22    -0.4082
+SINI_BC%GROUP1   5     -4.894     -62.51     -70.87     -11.22      162.8     -14.48
+SINI_BL%GROUP1   6    -0.1424     -74.49     -121.1    -0.4082     -14.48      212.4

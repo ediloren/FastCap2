@@ -82,28 +82,22 @@ default:
 	@echo "  all - all of the above"
 
 fastcap: $(OBJS)
-	$(CC) -o temp.out $(CFLAGS) $(OBJS) $(LIBS)
-	mv temp.out $(BIN)/fastcap
+	$(CC) -o $(BIN)/fastcap $(CFLAGS) $(OBJS) $(LIBS)
 
 busgen: $(OBJSB)
-	$(CC) -o temp.out $(CFLAGS) $(OBJSB) $(LIBS)
-	mv temp.out $(BIN)/busgen
+	$(CC) -o $(BIN)/busgen $(CFLAGS) $(OBJSB) $(LIBS)
 
 capgen: $(OBJSP)
-	$(CC) -o temp.out $(CFLAGS) $(OBJSP) $(LIBS)
-	mv temp.out $(BIN)/capgen
+	$(CC) -o $(BIN)/capgen $(CFLAGS) $(OBJSP) $(LIBS)
 
 cubegen: $(OBJSC)
-	$(CC) -o temp.out $(CFLAGS) $(OBJSC) $(LIBS)
-	mv temp.out $(BIN)/cubegen
+	$(CC) -o $(BIN)/cubegen $(CFLAGS) $(OBJSC) $(LIBS)
 
 pyragen: $(OBJST)
-	$(CC) -o temp.out $(CFLAGS) $(OBJST) $(LIBS)
-	mv temp.out $(BIN)/pyragen
+	$(CC) -o $(BIN)/pyragen $(CFLAGS) $(OBJST) $(LIBS)
 
 pipedgen: $(OBJSI)
-	$(CC) -o temp.out $(CFLAGS) $(OBJSI) $(LIBS)
-	mv temp.out $(BIN)/pipedgen
+	$(CC) -o $(BIN)/pipedgen $(CFLAGS) $(OBJSI) $(LIBS)
 
 all : fastcap busgen capgen cubegen pyragen pipedgen
 

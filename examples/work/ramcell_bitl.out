@@ -1,0 +1,33 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../ramcell_bitl.neu
+Surface ../ramcell_bitl.neu has 82 quads and 150 tris
+  Input surfaces:
+   GROUP1
+    ramcell_bitl.neu, conductor
+      title: `RAM CELL, BIT LINE CONDUCTOR'
+      outer permittivity: 1
+      number of panels: 232
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 17:43:00 2014
+  Host: frost
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 232
+    Number of conductor panels: 232
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 3 (lowest)
+Percentage of multiplies done by multipole: 22.5%
+
+ITERATION DATA
+Starting on column 1 (BIT_LINE%GROUP1)
+1 2 3 
+
+CAPACITANCE MATRIX, nanofarads
+                          1 
+BIT_LINE%GROUP1 1     0.1189

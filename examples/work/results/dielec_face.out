@@ -1,0 +1,35 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../dielec_face.neu
+Surface ../dielec_face.neu has 38 quads and 0 tris
+  Input surfaces:
+   GROUP1
+    dielec_face.neu, conductor
+      title: `DIELECTRIC, FACE, ELEM LEN = 0.25'
+      outer permittivity: 1
+      number of panels: 38
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 16:25:41 2014
+  Host: poe
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 38
+    Number of conductor panels: 38
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 3 (lowest)
+No expansions at level 2
+Percentage of multiplies done by multipole: 0%
+Warning: no multipole acceleration
+
+ITERATION DATA
+Starting on column 1 (FACE%GROUP1)
+1 2 
+
+CAPACITANCE MATRIX, picofarads
+                      1 
+FACE%GROUP1 1      49.87

@@ -1,48 +1,56 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
 
-double **Q2PDiag(chgs, numchgs, is_dummy, calc)
-charge **chgs;
-int numchgs, *is_dummy;
-int calc;
+/* SRW */
+double **Q2PDiag(charge**, int, int*, int);
+double **Q2P(charge**, int, int*, charge**, int, int);
+double **Q2Pfull(cube*, int);
+double **ludecomp(double**, int, int);
+void solve(double**, double*, double*, int);
+void invert(double**, int, int*);
+int compressMat(double**, int, int*, int);
+void expandMat(double**, int, int, int*, int);
+void matcheck(double**, int, int);
+void matlabDump(double**, int, char*);
+
+
+double **Q2PDiag(charge **chgs, int numchgs, int *is_dummy, int calc)
 {
   double **mat;
   int i, j;
-  double calcp();
 
   /* Allocate storage for the potential coefficients. */
   CALLOC(mat, numchgs, double*, ON, AQ2PD);
@@ -77,15 +85,11 @@ int calc;
   return(mat);
 }
 
-double **Q2P(qchgs, numqchgs, is_dummy, pchgs, numpchgs, calc)
-charge **qchgs, **pchgs;
-int numqchgs, numpchgs;
-int *is_dummy;
-int calc;
+double **Q2P(charge **qchgs, int numqchgs, int *is_dummy, charge **pchgs,
+    int numpchgs, int calc)
 {
   double **mat;
   int i, j;
-  double calcp();
 
   /* Allocate storage for the potential coefficients. P rows by Q cols. */
   CALLOC(mat, numpchgs, double*, ON, AQ2P);
@@ -119,12 +123,10 @@ int calc;
   used only in conjunction with DMPMAT == ON  and DIRSOL == ON
   to make 1st directlist mat = full P mat
 */
-double **Q2Pfull(directlist, numchgs)
-int numchgs;
-cube *directlist;
+double **Q2Pfull(cube *directlist, int numchgs)
 {
   int i, j, fromp, fromq, top, toq;
-  double **mat, calcp();
+  double **mat;
   cube *pq, *pp;
   charge **pchgs, **qchgs, *eval;
 
@@ -159,10 +161,7 @@ cube *directlist;
   - returned matrix has L below the diagonal, U above (GVL1 pg 58)
   - if allocate == TRUE ends up storing P and LU (could be a lot)
 */
-double **ludecomp(matin, size, allocate)
-double **matin;
-int size;
-int allocate;
+double **ludecomp(double **matin, int size, int allocate)
 {
   extern int fulldirops;
   double factor, **mat;
@@ -181,7 +180,7 @@ int allocate;
   for(k = 0; k < size-1; k++) {	/* loop on rows */
     if(mat[k][k] == 0.0) {
       fprintf(stderr, "ludecomp: zero piovt\n");
-      exit(0);
+      exit(1);
     }
     for(i = k+1; i < size; i++) { /* loop on remaining rows */
       factor = (mat[i][k] /= mat[k][k]);
@@ -198,9 +197,7 @@ int allocate;
 /*
   For direct solution of Pq = psi, used if DIRSOL == ON or if preconditioning.
 */
-void solve(mat, x, b, size)
-double **mat, *x, *b;
-int size;
+void solve(double **mat, double *x, double *b, int size)
 {
   extern int fulldirops;
   int i, j;
@@ -231,9 +228,7 @@ int size;
   In-place inverts a matrix using guass-jordan.
   - is_dummy[i] = 0 => ignore row/col i
 */
-void invert(mat, size, reorder)
-double **mat;
-int size, *reorder;
+void invert(double **mat, int size, int *reorder)
 {
   int i, j, k, best;
   double normal, multiplier, bestval, nextbest;
@@ -307,9 +302,7 @@ int size, *reorder;
    comp_rows = BOTH => remove both rows and columns
    returns number of rows/cols in compressed matrix
 */
-int compressMat(mat, size, is_dummy, comp_rows)
-double **mat;
-int size, *is_dummy, comp_rows;
+int compressMat(double **mat, int size, int *is_dummy, int comp_rows)
 {
   static int *cur_order;
   static int cur_order_array_size = 0;
@@ -351,9 +344,8 @@ int size, *is_dummy, comp_rows;
    exp_rows = FALSE => add cols corresponding to ones in is_dummy[]
    exp_rows = BOTH => add rows and columns
 */
-void expandMat(mat, size, comp_size, is_dummy, exp_rows)
-double **mat;
-int size, *is_dummy, exp_rows, comp_size;
+void expandMat(double **mat, int size, int comp_size, int *is_dummy,
+    int exp_rows)
 {
   int i, j, k, next_rc;
 
@@ -389,9 +381,7 @@ int size, *is_dummy, exp_rows, comp_size;
 Checks to see if the matrix has the M-matrix sign pattern and if
 it is diagonally dominant. 
 */
-matcheck(mat, rows, size)
-double **mat;
-int rows, size;
+void matcheck(double **mat, int rows, int size)
 {
   double rowsum;
   int i, j;
@@ -414,10 +404,7 @@ int rows, size;
 }
 
 
-matlabDump(mat, size, name)
-double **mat;
-int size;
-char *name;
+void matlabDump(double **mat, int size, char *name)
 {
 FILE *foo;
 int i,j;

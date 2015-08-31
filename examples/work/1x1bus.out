@@ -1,0 +1,91 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: 1x1bus.lst
+Surface cond_air_1x1.qui has 171 quads and 0 tris
+Surface cond_dielec_1x1.qui has 81 quads and 0 tris
+Surface dielec_topbot.neu has 96 quads and 0 tris
+Surface dielec_topbot.neu has 96 quads and 0 tris
+Surface dielec_topbot.neu has 96 quads and 0 tris
+Surface dielec_sides.neu has 48 quads and 0 tris
+Surface dielec_face.neu has 38 quads and 0 tris
+Surface dielec_face.neu has 38 quads and 0 tris
+  Input surfaces:
+   GROUP1
+    cond_air_1x1.qui, conductor
+      title: `1X1 bus crossing problem with 1m wires (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 171
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+    cond_dielec_1x1.qui, conductor
+      title: `1X1 bus crossing problem with 1m wires (n=3 e=0.1)'
+      outer permittivity: 7.5
+      number of panels: 81
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+   GROUP2
+    dielec_topbot.neu, dielectric interface
+      title: `DIELECTRIC, TOP AND BOT W/EXTRA LINES, ELEM LEN = 0.25'
+      permittivities: 7.5 (inner) 1 (outer)
+      number of panels: 96
+      number of extra evaluation points: 192
+      translation: (0 0 0)
+   GROUP3
+    dielec_topbot.neu, dielectric interface
+      title: `DIELECTRIC, TOP AND BOT W/EXTRA LINES, ELEM LEN = 0.25'
+      permittivities: 7.5 (inner) 1 (outer)
+      number of panels: 96
+      number of extra evaluation points: 192
+      translation: (0 1 0)
+   GROUP4
+    dielec_topbot.neu, dielectric interface
+      title: `DIELECTRIC, TOP AND BOT W/EXTRA LINES, ELEM LEN = 0.25'
+      permittivities: 7.5 (inner) 1 (outer)
+      number of panels: 96
+      number of extra evaluation points: 192
+      translation: (0 2 0)
+   GROUP5
+    dielec_sides.neu, dielectric interface
+      title: `DIELECTRIC, SIDES, 1X1 BUS CROSSING'
+      permittivities: 7.5 (inner) 1 (outer)
+      number of panels: 48
+      number of extra evaluation points: 96
+      translation: (0.5 0 0)
+   GROUP6
+    dielec_face.neu, dielectric interface
+      title: `DIELECTRIC, FACE, ELEM LEN = 0.25'
+      permittivities: 7.5 (inner) 1 (outer)
+      number of panels: 38
+      number of extra evaluation points: 76
+      translation: (0 0 0)
+   GROUP7
+    dielec_face.neu, dielectric interface
+      title: `DIELECTRIC, FACE, ELEM LEN = 0.25'
+      permittivities: 7.5 (inner) 1 (outer)
+      number of panels: 38
+      number of extra evaluation points: 76
+      translation: (0 3 0)
+  Date: Wed Jan  8 17:42:51 2014
+  Host: frost
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 4
+  Overall permittivity factor: 1
+  Total number of panels: 664
+    Number of conductor panels: 252
+    Number of dielectric interface panels: 412
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 2
+No multipole expansions at level 4 (lowest)
+Percentage of multiplies done by multipole: 91.8%
+
+ITERATION DATA
+Starting on column 1 (1%GROUP1)
+1 2 3 4 5 6 7 8 9 10 11 12 
+Starting on column 2 (2%GROUP1)
+1 2 3 4 5 6 7 8 9 10 11 12 
+
+CAPACITANCE MATRIX, picofarads
+                   1          2 
+1%GROUP1 1      203.5     -85.13
+2%GROUP1 2     -85.13      153.9

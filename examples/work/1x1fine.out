@@ -1,0 +1,36 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../1x1fine.neu
+Surface ../1x1fine.neu has 252 quads and 0 tris
+  Input surfaces:
+   GROUP1
+    1x1fine.neu, conductor
+      title: `ONE X BUS FINE MESH'
+      outer permittivity: 1
+      number of panels: 252
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 17:43:00 2014
+  Host: frost
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 252
+    Number of conductor panels: 252
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 2
+No expansions at level 3 (lowest)
+Percentage of multiplies done by multipole: 26.3%
+
+ITERATION DATA
+Starting on column 1 (CONDUCTOR1%GROUP1)
+1 2 3 4 
+Starting on column 2 (CONDUCTOR2%GROUP1)
+1 2 3 4 
+
+CAPACITANCE MATRIX, picofarads
+                            1          2 
+CONDUCTOR1%GROUP1 1      141.8     -60.86
+CONDUCTOR2%GROUP1 2     -60.86      141.8

@@ -1,40 +1,47 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
+
+/* SRW */
+/* disrect.c */
+int wrQuadCells(FILE*, int, int, int, double, double, double, double, double,
+    double, double, double, double, double, double, double);
+int disRect(FILE*, int, double, int, int, double, double, double, double,
+    double, double, double, double, double, double, double, double);
 
 #define DEFWID 1.0		/* default wire width */
 #define DEFEFR 0.1		/* default edge-cell-width/inner-cell-width */
@@ -48,20 +55,25 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 #define TRUE 1
 #define FALSE 0
 
+/* SRW */
+int disBar(FILE*, int, double, int, int, int, int, int, double, double,
+    double, double, double, double, double, double, double, double,
+    double, double);
+
 /*
   writes a quickif.c format dicretization of a bar given by 4 corners
   - corners must all be one edge away from corner1
   - returns the number of panels used
 */
-int disBar(fp, cond, edgefrac, ncells, wires, do_cond, do_dielec, no_disc,
-	     x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4)
-int ncells;			/* number of cells on short side, > 2 */
-int cond;			/* conductor number */
-int wires;			/* bar to be used in a wiresXwires xing */
-int do_cond, do_dielec, no_disc;
-double edgefrac;       		/* edge cell widths =edgefrac*(inner widths) */
-double x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4; /* 4 corners */
-FILE *fp;
+int disBar(FILE *fp, int cond, double edgefrac, int ncells, int wires,
+    int do_cond, int do_dielec, int no_disc,
+    double x1, double y1, double z1, double x2, double y2, double z2,
+    double x3, double y3, double z3, double x4, double y4, double z4)
+/* int ncells;			number of cells on short side, > 2 */
+/* int cond;			conductor number */
+/* int wires;			bar to be used in a wiresXwires xing */
+/* double edgefrac;     edge cell widths =edgefrac*(inner widths) */
+/* double x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4; 4 corners */
 {
   int nsec = 2*wires + 1, sec, shortside, npanels = 0, i;
   int do_ref_side, do_opp_side;
@@ -177,18 +189,16 @@ FILE *fp;
   generates a wires crossing wires bus crossing example in quickif.c format
   - uses disRect() for all discretization of rectangular faces
 */
-main(argc, argv)
-int argc;
-char *argv[];
+int
+main(int argc, char **argv)
 {
   char temp[BUFSIZ], **chkp, *chk, name[BUFSIZ];
   int no_disc, name_given = FALSE;
   int wires, npanels = 0, ncells, cmderr = FALSE, i, cond, do_dielec, do_cond;
-  double edgefrac, pitch, strtod();
+  double edgefrac, pitch;
   double x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4; /* 4 corners */
   double x0, y0, z0;		/* master origin */
-  long strtol();
-  FILE *fp, *fopen();
+  FILE *fp;
 
   /* load default parameters */
   pitch = 2*DEFWID;
@@ -292,7 +302,7 @@ char *argv[];
   if(cmderr == TRUE) {
     fprintf(stderr,
 	    "Usage: %s [-xo<originx>] [-yo<originy>] [-zo<originz>]\n              [-c<conductors/bus>] [-w<wire width>]\n              [-n<num panels/wire width>] [-e<rel edge panel width>]\n              [-na<name base>] [-d]\n", 
-	    argv[0], DEFNWI, DEFWID, DEFNCL, DEFEFR);
+	    argv[0]);
     fprintf(stderr, "DEFAULT VALUES:\n");
     fprintf(stderr, "  origin = (xo yo zo) = (%g %g %g)\n", X0, Y0, Z0);
     fprintf(stderr, "  conductors/bus = %d\n", DEFNWI);
@@ -302,7 +312,7 @@ char *argv[];
     fprintf(stderr, "  conductor name base = <none> (wires get numbered)\n");
     fprintf(stderr, "OPTIONS:\n");
     fprintf(stderr, "  -d = don't discretize faces\n");
-    exit(0);
+    return (1);
   }
 
   /* open output file */
@@ -349,4 +359,5 @@ char *argv[];
       fprintf(fp, "N %d %s%d\n", wires+i, name, wires+i);
     }
   }
+  return (0);
 }

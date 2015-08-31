@@ -1,0 +1,38 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../ramcell_botd.neu
+Surface ../ramcell_botd.neu has 160 quads and 0 tris
+  Input surfaces:
+   GROUP1
+    ramcell_botd.neu, conductor
+      title: `RAM CELL, LOWER SINI/SI02 INTERFACE'
+      outer permittivity: 1
+      number of panels: 160
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 17:43:00 2014
+  Host: frost
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 160
+    Number of conductor panels: 160
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 3
+Percentage of multiplies done by multipole: 43.4%
+
+ITERATION DATA
+Starting on column 1 (SINI_BR%GROUP1)
+1 2 3 
+Starting on column 2 (SINI_BC%GROUP1)
+1 2 3 
+Starting on column 3 (SINI_BL%GROUP1)
+1 2 3 
+
+CAPACITANCE MATRIX, picofarads
+                         1          2          3 
+SINI_BR%GROUP1 1      150.9     -35.94     -12.33
+SINI_BC%GROUP1 2     -35.94      125.5      -33.4
+SINI_BL%GROUP1 3     -12.33      -33.4      127.5

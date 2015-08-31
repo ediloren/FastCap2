@@ -1,36 +1,35 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 /* 
@@ -48,6 +47,12 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
  - no attempt is made to make allocation efficient in terms of virtual pages
 */
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+/* SRW */
+#define NO_SBRK
 
 #define NALLOC 8192		/* >= sizeof(HEADER)*NALLOC bytes sbrk()'d */
 #define MAGICN 0xaaaaaaaaL	/* used to check fidelity of allocated blks */
@@ -85,25 +90,32 @@ typedef union header HEADER;
   - an alternative to mocore() but should only be used if sbrk() doesnt zero
 */
 #define MORECORE(SIZE) (HEADER *)calloc(1, SIZE*sizeof(HEADER))
-char *calloc();
-char *malloc();
 
 static HEADER *base = NULL;    	/* base of allocated block list */
 static HEADER *allocp = NULL;	/* last allocated block */
 static unsigned int sizeofHDR = sizeof(HEADER);
 
+/* SRW */
+char *ualloc(unsigned int);
+void ualloc_verify(void);
+void uallocEfcy(long);
+
 /*
   asks operating system for more memory which is added to the top block
   - memory not zeroed out
 */
-static HEADER *mocore(nu)
-unsigned int nu;
+static HEADER *mocore(unsigned int nu)
 {
-  char *sbrk();
   char *cp;
+#ifdef NO_SBRK
+  cp = (char *)calloc(nu,sizeofHDR);
+  if(cp == NULL) return(NULL);
+#else
 
   cp = sbrk(nu*sizeofHDR);
-  if((int)cp == -1) return(NULL);
+/*  if((int)cp == -1) return(NULL); */
+  if(cp == (char*)-1) return (NULL);  /* SRW */
+#endif
   return((HEADER *)cp);
 }
 
@@ -114,10 +126,8 @@ unsigned int nu;
   - ultimately uses mocore(), since no frees are done (sbrk() zeros added
     memory) this allocator performs like calloc() w/no explicit assigns to 0
 */
-char *ualloc(nbytes)
-unsigned int nbytes;
+char *ualloc(unsigned int nbytes)
 {
-  HEADER *mocore();
   HEADER *p, *q;
   int nunits;			/* size in number of sizeof(HEADER)'s */
   int brkunits;			/* number to add to heap */
@@ -225,7 +235,7 @@ unsigned int nbytes;
   - checks if length corresponds to pointers (UGDEBG == 1 or 2)
   - prints information about list of allocated blocks (UGDEBG == 2)
 */
-void ualloc_verify()
+void ualloc_verify(void)
 {
   HEADER *p;
   int cnt = 1;
@@ -268,9 +278,11 @@ void ualloc_verify()
         memory lost in each header struct (a problem with many small things)
   - if base == NULL (not using ugly allocator), final break value is printed
 */
-void uallocEfcy(memcount)
-long memcount;
+void uallocEfcy(long memcount)
 {
+#ifdef NO_SBRK
+  return;
+#else
 #if UGDEBG == 2
   HEADER *p;
   unsigned int waste = 0;
@@ -278,7 +290,6 @@ long memcount;
   int first = 1;
 #endif
   int total;
-  char *sbrk();
 
   total = (int)(sbrk(0) - (char *)base);
 
@@ -309,5 +320,5 @@ long memcount;
 	      100*(double)(stdiowaste*sizeof(HEADER))/((double)total));
 #endif
   fprintf(stdout, ")\n");
-
+#endif
 }

@@ -1,0 +1,5 @@
+
+assign_names: in conductor 'BOTLEFT'
+  can't find named patch in master list
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../dielec_topbot.neu

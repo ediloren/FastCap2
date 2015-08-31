@@ -1,42 +1,53 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #define MAX(a,b) (((a)>(b))?(a):(b))
+
+/* SRW */
+/* epsilon.c */
+void getEpsBnds(double*, double*);
+
+/* SRW */
+int wrQuadCells(FILE*, int, int, int, double, double, double, double, double,
+    double, double, double, double, double, double, double);
+int disRect(FILE*, int, double, int, int, double, double, double, double,
+    double, double, double, double, double, double, double, double);
+
 
 /*
   write a set of quadralateral panels for a rectancle in quickif.c format
@@ -50,13 +61,10 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
   - returns number of panels generated
 */
 
-int wrQuadCells(fp, cond, sinernum, linernum, sinerwid, linerwid, sedgewid,
-		 x1, y1, z1, x2, y2, z2, x4, y4, z4)
-int cond;			/* conductor number */
-int sinernum, linernum;
-double sinerwid, linerwid, sedgewid;
-double x1, y1, z1, x2, y2, z2, x4, y4, z4;
-FILE *fp;
+int wrQuadCells(FILE *fp, int cond, int sinernum, int linernum,
+    double sinerwid, double linerwid, double sedgewid, double x1, double y1,
+    double z1, double x2, double y2, double z2, double x4, double y4, double z4)
+/* int cond;			conductor number */
 {
   int sncell, lncell, npanels = 0;
   double x12, y12, z12, x14, y14, z14; /* unit vector from p1 to p2, p4 */
@@ -163,14 +171,14 @@ FILE *fp;
   - returns the number of panels made
   - no_discr 
 */
-int disRect(fp, cond, edgefrac, ncells, no_discr,
-	     x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4)
-int ncells;			/* number of cells on short side, > 2 */
-int cond;			/* conductor number */
-int no_discr;			/* TRUE => no discr., just wr the four pnts */
-double edgefrac;       		/* edge cell widths =edgefrac*(inner widths) */
-double x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4; /* 4 corners */
-FILE *fp;
+int disRect(FILE *fp, int cond, double edgefrac, int ncells, int no_discr,
+    double x1, double y1, double z1, double x2, double y2, double z2,
+    double x3, double y3, double z3, double x4, double y4, double z4)
+/* int ncells;			number of cells on short side, > 2 */
+/* int cond;			conductor number */
+/* int no_discr;			TRUE => no discr., just wr the four pnts */
+/* double edgefrac;       		edge cell widths =edgefrac*(inner widths) */
+/* double x1, y1, z1, x2, y2, z2, x3, y3, z3, x4, y4, z4; */ /* 4 corners */
 {
   int lflag, linernum, sinernum, npanels;
   double lside, sside, temp, sedgewid, sinerwid, linerwid;
@@ -179,7 +187,7 @@ FILE *fp;
 
   if(fp == NULL) {
     fprintf(stderr, "\ndisRect: bad output file pointer\n");
-    exit(0);
+    exit(1);
   }
 
   if(no_discr) {
@@ -222,7 +230,7 @@ FILE *fp;
   else {
     fprintf(stderr, "\ndisRect: negative edge to inner panel ratio = %g\n",
 	    edgefrac);
-    exit(0);
+    exit(1);
   }
 
   /* figure the long side inner cell widths (edge cell widths are the same) */

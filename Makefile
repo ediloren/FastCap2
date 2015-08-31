@@ -7,7 +7,7 @@ RM = /bin/rm
 CAT = /bin/cat
 
 # changed using `config [type]' - called makefiles switched around
-TYPE = other
+TYPE = 4
 
 SRC = src
 DOC = doc
@@ -53,3 +53,8 @@ manual:
 
 clean:
 	cd $(SRC) ; $(MAKE) clean
+
+distclean:
+	cd $(SRC) ; $(MAKE) clean
+	@rm -f bin/fastcap* bin/cubegen* bin/capgen* bin/busgen* \
+ bin/pipedgen* bin/pyragen*

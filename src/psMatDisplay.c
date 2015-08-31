@@ -1,39 +1,39 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
+#include "zbufGlobal.h"
 
 /*
   for writting sparsity pattern ps file in Aldus Freehand format
@@ -71,6 +71,10 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
                                    IMAGEX/Y to get final image size
                                    - these values should allow 7.5x10 images */
 
+/* SRW -- Now including zbufGlobal.h, override these. */
+#undef LINCAP
+#undef LINJIN
+
 #define LINCAP 0		/* line cap parameter - 0 => butt cap */
 #define LINJIN 0		/* line join parameter - 0 => miter join */
 #define GREYLV 0		/* grey level for lines - 0 => black */
@@ -83,13 +87,19 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 
 char **aliased_matrix;	/* the aliased matrix */
 
+/* SRW */
+void dump_aldus_hdr(FILE*, double, double, double, double, int);
+void dump_aldus_foot(FILE*, int, char**, int, int, char*);
+void dump_block(FILE*, double, double, double, double);
+void dump_line(FILE*, double, double, double);
+void dump_ps_mat(char*, int, int, int, int, char**, int, int);
+
+
 /*
   dump Aldus Freehand readable header
 */
-void dump_aldus_hdr(fp, lowx, lowy, upx, upy, dump_text_hdr)
-double lowx, lowy, upx, upy;
-int dump_text_hdr;
-FILE *fp;
+void dump_aldus_hdr(FILE *fp, double lowx, double lowy, double upx, double upy,
+    int dump_text_hdr)
 {
   /* print the lines before the bounding box */
   fprintf(fp, "%%!PS-Adobe-2.0 EPSF-1.2\n");
@@ -133,10 +143,8 @@ FILE *fp;
 /*
   dump Aldus Freehand readable trailer
 */
-void dump_aldus_foot(fp, insert_showpage, argv, argc, print_cmd_line, aux_str)
-int insert_showpage, print_cmd_line, argc;
-char *argv[], *aux_str;
-FILE *fp;
+void dump_aldus_foot(FILE *fp, int insert_showpage, char **argv, int argc,
+    int print_cmd_line, char *aux_str)
 {
   int f;
   char line[BUFSIZ];
@@ -166,9 +174,8 @@ FILE *fp;
   dumps a black filled block xwid wide by ywid tall, 
     with lower left corner (xstart, ystart)
 */
-void dump_block(fp, xstart, ystart, xwid, ywid)
-FILE *fp;
-double xstart, ystart, xwid, ywid;
+void dump_block(FILE *fp, double xstart, double ystart, double xwid,
+    double ywid)
 {
   fprintf(fp, "newpath\n");
   fprintf(fp, "%g %g moveto\n", xstart, ystart);
@@ -183,9 +190,7 @@ double xstart, ystart, xwid, ywid;
   dumps a line of length len with left center (xstart, ystart)
   assumes line width, grey level and line ends set up before
 */
-void dump_line(fp, xstart, ystart, len)
-FILE *fp;
-double xstart, ystart, len;
+void dump_line(FILE *fp, double xstart, double ystart, double len)
 {
   /*fprintf(fp, "%g %g moveto ", xstart, ystart);
   fprintf(fp, "%g %g lineto stroke\n", xstart+len, ystart);*/
@@ -199,15 +204,13 @@ double xstart, ystart, len;
   - call first with type = OPEN, then on each calcp with type = UPDATE,
     finally with type = CLOSE
 */
-void dump_ps_mat(filename, row, col, num_row, num_col, argv, argc, type)
-char *filename, *argv[];
-int row, col, num_row, num_col, type, argc;
+void dump_ps_mat(char *filename, int row, int col, int num_row, int num_col,
+    char **argv, int argc, int type)
 {
   static FILE *fp = NULL;
   double widx, widy;
   double blk_size_x, blk_size_y;
   static double blk_size;
-  FILE *fopen();
 
   static int alias_size_r, alias_size_c, alias_size;
   static int num_alias_r, num_alias_c;
@@ -223,7 +226,7 @@ int row, col, num_row, num_col, type, argc;
 
     if((fp = fopen(filename, "w")) == NULL) {
       fprintf(stderr, "dump_ps_mat: can't open `%s' to write\n", filename);
-      exit(-1);
+      exit(1);
     }
 
     /* if size of matrix is less than alias limits in both dimensions
@@ -296,7 +299,7 @@ int row, col, num_row, num_col, type, argc;
   else if(type == UPDATE) {
     if(fp == NULL) {
       fprintf(stderr, "dump_ps_mat: ps file not open\n");
-      exit(0);
+      exit(1);
     }
 
     /* write a block in the (row, col) position
@@ -336,7 +339,7 @@ int row, col, num_row, num_col, type, argc;
   }
   else {
     fprintf(stderr, "dump_ps_mat: bad type of call\n");
-    exit(-1);
+    exit(1);
   }
   
 }

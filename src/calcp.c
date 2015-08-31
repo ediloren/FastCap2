@@ -1,36 +1,35 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
@@ -80,13 +79,30 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 static int num2nd=0, num4th=0, numexact=0;
 static int num2ndsav=0, num4thsav=0, numexactsav=0;
 
-initcalcp(panel_list)
-  charge *panel_list;
+/* SRW */
+void initcalcp(charge*);
+int oldflip_normal(charge*);
+int flip_normal(charge*);
+int planarize(charge*);
+void centroid(charge*, double);
+double normalize(double*);
+int If_Equal(double*, double*);
+void Cross_Product(double*, double*, double*);
+double calcp(charge*, double, double, double, double*);
+void dumpnums(int, int);
+double tilelength(charge*);
+void ComputeMoments(charge*);
+void dp(charge*);
+void testCalcp(charge*);
+void fileCorners(charge*, FILE*);
+void calcpm(double*, double, double, double, int, int);
+
+
+void initcalcp(charge *panel_list)
 {
   charge *pq, *npq;
   double vtemp[3];
   double length, maxlength, minlength, length20, length31, sum, sum2, delta;
-  double normalize();
   int i, j, next;
 
 #if JACDBG == ON
@@ -205,7 +221,7 @@ initcalcp(panel_list)
       pq->corner[i][ZI] = vtemp[ZI];
       if(fabs(pq->corner[i][ZI]) > (EQUIV_TOL * pq->min_diag)) {
 	printf("FATAL PROGRAM ERROR: renormalized z=%g\n", pq->corner[i][ZI]);
-	exit(0);
+	exit(1);
       }
       pq->corner[i][ZI] = 0.0;
     }
@@ -232,8 +248,7 @@ initcalcp(panel_list)
 /*
   determine if normal needs to be flipped to get dielectric bdry cond right
 */
-oldflip_normal(panel)
-charge *panel;
+int oldflip_normal(charge *panel)
 {
   int i;
   double x, y, z;
@@ -284,7 +299,7 @@ charge *panel;
 	      panel->corner[0][0], panel->corner[0][1], panel->corner[0][2]);
       fprintf(stderr, "  Normal: (%g %g %g)\n",
 	      normal[0], normal[1], normal[2]);
-      exit(0);
+      exit(1);
     }
     if(ref_inside) flip_normal = TRUE;
     }
@@ -301,7 +316,7 @@ charge *panel;
 	      panel->corner[0][0], panel->corner[0][1], panel->corner[0][2]);
       fprintf(stderr, "  Normal: (%g %g %g)\n",
 	      normal[0], normal[1], normal[2]);
-      exit(0);
+      exit(1);
     }	
     if(!ref_inside) flip_normal = TRUE;
   }
@@ -314,8 +329,7 @@ charge *panel;
   - this function uses 0.0 as a breakpoint when really machine precision
     weighted checks should be done (really not an issue if ref point far)
 */
-flip_normal(panel)
-charge *panel;
+int flip_normal(charge *panel)
 {
   int i;
   double x, y, z;
@@ -360,7 +374,7 @@ charge *panel;
 	    panel->corner[0][0], panel->corner[0][1], panel->corner[0][2]);
     fprintf(stderr, "  Normal: (%g %g %g)\n",
 	    normal[0], normal[1], normal[2]);
-    exit(0);
+    exit(1);
   }
     
   return(flip_normal);
@@ -371,8 +385,7 @@ charge *panel;
 Changes the corner points so that they lie in the plane defined by the
 panel diagonals and any midpoint of an edge.
 */
-planarize(pq)
-charge *pq;
+int planarize(charge *pq)
 {
   double origin[3], corner[3], delta[4][3], px, py, dx, dy, dz;
   int i, j, numcorners = pq->shape;
@@ -419,9 +432,7 @@ first moments vanish.  Calculation begins by projection into the
 coordinate system defined by the panel normal as the z-axis and
 edge02 as the x-axis.
 */
-centroid(pp, x2)
-charge *pp;
-double x2;
+void centroid(charge *pp, double x2)
 {
   double vertex1[3], vertex3[3];
   double sum, dl, x1, y1, x3, y3, xc, yc;
@@ -449,8 +460,7 @@ double x2;
 
 }
 
-double normalize(vector)
-  double vector[3];
+double normalize(double *vector)
 {
   double length;
   int i;
@@ -465,8 +475,7 @@ double normalize(vector)
 }
 
 /* Assumes the vectors are normalized. */
-int If_Equal(vector1, vector2)
-  double vector1[3], vector2[3];
+int If_Equal(double *vector1, double *vector2)
 {
   int i;
 
@@ -476,8 +485,7 @@ int If_Equal(vector1, vector2)
 }
 
 /* Calculates result_vector = vector1 X vector2. */
-Cross_Product(vector1, vector2, result_vector)
-  double vector1[], vector2[], result_vector[];
+void Cross_Product(double *vector1, double *vector2, double *result_vector)
 {
   result_vector[XI] = vector1[YI]*vector2[ZI] - vector1[ZI]*vector2[YI];
   result_vector[YI] = vector1[ZI]*vector2[XI] - vector1[XI]*vector2[ZI];
@@ -501,9 +509,7 @@ the placement of the collocation point
     CASE5: eval pnt proj. on side extension (happens when paneled 
       faces meet at right angles, also possible other ways).
 */
-double calcp(panel, x, y, z, pfd)
-charge *panel;
-double x, y, z, *pfd;
+double calcp(charge *panel, double x, double y, double z, double *pfd)
 {
   double r[4], fe[4], xmxv[4], ymyv[4];
   double xc, yc, zc, zsq, xn, yn, zn, znabs, xsq, ysq, rsq, diagsq, dtol;
@@ -658,7 +664,7 @@ double x, y, z, *pfd;
     fprintf(stderr, "Evaluation Point in local coords = %g %g %g\n",xn,yn, zn);
     fprintf(stderr, "Panel Description Follows\n");
     dp(panel);
-    /*exit(0);*/
+    /*exit(1);*/
   }
 
 
@@ -666,8 +672,7 @@ double x, y, z, *pfd;
 }
 
 
-dumpnums(flag, size)
-int flag, size;
+void dumpnums(int flag, int size)
 {
   double total;
 
@@ -700,8 +705,7 @@ int flag, size;
   }
 }
 
-double tilelength(nq)
-charge *nq;
+double tilelength(charge *nq)
 {
   return nq->max_diag;
 }
@@ -714,8 +718,7 @@ local system, array S(15).  First initialize array
 Note that S(2)=S(6)=0 due to transfer above
 */
 
-ComputeMoments(pp)
-charge *pp;
+void ComputeMoments(charge *pp)
 {
   int order=MAXORDER;
   int i, j, nside,  N, M, N1, M1, M2, MN1, MN2;
@@ -725,7 +728,7 @@ charge *pp;
   static int maxorder = 0;
   static double CS[16] = { 0.0, 1.0, 1.0, 1.5, 1.5, 3.75, 1.0, 3.0, 
 			   1.5, 7.5, 1.5, 1.5, 3.75, 1.5, 7.5, 3.75 };
-  double *multi, sumc, sums, sign, **createBinom(), **createPmn();
+  double *multi, sumc, sums, sign;
   int m, n, r, halfn, flrm, ceilm, numterms, rterms;
   
   /* Allocate temporary storage and initialize arrays. */
@@ -828,8 +831,7 @@ charge *pp;
 
 /* Debugging Print Routines follow. */
 
-dp(panel)
-charge *panel;
+void dp(charge *panel)
 {
   int i;
   double c[4][3];
@@ -875,8 +877,7 @@ charge *panel;
 #define DIS 2
 #define SCALE 5
 
-testCalcp(pp)
-charge *pp;
+void testCalcp(charge *pp)
 {
 
   double offx, offy, offz, x, y, z, mult;
@@ -903,9 +904,7 @@ charge *pp;
 }
 
 
-fileCorners(pp, f)
-FILE *f;
-charge *pp;
+void fileCorners(charge *pp, FILE *f)
 
 {
   int i;
@@ -916,12 +915,11 @@ charge *pp;
 
 
 /* Test the moment code. */
-calcpm(multi, x, y, z, origorder, order)
-double *multi, x, y, z;
-int order;
+void calcpm(double *multi, double x, double y, double z, int origorder,
+    int order)
 {
   charge panel, *ppanel;
-  double **mat, **mulMulti2P(), potential;
+  double **mat, potential;
   int i, numterms;
 
   /* Create a temporary panel which has evaluation point as centroid. */
@@ -943,9 +941,7 @@ int order;
 
 /*
 
-dismat(mat, size)
-double **mat;
-int size;
+void dismat(double **mat, int size)
 {
   int i, j;
 

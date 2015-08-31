@@ -1,0 +1,35 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../sphere1.neu
+Surface ../sphere1.neu has 0 quads and 104 tris
+  Input surfaces:
+   GROUP1
+    sphere1.neu, conductor
+      title: `SPHERE, RADIUS 1, ELEM LEN = 0.5'
+      outer permittivity: 1
+      number of panels: 104
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 16:25:42 2014
+  Host: poe
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 104
+    Number of conductor panels: 104
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 3 (lowest)
+No expansions at level 2
+Percentage of multiplies done by multipole: 0%
+Warning: no multipole acceleration
+
+ITERATION DATA
+Starting on column 1 (SPHERE%GROUP1)
+1 2 3 
+
+CAPACITANCE MATRIX, nanofarads
+                        1 
+SPHERE%GROUP1 1     0.1063

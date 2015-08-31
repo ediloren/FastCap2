@@ -1,62 +1,66 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
-
-double **Q2P(), **Q2PDiag();
-double **mulMulti2P(), **mulQ2Multi(), **mulMulti2Multi();
-double **mulLocal2Local(), **mulLocal2P(), **mulQ2Local(), **mulMulti2Local();
 
 int *localcnt, *multicnt, *evalcnt;	/* counts of builds done by level */
 
 int **Q2Mcnt, **Q2Lcnt, **Q2Pcnt, **L2Lcnt; /* counts of xformation mats */
 int **M2Mcnt, **M2Lcnt, **M2Pcnt, **L2Pcnt, **Q2PDcnt;
 
+/* SRW */
+void mulMatDirect(ssystem*);
+void bdmulMatPrecond(ssystem*);
+void olmulMatPrecond(ssystem*);
+void find_flux_density_row(double**, double**, int, int, int, int, int,
+    charge**, charge**, int*, int*);
+void mulMatUp(ssystem*); 
+void mulMatEval(ssystem*);
+void mulMatDown(ssystem*);
+
+
 /*
 MulMatDirect creates the matrices for the piece of the problem that is done
 directly exactly.
 */
-mulMatDirect(sys)
-ssystem *sys;
+void mulMatDirect(ssystem *sys)
 {
   cube *nextc, *nextnbr;
   int i, nummats, **temp;
   extern double lutime, dirtime;
 
 #if DIRSOL == ON || EXPGCR == ON
-  double **ludecomp();
   extern double *trimat, *sqrmat; /* flattened triangular, square matrices */
   extern int up_size, eval_size;
   extern int *real_index;	/* for map btwn condensed/expanded vectors */
@@ -95,7 +99,7 @@ ssystem *sys;
       if(eval_size < MAXSIZ) {
 	fprintf(stderr, 
 		"mulMatDirect: non-block direct methods not supported\n");
-	exit(0);
+	exit(1);
 	/* if this is going to work, need a special, condensing Q2P
 	   as well as some way to use it in the framework of the GCR loop */
 	nextc->directmats[0] = Q2P(nextc->chgs, eval_size,
@@ -172,14 +176,13 @@ ssystem *sys;
 /*
 MulMatPrecond creates the preconditioner matrix
 */
-bdmulMatPrecond(sys)
-ssystem *sys;
+void bdmulMatPrecond(ssystem *sys)
 {
   cube *nc, *kid, *kidnbr;
   double **mat, **nbrmat;
   int i, j, k, l, kidi;
   int kidsize, nbrsize, size, row, col, first, offset;
-  double **ludecomp(), factor;
+  double factor;
   charge *pc;
   surface *surf;
 
@@ -274,8 +277,7 @@ ssystem *sys;
  ((nbr)->k == (nk)) && \
  ((nbr)->l == (nl)) )
 	
-olmulMatPrecond(sys)
-ssystem *sys;
+void olmulMatPrecond(ssystem *sys)
 {
   cube *nc, *nnbr, *nnnbr;
   double **mat, **nmat;
@@ -506,16 +508,13 @@ ssystem *sys;
   - if a dummy panel is not found in the panel list, its row is generated
     using explicit calcp() calls (shouldn't happen much)
 */
-find_flux_density_row(to_mat, from_mat, eval_row, n_chg, n_eval, row_offset,
-		      col_offset, eval_panels, chg_panels, eval_is_dummy, 
-		      chg_is_dummy)
-double **to_mat, **from_mat;
-int eval_row, n_chg, n_eval, row_offset, col_offset;
-charge **eval_panels, **chg_panels;
-int *eval_is_dummy, *chg_is_dummy;
+void find_flux_density_row(double **to_mat, double **from_mat, int eval_row,
+    int n_chg, int n_eval, int row_offset, int col_offset,
+    charge **eval_panels, charge **chg_panels, int *eval_is_dummy,
+    int *chg_is_dummy)
 {
   int dindex, j;
-  double factor, calcp();
+  double factor;
   charge *dp;
   surface *surf = eval_panels[eval_row]->surf;
 
@@ -643,8 +642,7 @@ children's multipoles or charges. Note that only one set of
 multipole to multipole matrices is computed per level by exploiting the
 uniform break-up of three-space (ie many shifts have similar geometries).  
 */
-mulMatUp(sys) 
-ssystem *sys; 
+void mulMatUp(ssystem *sys) 
 {
 cube *nextc, *kid;
 int i, j, numterms, depth, order = sys->order;
@@ -802,8 +800,7 @@ double **multimats[8];
   Greengard hiearchical downward pass
 
 */
-void mulMatEval(sys)
-ssystem *sys;
+void mulMatEval(ssystem *sys)
 {
   int i, j, k, ttlvects, vects;
   cube *na, *nc, *nexti;
@@ -911,8 +908,7 @@ ssystem *sys;
   -mats that give potentials (M2P, L2P, Q2P) are calculated in mulMatEval()
   -this routine makes only L2L, M2L and Q2L matrices
 */
-mulMatDown(sys)
-ssystem *sys;
+void mulMatDown(ssystem *sys)
 {
   int i, j, vects;
   cube *nc, *parent, *ni;

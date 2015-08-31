@@ -1,36 +1,35 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 
@@ -43,10 +42,12 @@ extern char *   calloc();
 extern char *   malloc();
 extern char *   realloc();
 #else
-#include <malloc.h>
+#include <stdlib.h>
+#include <string.h>
 #endif /* end if NEWS */
 #include <stdio.h>
 #include <math.h>
+#include <unistd.h>
 
 /* fastcap data structures */
 #include "mulStruct.h"
@@ -61,7 +62,7 @@ extern char *   realloc();
 #endif
 #endif
 
-#define VERSION 2.0
+#define VERSION_STRING "2.0wr (18Sep92, rev 070714)"
 
 /*********************************************************************** 
   macros for allocation with checks for NULL pntrs and 0 byte requests
@@ -72,10 +73,19 @@ extern char *   realloc();
   - MALLOC() used when memory can be anything
     core should be malloc() or ualloc()
 ***********************************************************************/
-/* #define CALCORE(NUM, TYPE) calloc((unsigned)(NUM),sizeof(TYPE)) */
+
+/* SRW - Default now is to use calloc/malloc rather than ualloc.  The
+ * sbrk function is deprecated in many operating systems. 11/16/13
+ */
+#define NO_SBRK
+#ifdef NO_SBRK
+#define sbrk(x) 0
+#define CALCORE(NUM, TYPE) calloc((unsigned)(NUM),sizeof(TYPE))
+#define MALCORE malloc
+#else
 #define CALCORE(NUM, TYPE) ualloc((unsigned)(NUM)*sizeof(TYPE))
-/* #define MALCORE malloc */
 #define MALCORE ualloc
+#endif
 
 /* counts of memory usage by multipole matrix type */
 extern long memcount;
@@ -105,8 +115,8 @@ extern long memMSC;
 #define DUMPALLOCSIZ                                                   \
 {                                                                      \
   (void)fprintf(stderr,                                                \
-		"Total Memory Allocated: %d kilobytes (brk = 0x%x)\n", \
-		memcount/1024, sbrk(0));                               \
+		"Total Memory Allocated: %ld kilobytes (brk = 0x%lx)\n", \
+		memcount/1024, (unsigned long)sbrk(0));                               \
 }
 
 #define CALLOC(PNTR, NUM, TYPE, FLAG, MTYP)                                 \
@@ -119,13 +129,13 @@ extern long memMSC;
        (void)fprintf(stderr,                                                \
 	 "\nfastcap: out of memory in file `%s' at line %d\n",              \
 	       __FILE__, __LINE__);                                         \
-       (void)fprintf(stderr, " (NULL pointer on %d byte request)\n",        \
+       (void)fprintf(stderr, " (NULL pointer on %ld byte request)\n",        \
 		     (NUM)*sizeof(TYPE));                                   \
        DUMPALLOCSIZ;                                                        \
        DUMPRSS;                                                             \
        (void)fflush(stderr);                                                \
        (void)fflush(stdout);                                                \
-       if(FLAG == ON) exit(0);                                              \
+       if(FLAG == ON) exit(1);                                              \
      }                                                                      \
      else {                                                                 \
        memcount += ((NUM)*sizeof(TYPE));                                    \
@@ -141,7 +151,7 @@ extern long memMSC;
        else if(MTYP == AMSC) memMSC += ((NUM)*sizeof(TYPE));                \
        else {                                                               \
          (void)fprintf(stderr, "CALLOC: unknown memory type %d\n", MTYP);   \
-         exit(0);                                                           \
+         exit(1);                                                           \
        }                                                                    \
      }                                                                      \
 }
@@ -156,13 +166,13 @@ extern long memMSC;
        (void)fprintf(stderr,                                                 \
 	 "\nfastcap: out of memory in file `%s' at line %d\n",               \
 	       __FILE__, __LINE__);                                          \
-       (void)fprintf(stderr, " (NULL pointer on %d byte request)\n",         \
+       (void)fprintf(stderr, " (NULL pointer on %ld byte request)\n",         \
 		     (NUM)*sizeof(TYPE));                                    \
        DUMPALLOCSIZ;                                                         \
        DUMPRSS;                                                              \
        (void)fflush(stderr);                                                 \
        (void)fflush(stdout);                                                 \
-       if(FLAG == ON) exit(0);                                               \
+       if(FLAG == ON) exit(1);                                               \
      }                                                                       \
      else {                                                                 \
        memcount += ((NUM)*sizeof(TYPE));                                    \
@@ -178,7 +188,7 @@ extern long memMSC;
        else if(MTYP == AMSC) memMSC += ((NUM)*sizeof(TYPE));                \
        else {                                                               \
          (void)fprintf(stderr, "MALLOC: unknown memory type %d\n", MTYP);   \
-         exit(0);                                                           \
+         exit(1);                                                           \
        }                                                                    \
      }                                                                      \
 }
@@ -369,3 +379,275 @@ misc. global macros
 /* blkDirect.c related flags - used only when DIRSOL == ON || EXPGCR == ON */
 #define MAXSIZ 0		/* any more tiles than this uses matrix on disk
 				   for DIRSOL == ON or EXPGCR == ON */
+
+#define SINGLE_FILE_INPUT ON  /* allow all input data in single list file,
+                               * see input.c */
+
+/* blkDirect.c */
+// int sqrdex(int, int, int);
+// int lowdex(int, int, int);
+// void dumpMatCor(double**, double*, int);
+// char *getName(int, char*);
+// void transpose(double*, int);
+// void wrMat(double*, int, int, int);
+// void rdMat(double*, int, int, int);
+// void matXfer(double*, double*, int, int);
+// void blkMatsolve(double*, double*, int, int);
+// void subInnerProd(double*, double*, int, int, int);
+// void blkLudecomp(double*, int);
+// void blkSolve(double*, double*, int, double*, double*);
+// void blkQ2Pfull(cube*,  int, int, double**, double**, int**, int*);
+// void blkLUdecomp(double*, double*, int);
+// void blkAqprod(double*, double*, int, double*);
+// void blkCompressVector(double*, int, int, int*);
+// void blkExpandVector(double*, int, int);
+
+/* calcp.c */
+void initcalcp(charge*);
+// int oldflip_normal(charge*);
+// int flip_normal(charge*);
+// int planarize(charge*);
+// void centroid(charge*, double);
+// double normalize(double*);
+// int If_Equal(double*, double*);
+// void Cross_Product(double*, double*, double*);
+double calcp(charge*, double, double, double, double*);
+void dumpnums(int, int);
+double tilelength(charge*);
+// void ComputeMoments(charge*);
+// void dp(charge*);
+// void testCalcp(charge*);
+// void fileCorners(charge*, FILE*);
+// void calcpm(double*, double, double, double, int, int);
+
+/* capsolve.c */
+int capsolve(double***, ssystem*, charge*, int, int, int, Name*);
+// int oldgcr(ssystem*, double*, double*, double*, double*, double**, double**,
+//     int, int, int, double, charge*);
+// void oldcomputePsi(ssystem*, charge*);
+// int gcr(ssystem*, double*, double*, double*, double*, double**, double**,
+//     int, int, double, charge*);
+// int gmres(ssystem*, double*, double*, double*, double*, double**, double**,
+//     int, int, double, charge*);
+// void computePsi(ssystem*, double*, double*, int, charge*);
+
+/* direct.c */
+double **Q2PDiag(charge**, int, int*, int);
+double **Q2P(charge**, int, int*, charge**, int, int);
+// double **Q2Pfull(cube*, int);
+double **ludecomp(double**, int, int);
+void solve(double**, double*, double*, int);
+void invert(double**, int, int*);
+int compressMat(double**, int, int*, int);
+void expandMat(double**, int, int, int*, int);
+// void matcheck(double**, int, int);
+// void matlabDump(double**, int, char*);
+
+/* electric.c */
+void compute_electric_fields(ssystem*, charge*);
+
+/* electric_mod.c */
+// void compute_electric_fields(ssystem*, charge*);
+
+/* electric_old.c */
+// void compute_electric_fields(ssystem*, charge*);
+
+/* input.c */
+// void setup_file_offsets(FILE*);
+// FILE *fc_fopen(char*, char*);
+// void read_list_file(surface**, int*, char*, int);
+// void add_dummy_panels(charge*);
+char *hack_path(char*);
+// void reassign_cond_numbers(charge*, NAME*, char*);
+// void negate_cond_numbers(charge*, NAME*);
+// int dump_ilist(void);
+int want_this_iter(ITER*, int);
+void get_ps_file_base(char**, int);
+// charge *read_panels(surface*, Name**, int*);
+// ITER *get_kill_num_list(Name*, char*);
+// void parse_command_line(char**, int, int*, int*, double*, int*, int*,
+//     char**, char**, int*);
+// surface *read_all_surfaces(char*, char*, int, char*, double);
+// surface *input_surfaces(char**, int, int*, int*, double*, int*, int*, char*);
+// void dumpSurfDat(surface*);
+// void remove_name(Name**, int);
+// void remove_conds(charge**, ITER*, Name**);
+// void resolve_kill_lists(ITER*, ITER*, ITER*, int);
+// charge *input_problem(char**, int, int*, int*, double*, int*, int*, Name**,
+//     int*);
+
+/* mulDisplay.c */
+// void disExtrasimpcube(cube*);
+// void disExParsimpcube(cube*);
+// void dissimpcube(cube*);
+// void discube(cube*);
+// void disupcube(cube*);
+// void disdirectcube(cube*);
+// void dissys(ssystem*);
+// void dismat(double**, int, int);
+// void disvect(double*, int);
+// void dischg(charge*);
+// void disallchg(charge*); 
+// void disfchg(charge*);
+// void dumpMat(double**, int, int);
+void dumpCorners(FILE*, double**, int, int);
+// void dumpVecs(double*, int*, int);
+// void dumpChgs(charge**, int, double, double, double);
+// void dumpChgsWDummy(charge**, int, int*, double, double, double);
+// void dispQ2M(double**, charge**, int, double, double, double, int);
+// void dispM2L(double**, double, double, double, double, double,
+//     double, int);
+// void dispQ2L(double**, charge**, int, double, double, double, int);
+void dispQ2P(double**, charge**, int, int*, charge**, int);
+void dispQ2PDiag(double**mat, charge**, int, int*);
+// void dispM2M(double**, double, double, double, double, double,
+//     double, int);
+// void dispL2L(double**, double, double, double, double, double, double, int);
+// void dispM2P(double**, double, double, double, charge**, int, int);
+// void dispL2P(double**, double, double, double, charge**, int, int);
+// void dumpUpVecs(cube*);
+// void dumpLevOneUpVecs(ssystem*);
+// void chkList(ssystem*, int);
+// void chkCube(ssystem*, cube*, int);
+// void chkLowLev(ssystem*, int);
+// void dump_face(FILE*, face*);
+// void dumpSynCore1(char*, int, int*, int*, int*, int*);
+// void dumpSynCore2(char*, int, int*);
+// void dumpChgDen(FILE*, double*, charge*);
+// void dumpMatCnts(int**, int, char*);
+// void dumpMatBldCnts(ssystem*);
+void dumpConfig(FILE*, char*);
+// char *padName(char*, char*, int);
+// char *spaces(char*, int);
+void mksCapDump(double**, int, double, Name**);
+// void dumpMulSet(ssystem*, int, int);
+// void dump_preconditioner(ssystem*, charge*, int);
+// int has_duplicate_panels(FILE*, charge*);
+// #if DSQ2PD == ON
+// void dumpQ2PDiag(cube*);
+// #endif
+// void chkDummy(double*, int*, int);
+// void chkDummyList(charge**, int*, int);
+// void dumpCondNames(FILE*, Name*);
+// int dumpNameList(Name*);
+
+/* mulDo.c */
+void mulDirect(ssystem*);
+void mulPrecond(ssystem*, int);
+void mulUp(ssystem*);
+void mulEval(ssystem*);
+void mulDown(ssystem*);
+// #if OPCNT == ON
+// void printops(void);
+// #endif
+
+/* mulLocal.c */
+void evalFacFra(double**, int);
+// void evalSqrtFac(double**, double**, int);
+// void evalSinCos(double, int);
+// double sinB(int);
+// double cosB(int);
+double **mulMulti2Local(double, double, double, double, double, double, int);
+double **mulLocal2Local(double, double, double, double, double, double, int);
+double **mulQ2Local(charge**, int, int*, double, double, double, int);
+double **mulLocal2P(double, double, double, charge**, int, int);
+
+/* mulMats.c */
+void mulMatDirect(ssystem*);
+// void bdmulMatPrecond(ssystem*);
+void olmulMatPrecond(ssystem*);
+// void find_flux_density_row(double**, double**, int, int, int, int, int,
+//     charge**, charge**, int*, int*);
+void mulMatUp(ssystem*) ;
+void mulMatEval(ssystem*);
+void mulMatDown(ssystem*);
+
+/* mulMats_mod.c */
+// void mulMatDirect(ssystem*);
+// void bdmulMatPrecond(ssystem*);
+// void olmulMatPrecond(ssystem*);
+// void find_flux_density_row(double**, double**, int, int, int, int, int,
+//     charge**, charge**, int*, int*);
+// void mulMatUp(ssystem*); 
+// void mulMatEval(ssystem*);
+// void mulMatDown(ssystem*);
+
+/* mulMats_old.c */
+// void mulMatDirect(ssystem*);
+// void bdmulMatPrecond(ssystem*);
+// void olmulMatPrecond(ssystem*);
+// void find_flux_density_row(double**, double**, int, int, int, int, int,
+//     charge**, charge**, int*, int*);
+// void mulMatUp(ssystem*); 
+// void mulMatEval(ssystem*);
+// void mulMatDown(ssystem*);
+
+/* mulMulti.c */
+int multerms(int);
+int costerms(int);
+// int sinterms(int);
+void xyz2sphere(double, double, double, double, double, double, double*,
+    double*, double*);
+double iPwr(int);
+double fact(int);
+// void evalFactFac(double**, int);
+void mulMultiAlloc(int, int, int);
+void evalLegendre(double, double*, int);
+double **mulQ2Multi(charge**, int*, int, double, double, double, int);
+double **mulMulti2Multi(double, double, double, double, double, double, int);
+double **mulMulti2P(double, double, double, charge**, int, int);
+
+/* mulSetup.c */
+// ssystem *mulInit(int, int, int, charge*);
+// void getrelations(ssystem*);
+// void setPosition(ssystem*);
+// void setExact(ssystem*, int);
+// int cntDwnwdChg(cube*, int);
+
+/* patran.c */
+charge *patfront(FILE*, int*, int, double*, Name**, int*, char*);
+// void input(FILE*, char*, int, double*);
+// void waste_line(int, FILE*);
+// void file_title(FILE*);
+// void summary_data(FILE*);
+// void node_data(FILE*, double*);
+// void element_data(FILE*);
+// void grid_data(FILE*, double*);
+// void patch_data(FILE*);
+// void CFEG_table(FILE*);
+// void name_data(FILE*);
+// void grid_equiv_check(void);
+// int if_same_coord(double*, double*);
+char *delcr(char*);
+// void fill_patch_patch_table(int*);
+// int if_same_grid(int, GRID*);
+// void assign_conductor(int*);
+// void depth_search(int*, int*, int);
+// char *getPatranName(int);
+// charge *make_charges_all_patches(Name**, int*, int, char*);
+// charge *make_charges_patch(int, int*,int);
+// void assign_names(void)
+
+/* psMatDisplay.c */
+// void dump_aldus_hdr(FILE*, double, double, double, double, int);
+// void dump_aldus_foot(FILE*, int, char**, int, int, char*);
+// void dump_block(FILE*, double, double, double, double);
+// void dump_line(FILE*, double, double, double);
+// void dump_ps_mat(char*, int, int, int, int, char**, int, int);
+
+/* quickif.c */
+// int alias_match(Name*, char*);
+// int alias_match_name(Name*, char*);
+// void add_to_alias(Name*, char*);
+char *last_alias(Name*);
+int getConductorNum(char*, Name**, int*);
+// int getConductorNumNoAdd(char*, Name*);
+char *getConductorName(int, Name**);
+// int oldrenameConductor(char*, char*, Name**, int*);
+// int renameConductor(char*, char*, Name**, int*);
+charge *quickif(FILE*, char*, char*, int, double*, int*, Name**, char*);
+
+/* savemat_mod.c */
+void savemat(FILE*, int, char*, int, int, int, double*, double*);
+void savemat_mod(FILE*, int, char*, int, int, int, double*, double*, int, int);
+

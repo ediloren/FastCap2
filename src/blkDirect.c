@@ -1,41 +1,41 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
+#include <fcntl.h>
 
-#define SQRMAT 0		/* for rdMat(), wrMat() */
+#define SQRMAT 0		/* for rdMat(), wrMat) */
 #define TRIMAT 1
 #define COLMAT 2
 #define LOWMAT 0		/* for blkMatSolve() */
@@ -59,11 +59,31 @@ int *real_index;		/* real_index[i] = index in full array
 				   (w/dummies) corresponding to entry i in
 				   the condensed array used by blk routines */
 
+/* SRW */
+int sqrdex(int, int, int);
+int lowdex(int, int, int);
+void dumpMatCor(double**, double*, int);
+char *getName(int, char*);
+void transpose(double*, int);
+void wrMat(double*, int, int, int);
+void rdMat(double*, int, int, int);
+void matXfer(double*, double*, int, int);
+void blkMatsolve(double*, double*, int, int);
+void subInnerProd(double*, double*, int, int, int);
+void blkLudecomp(double*, int);
+void blkSolve(double*, double*, int, double*, double*);
+void blkQ2Pfull(cube*,  int, int, double**, double**, int**, int*);
+void blkLUdecomp(double*, double*, int);
+void blkAqprod(double*, double*, int, double*);
+void blkCompressVector(double*, int, int, int*);
+void blkExpandVector(double*, int, int);
+
+
 /*
   index into a square siz x siz matrix stored linearly
 */
-int sqrdex(i, j, siz)
-int i, j, siz;			/* row, column and size */
+int sqrdex(int i, int j, int siz)
+/* int i, j, siz;			row, column and size */
 {
   return(i*siz + j);
 }
@@ -71,15 +91,15 @@ int i, j, siz;			/* row, column and size */
 /*
   index into a lower triangular (w/diagonal) siz x siz matrix stored linearly
 */
-int lowdex(i, j, siz)
-int i, j, siz;			/* row, column and size */
+int lowdex(int i, int j, int siz)
+/* int i, j, siz;			row, column and size */
 {
   int ret;
   if(j > i || (ret = i*(i+1)/2 + j) > siz*(1+siz)/2) {
     fprintf(stderr, 
 	    "lowdex: bad indices for lower triangular i=%d  j=%d siz =%d\n",
 	    i, j, siz);
-    exit(0);
+    exit(1);
   }
   else return(ret);
 }
@@ -87,8 +107,8 @@ int i, j, siz;			/* row, column and size */
 /*
   index into an upper triangular (w/diagonal) siz x siz matrix stored linearly
 */
-int uppdex(i, j, siz)
-int i, j, siz;			/* row, column and size */
+int uppdex(int i, int j, int siz)
+/* int i, j, siz;			row, column and size */
 {
   int ret;
   
@@ -96,7 +116,7 @@ int i, j, siz;			/* row, column and size */
     fprintf(stderr, 
 	    "uppdex: bad indices for upper triangular i=%d  j=%d siz =%d\n",
 	    i, j, siz);
-    exit(0);
+    exit(1);
   }
   else return(ret);
 }
@@ -104,9 +124,9 @@ int i, j, siz;			/* row, column and size */
 /*
   for debug only - dumps upper left corner of a matrix
 */
-void dumpMatCor(mat, vec, fsize)
-int fsize;			/* full matrix size for flat storage */
-double **mat, *vec;		/* does first one that's not null */
+void dumpMatCor(double **mat, double *vec, int fsize)
+/* int fsize;			full matrix size for flat storage */
+/* double **mat, *vec;		does first one that's not null */
 {
   int i, j, size = 5;
 
@@ -134,9 +154,7 @@ double **mat, *vec;		/* does first one that's not null */
 /*
   gets the file name from the flag
 */
-char *getName(file, name)
-int file;
-char *name;
+char *getName(int file, char *name)
 {
   if(file == L11 || file == L21 || file == LTIL) name[0] = 'L';
   else name[0] = 'U';
@@ -156,11 +174,9 @@ char *name;
 /*
   converts a square matrix to its transpose (used to write columnwise)
 */
-void transpose(mat, siz)
-double *mat;
-int siz;
+void transpose(double *mat, int siz)
 {
-  int i, j, sqrdex();
+  int i, j;
   double temp;
 
   for(i = 0; i < siz; i++) {
@@ -176,26 +192,25 @@ int siz;
 /*
   writes full or triangular matrices 
 */
-void wrMat(mat, siz, file, type)
-double *mat;
-int siz, file, type;		/* siz is #rows and cols */
+void wrMat(double *mat, int siz, int file, int type)
+/* int siz, file, type;		siz is #rows and cols */
 {
-  int i, j, sqrdex(), ds = sizeof(double), fdis;
+  int i, j, ds = sizeof(double), fdis;
   int realsiz, actsiz;			/* size in chars */
-  char name[3], *getName();			/* name of file */
+  char name[3];			/* name of file */
 
   /* figure the real size */
   if(type == TRIMAT) realsiz = ds*siz*(siz+1)/2;
   else if(type == SQRMAT || type == COLMAT) realsiz = sizeof(double)*siz*siz;
   else {
     fprintf(stderr, "wrMat: bad type flag %d\n", type);
-    exit(0);
+    exit(1);
   }
 
   /* figure name of file and create, open to write */
   if((fdis = creat(getName(file, name), PMODE)) == -1) {
     fprintf(stderr, "wrMat: can't creat '%s'\n", name);
-    exit(0);
+    exit(1);
   }
 
   fprintf(stderr,"Writing %s...", name);
@@ -206,7 +221,7 @@ int siz, file, type;		/* siz is #rows and cols */
     fprintf(stderr, 
 	    "wrMat: buffer write error to '%s,' wrote %d of %d dbls\n", 
 	    name, actsiz/ds, realsiz/ds);
-    exit(0);
+    exit(1);
   }
   close(fdis);
 
@@ -216,26 +231,25 @@ int siz, file, type;		/* siz is #rows and cols */
 /*
   reads full or triangular matrices 
 */
-void rdMat(mat, siz, file, type)
-double *mat;
-int siz, file, type;		/* siz is #rows and cols */
+void rdMat(double *mat, int siz, int file, int type)
+/* int siz, file, type;		siz is #rows and cols */
 {
-  int i, j, sqrdex(), fdis;
+  int i, j, fdis;
   int realsiz;			/* size in chars */
-  char name[3], *getName();   	/* name of file */
+  char name[3];   	/* name of file */
 
   /* figure the real size */
   if(type == TRIMAT) realsiz = sizeof(double)*siz*(siz+1)/2;
   else if(type == SQRMAT) realsiz = sizeof(double)*siz*siz;
   else {
     fprintf(stderr, "rdMat: bad type flag %d\n", type);
-    exit(0);
+    exit(1);
   }
 
   /* figure name of file and open to read */
   if((fdis = open(getName(file, name), 0)) == -1) {
     fprintf(stderr, "rdMat: can't open '%s'\n", name);
-    exit(0);
+    exit(1);
   }
 
   fprintf(stderr,"Reading %s...", name);
@@ -243,7 +257,7 @@ int siz, file, type;		/* siz is #rows and cols */
   /* read the data and close */
   if(realsiz != read(fdis, (char *)mat, realsiz)) {
     fprintf(stderr, "rdMat: read error to '%s'\n", name);
-    exit(0);
+    exit(1);
   }
   close(fdis);
 
@@ -253,11 +267,9 @@ int siz, file, type;		/* siz is #rows and cols */
 /*
   transfer part of the square matrix to the triangular matrix
 */
-void matXfer(matsq, matri, siz, type)
-int siz, type;
-double *matsq, *matri;
+void matXfer(double *matsq, double *matri, int siz, int type)
 {
-  int i, j, uppdex(), sqrdex(), temp;
+  int i, j, temp;
 
   if(type == UP2TR) {		/* mv upper triangular part */
     for(i = 0; i < siz; i++) {	/* from row zero up */
@@ -277,18 +289,16 @@ double *matsq, *matri;
   }
   else {
     fprintf(stderr, "matXfer: bad type %d\n", type);
-    exit(0);
+    exit(1);
   }
 }  
 
 /*
   does many rhs, triangular problem to get L21 and U12 for blk factorization
 */
-void blkMatsolve(matsq, matri, siz, type)
-int siz, type;
-double *matsq, *matri;
+void blkMatsolve(double *matsq, double *matri, int siz, int type)
 {
-  int i, j, k, sqrdex(), lowdex(), uppdex();
+  int i, j, k;
   extern int fulldirops;
 
   if(type == LOWMAT) {
@@ -323,7 +333,7 @@ double *matsq, *matri;
   }
   else {
     fprintf(stderr, "blkMatsolve: bad type %d\n", type);
-    exit(0);
+    exit(1);
   }
 
 }
@@ -331,13 +341,12 @@ double *matsq, *matri;
 /*
   figures the difference A11-(L21)(U12) - part of block factorization
 */
-void subInnerProd(matsq, matri, siz, matl, matu)
-double *matsq, *matri;
-int siz, matl, matu;		/* size in doubles; matrices to multiply */
+void subInnerProd(double *matsq, double *matri, int siz, int matl, int matu)
+/* int siz, matl, matu;		size in doubles; matrices to multiply */
 {
-  int i, j, k, matrisiz, rowlim, rowliml, colimu, fdl, fdu, lowdex(), sqrdex();
+  int i, j, k, matrisiz, rowlim, rowliml, colimu, fdl, fdu;
   int froml, fromu, ds = sizeof(double), readl, readu;
-  char *getName(), name[3];
+  char name[3];
   double *matriu, temp;
   extern int fulldirops;
   extern double lutime;
@@ -355,7 +364,7 @@ int siz, matl, matu;		/* size in doubles; matrices to multiply */
   /* open the relvant files */
   if((fdl = open(getName(matl, name), 0)) == -1) {
     fprintf(stderr, "subInnerProd: can't open '%s'\n", name);
-    exit(0);
+    exit(1);
   }
 
   /* for each matl chunk, read in all chunks of matu and do inner products */
@@ -364,12 +373,12 @@ int siz, matl, matu;		/* size in doubles; matrices to multiply */
     if(readl % (siz*ds) != 0) {	/* must read in row size chunks */
       fprintf(stderr, "subInnerProd: read error from '%s'\n", 
 	      getName(matl, name));
-      exit(0);
+      exit(1);
     }
     readl /= (siz*ds);
     if((fdu = open(getName(matu, name), 0)) == -1) { /* (re)open u part */
       fprintf(stderr, "subInnerProd: can't open '%s'\n", name);
-      exit(0);
+      exit(1);
     }
     for(fromu = 0; fromu < siz; fromu += colimu) { /* loop on cols in u part */
       fprintf(stderr, "%d-%d ", froml, fromu);
@@ -377,7 +386,7 @@ int siz, matl, matu;		/* size in doubles; matrices to multiply */
       if(readu % (siz*ds) != 0) {	/* must read in col size chunks */
 	fprintf(stderr, "subInnerProd: read error from '%s'\n", 
 		getName(matu, name));
-	exit(0);
+	exit(1);
       }
       readu /= (siz*ds);
       /* do the inner product/subtractions possible with these chunks */
@@ -411,18 +420,16 @@ int siz, matl, matu;		/* size in doubles; matrices to multiply */
   - returned matrix has L below the diagonal, U above (GVL1 pg 58)
   - meant to be used with 2x2 block matrix factorization
 */
-void blkLudecomp(mat, size)
-double *mat;
-int size;
+void blkLudecomp(double *mat, int size)
 {
   extern int fulldirops;
   double factor;
-  int i, j, k, sqrdex();
+  int i, j, k;
 
   for(k = 0; k < size-1; k++) {	/* loop on rows */
     if(mat[SQDEX(k, k, size)] == 0.0) {
       fprintf(stderr, "blkLudecomp: zero piovt\n");
-      exit(0);
+      exit(1);
     }
     fprintf(stderr,"%d ", k);
     for(i = k+1; i < size; i++) { /* loop on remaining rows */
@@ -440,9 +447,8 @@ int size;
 /*
   solves using factored matrix on disc
 */
-void blkSolve(x, b, siz, matri, matsq)
-int siz;
-double *x, *b, *matri, *matsq;			/* solution, rhs */
+void blkSolve(double *x, double *b, int siz, double *matri, double *matsq)
+/* double *x, *b, *matri, *matsq;			solution, rhs */
 {
   int i, j, k;
   extern int fulldirops;
@@ -536,15 +542,12 @@ double *x, *b, *matri, *matsq;			/* solution, rhs */
   - only 3/8 of the entire matrix is in core at any given time, rest on disc
     in L11, U11, U12, L21, Ltil and Util
 */
-void blkQ2Pfull(directlist,  numchgs, numchgs_wdummy, 
-		triArray, sqrArray, real_index, is_dummy)
-int numchgs, numchgs_wdummy, *is_dummy, **real_index;
-double **triArray, **sqrArray;	/* LINEAR arrays: 1 triangular, 1 square mat */
-cube *directlist;
+void blkQ2Pfull(cube *directlist,  int numchgs, int numchgs_wdummy, 
+    double **triArray, double **sqrArray, int **real_index, int *is_dummy)
+/* double **triArray, **sqrArray;	LINEAR arrays: 1 triangular, 1 square mat */
 {
-  int i, j, fromp, fromq, top, toq, matsize, lowdex(), sqrdex(), uppdex(); 
+  int i, j, fromp, fromq, top, toq, matsize;
   int k, l, i_real, j_real;
-  double calcp();
   cube *pq, *pp;
   charge **pchgs, **qchgs, *ppan, *qpan;
   double pos_fact, neg_fact;
@@ -561,7 +564,7 @@ cube *directlist;
   }
   else {
     fprintf(stderr, "blkQ2Pfull: can't handle an odd number of panels\n");
-    exit(0);
+    exit(1);
   }
 
   /* load the matrix in the style of Q2P() - no attempt to exploit symmetry */
@@ -570,7 +573,7 @@ cube *directlist;
   pp = pq = directlist;
   if(pp == NULL || pp->dnext != NULL || pp->upnumeles[0] != numchgs_wdummy) {
     fprintf(stderr, "blkQ2Pfull: bad directlist, must run with depth 0\n");
-    exit(0);
+    exit(1);
   }
 
   pchgs = qchgs = pp->chgs;
@@ -585,7 +588,7 @@ cube *directlist;
   }
   if(j != numchgs) {
     fprintf(stderr, "blkQ2Pfull: panel count and given #panels don't match\n");
-    exit(0);
+    exit(1);
   }
 
   /* dump the four matrix sections */
@@ -631,7 +634,7 @@ cube *directlist;
       /* dump the 1/4 matrix to a file */
       if(k == 0 && l == 0) {
 	wrMat(*sqrArray, numchgs/2, L11, SQRMAT);
-	/* dumpMatCor((double **)NULL, *sqrArray, numchgs/2); /* for debug */
+	/* dumpMatCor((double **)NULL, *sqrArray, numchgs/2); */ /* for debug */
       }
       else if(k == 0 && l == 1) wrMat(*sqrArray, numchgs/2, U12, SQRMAT);
       else if(k == 1 && l == 0) wrMat(*sqrArray, numchgs/2, L21, SQRMAT);
@@ -651,9 +654,9 @@ cube *directlist;
   using four sections of A stored on disk as 
   A11 = L11, A12 = U12, A21 = L21, A22 = LTI
 */
-void blkLUdecomp(sqrArray, triArray, numchgs)
-double *sqrArray, *triArray;	/* previously allocated flattened matrices */
-int numchgs;			/* A is numchgsxnumchgs */
+void blkLUdecomp(double *sqrArray, double *triArray, int numchgs)
+/* double *sqrArray, *triArray;	previously allocated flattened matrices */
+/* int numchgs;			A is numchgsxnumchgs */
 {
   extern double lutime;
 
@@ -731,12 +734,12 @@ int numchgs;			/* A is numchgsxnumchgs */
   L11 U12
   L21 LTI
 */
-void blkAqprod(p, q, size, sqmat)
-int size;			/* A is size by size */
-double *p, *q;			/* p = Aq is calculated */
-double *sqmat;			/* flat storage space for 1/4 of A */
+void blkAqprod(double *p, double *q, int size, double *sqmat)
+/* int size;			A is size by size */
+/* double *p, *q;			p = Aq is calculated */
+/* double *sqmat;			flat storage space for 1/4 of A */
 {
-  int i, j, k, l, fromp, fromq, sqrdex();
+  int i, j, k, l, fromp, fromq;
   extern int fullPqops;
   extern double dirtime;
 
@@ -770,9 +773,8 @@ double *sqmat;			/* flat storage space for 1/4 of A */
     (all zero columns removed and row ops done for divided differences)
   - should ultimately convert multipole over to condensed form, wont need this
 */
-void blkCompressVector(vec, num_panels, real_size, is_dummy)
-double *vec;
-int num_panels, *is_dummy, real_size;
+void blkCompressVector(double *vec, int num_panels, int real_size,
+    int *is_dummy)
 {
   int i, j;
 
@@ -785,16 +787,14 @@ int num_panels, *is_dummy, real_size;
   if(j != real_size) {
     fprintf(stderr, "blkCompressVector: number of real panels not right, %d\n",
 	    j);
-    exit(0);
+    exit(1);
   }
 }
 
 /*
   the inverse of the above function
 */
-void blkExpandVector(vec, num_panels, real_size)
-int num_panels, real_size;
-double *vec;
+void blkExpandVector(double *vec, int num_panels, int real_size)
 {
   int i, j, from, to, cur_real;
   extern int *real_index;	/* this index set relies on indexing from 0 */

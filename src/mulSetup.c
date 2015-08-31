@@ -1,49 +1,64 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
 
 cube *cstack[1024];		/* Stack used in several routines. */
 
+/* SRW */
+ssystem *mulInit(int, int, int, charge*);
+void getrelations(ssystem*);
+void setPosition(ssystem*);
+void setExact(ssystem*, int);
+int cntDwnwdChg(cube*, int);
+
+static int placeq(int, ssystem*, charge*);
+static void placeqold(ssystem*, charge*);
+static void indexkid(ssystem*, cube*, int*, int*);
+static void getnbrs(ssystem*);
+static void linkcubes(ssystem*);
+static void setMaxq(ssystem*);
+static void markUp(cube*, int);
+static int getInter(cube*);
+static void getAllInter(ssystem*);
+static void set_vector_masks(ssystem*);
+
 /*
   sets up the partitioning of space and room for charges and expansions
 */
-ssystem *mulInit(autom, depth, order, charges)
-int autom;			/* ON => choose depth automatically */
-int depth, order;
-charge *charges;
+ssystem *mulInit(int autom, int depth, int order, charge *charges)
+/* int autom;			ON => choose depth automatically */
 {
   ssystem *sys;
   int qindex=1, cindex=1;
@@ -97,19 +112,16 @@ charge *charges;
   - this routine is still called to set automatic levels if ADAPT is OFF,
      ie even when the calculation is not adaptive, so results can be compared
 */
-static int placeq(flag, sys, charges)
-int flag;			/* ON => set depth automatically */
-ssystem *sys;
-charge *charges;
+static int placeq(int flag, ssystem *sys, charge *charges)
+/* int flag;			ON => set depth automatically */
 {
-  int i, j, k, l, side, totalq, isexact, multerms(), depth;
+  int i, j, k, l, side, totalq, isexact, depth;
   int xindex, yindex, zindex, limit = multerms(sys->order), compflag;
   int exact_cubes_this_level, cubes_this_level;
   double length0, length, exact_ratio;
-  double minx, maxx, miny, maxy, minz, maxz, tilelength(), maxTileLength;
+  double minx, maxx, miny, maxy, minz, maxz, maxTileLength;
   charge *nextq, *compq;
   cube *****cubes, *nextc;
-  char *hack_path();
 
   /* Figure out the length of lev 0 cube and total number of charges. */
   nextq = charges;
@@ -189,7 +201,7 @@ charge *charges;
 	fprintf(stderr, 
 		"placeq: out of cube pntr space - increase MAXDEP == %d\n", 
 		MAXDEP);
-	exit(0);
+	exit(1);
       }
 
       length = (1.01 * length0)/side;
@@ -197,19 +209,19 @@ charge *charges;
       CALLOC(cubes[i], side, cube***, OFF, AMSC);
       if(cubes[i] == NULL) {
 	fprintf(stderr, "placeq: %d levels set up\n", i-1);
-	exit(0);
+	exit(1);
       }
       for(j=0; j < side; j++) {
 	CALLOC(cubes[i][j], side, cube**, OFF, AMSC);
 	if(cubes[i][j] == NULL) {
 	  fprintf(stderr, "placeq: %d levels set up\n", i-1);
-	  exit(0);
+	  exit(1);
 	}
 	for(k=0; k < side; k++) {
 	  CALLOC(cubes[i][j][k], side, cube*, OFF, AMSC);
 	  if(cubes[i][j][k] == NULL) {
 	    fprintf(stderr, "placeq: %d levels set up\n", i-1);
-	    exit(0);
+	    exit(1);
 	  }
 	}
       }
@@ -224,14 +236,14 @@ charge *charges;
 	  CALLOC(nextc, 1, cube, OFF, AMSC);
 	  if(nextc == NULL) {
 	    fprintf(stderr, "placeq: %d levels set up\n", i-1);
-	    exit(0);
+	    exit(1);
 	  }
 	  cubes[i][xindex][yindex][zindex] = nextc;
 	  nextc->upnumvects = 1;
 	  CALLOC(nextc->upnumeles, 1, int, OFF, AMSC);
 	  if(nextc->upnumeles == NULL) {
 	    fprintf(stderr, "placeq: %d levels set up\n", i-1);
-	    exit(0);
+	    exit(1);
 	  }
 	  nextc->upnumeles[0] = 1;
 	}
@@ -385,12 +397,10 @@ charge *charges;
 /* 
 Place the charges in the cube structure. 
 */
-static placeqold(sys, charges)
-ssystem *sys;
-charge *charges;
+static void placeqold(ssystem *sys, charge *charges)
 {
 double length;
-double minx, maxx, miny, maxy, minz, maxz, tilelength();
+double minx, maxx, miny, maxy, minz, maxz;
 int depth=sys->depth;
 int j, k, l, xindex, yindex, zindex, side = sys->side;
 int totalq;
@@ -423,7 +433,7 @@ cube *nextc, *****cubes = sys->cubes;
   length = (1.01 * length) / side;
   if(length == 0) {
     fprintf(stderr,"placeq: All the lengths in the problem are zero\n");
-    exit(0);
+    exit(1);
   }
   sys->length = length;
   sys->minx = minx;
@@ -484,8 +494,7 @@ cube *nextc, *****cubes = sys->cubes;
 /*
 GetRelations allocates parents links the children. 
 */
-getrelations(sys)
-ssystem *sys;
+void getrelations(ssystem *sys)
 {
 cube *nextc, *parent, *****cubes = sys->cubes;
 int i, j, k, l, side;
@@ -526,8 +535,7 @@ int i, j, k, l, side;
 /*
 Set the position coordinates of the cubes.
 */
-setPosition(sys)
-ssystem *sys;
+void setPosition(ssystem *sys)
 {
 int i, j, k, l;
 int side = sys->side;
@@ -563,10 +571,7 @@ psuedo-adaptive scheme.  Also get the pointer to the appropriate section
 of the charge and potential vector.  Uses the eval vector for the potential
 coeffs at the lowest level.  Also index the lowest level cubes.
 */
-static indexkid(sys, dad, pqindex, pcindex)
-ssystem *sys;
-cube *dad;
-int *pqindex, *pcindex;
+static void indexkid(ssystem *sys, cube *dad, int *pqindex, int *pcindex)
 {
   int i;
   
@@ -601,14 +606,12 @@ potential vector.  Otherwise, the number of nonzero kids is counted
 and put in upnumvects as usual.  
 */
 /* added 30Mar91: provisions for loc_exact and mul_exact */
-setExact(sys, numterms)
-ssystem *sys;
-int numterms;
+void setExact(ssystem *sys, int numterms)
 {
 int i, j, k, l, m, n;
 int side = sys->side;
 int depth = sys->depth;
-int numchgs, num_eval_pnts, first, multerms();
+int numchgs, num_eval_pnts, first;
 cube *nc, *nkid, *****cubes = sys->cubes;
 int all_mul_exact, all_loc_exact, p, num_real_panels;
 
@@ -717,8 +720,7 @@ int all_mul_exact, all_loc_exact, p, num_real_panels;
 Find all the nearest neighbors.
 At the bottom level, get neighbors due to a parents being exact.
 */
-static getnbrs(sys)
-ssystem *sys;
+static void getnbrs(ssystem *sys)
 {
 cube *nc, *np, *****cubes = sys->cubes;
 int depth = sys->depth;
@@ -773,9 +775,8 @@ being exact.
 /*
   returns the number of charges in the lowest level cubes contained in "cp"
 */
-int cntDwnwdChg(cp, depth)
-int depth;			/* number of lowest level */
-cube *cp;
+int cntDwnwdChg(cube *cp, int depth)
+/* int depth;			number of lowest level */
 {
   int i;
   int cnt;
@@ -793,8 +794,7 @@ for the cubes requiring local expansion work, one for the cubes requiring
 direct methods and one for cubes with potential evaluation points. 
 Note, upnumvects and exact must be set!!!
 */
-static linkcubes(sys)
-ssystem *sys;
+static void linkcubes(ssystem *sys)
 {
   cube *nc, **plnc, **pdnc, **pmnc, *****cubes = sys->cubes;
   int i, j, k, l, cnt = 0;
@@ -848,8 +848,7 @@ ssystem *sys;
 /*
 Determine maximum number of chgs contained in a single cube.
 */
-static setMaxq(sys)
-ssystem *sys;
+static void setMaxq(ssystem *sys)
 {
   int i, j, k, l, side, p, kids_are_exact, all_null, depth = sys->depth;
   int mul_maxq, mul_maxlq, loc_maxq, loc_maxlq, num_chgs, real_panel_cnt;
@@ -941,9 +940,7 @@ ssystem *sys;
 /* 
   markup sets the flag to "flag" in the child and its nearest nbrs
 */
-static markUp(child, flag)
-cube *child;
-int flag;
+static void markUp(cube *child, int flag)
 {
   int i,j;
   cube *nc, *np;
@@ -959,8 +956,7 @@ int flag;
    for cube "child", excluding only empty cubes
   -interaction list pointer is saved in the interList cube struct field
 */
-static getInter(child)
-cube *child;
+static int getInter(cube *child)
 {
   int i, j, vects, usekids, lc, jc, kc, ln, jn, kn;
   int numnbr = (child->parent)->numnbrs; /* number of neighbors */
@@ -1029,8 +1025,7 @@ cube *child;
 /*
   generates explicit, true interaction lists for all non-empty cubes w/lev > 1
 */
-static getAllInter(sys)
-ssystem *sys;
+static void getAllInter(ssystem *sys)
 {
   int i, j, k, l, side, depth = sys->depth;
   cube *nc, *****cubes = sys->cubes;
@@ -1051,8 +1046,7 @@ ssystem *sys;
   - mask vectors are redundant (could read flags in charge struct) 
   - done for speed in potential eval loop
 */
-static set_vector_masks(sys)
-ssystem *sys;
+static void set_vector_masks(ssystem *sys)
 {
   int i;
   cube *cp;

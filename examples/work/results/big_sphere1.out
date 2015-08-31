@@ -1,0 +1,33 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../big_sphere1.neu
+Surface ../big_sphere1.neu has 0 quads and 432 tris
+  Input surfaces:
+   GROUP1
+    big_sphere1.neu, conductor
+      title: `SPHERE, RADIUS 2, ELEM LEN = 0.5'
+      outer permittivity: 1
+      number of panels: 432
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 16:25:41 2014
+  Host: poe
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 432
+    Number of conductor panels: 432
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 3 (lowest)
+Percentage of multiplies done by multipole: 11.5%
+
+ITERATION DATA
+Starting on column 1 (SPHERE%GROUP1)
+1 2 
+
+CAPACITANCE MATRIX, nanofarads
+                        1 
+SPHERE%GROUP1 1       0.22

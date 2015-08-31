@@ -1,36 +1,35 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 /**************************************************************************
@@ -67,17 +66,37 @@ int first_grid;			/* note that current_name static is not */
 int first_patch;		/*   reset since the name list must */
 int first_cfeg;			/*   be preserved as new files are read */
 
-charge *patfront(stream, file_is_patran_type, surf_type, trans_vector,
-		 name_list, num_cond, name_suffix)
-  FILE *stream;
-int *file_is_patran_type, surf_type, *num_cond;
-double *trans_vector;
-Name **name_list;
-char *name_suffix;
+/* SRW */
+charge *patfront(FILE*, int*, int, double*, Name**, int*, char*);
+void input(FILE*, char*, int, double*);
+void waste_line(int, FILE*);
+void file_title(FILE*);
+void summary_data(FILE*);
+void node_data(FILE*, double*);
+void element_data(FILE*);
+void grid_data(FILE*, double*);
+void patch_data(FILE*);
+void CFEG_table(FILE*);
+void name_data(FILE*);
+void grid_equiv_check(void);
+int if_same_coord(double*, double*);
+char *delcr(char*);
+void fill_patch_patch_table(int*);
+int if_same_grid(int, GRID*);
+void assign_conductor(int*);
+void depth_search(int*, int*, int);
+char *getPatranName(int);
+charge *make_charges_all_patches(Name**, int*, int, char*);
+charge *make_charges_patch(int, int*,int);
+void assign_names(void);
+
+
+charge *patfront(FILE *stream, int *file_is_patran_type, int surf_type,
+    double *trans_vector, Name **name_list, int *num_cond, char *name_suffix)
 {
   int *patch_patch_table, numq=0;
   static char *line = NULL;
-  charge *make_charges_all_patches(), *firstq, *quickif();
+  charge *firstq;
   double *corner0, *corner1, *corner2, *corner3;
 
   if(line == NULL) CALLOC(line, BUFSIZ, char, ON, AMSC);
@@ -131,13 +150,10 @@ char *name_suffix;
 
 ****************************************************************************/
 
-input(stream, line, surf_type, trans_vector)
-  char *line;
-  FILE *stream;
-int surf_type;
-double *trans_vector;
+void input(FILE *stream, char *line, int surf_type, double *trans_vector)
 {
   int END=0;
+  int ret;
 
   /* Reads in the first line from each card, and branch off.  ID, IV, KC, 
      N1, N2, N3, N4 and N5 are global variables accessible by subroutines. */
@@ -147,10 +163,16 @@ double *trans_vector;
       sscanf(line,"%d %d %d %d %d %d %d %d %d", 
 	   &type_number, &ID, &IV, &KC, &N1, &N2, &N3, &N4, &N5);    
       line[0] = '0';
+      ret = 0;
     }
-    else fscanf(stream,"%d %d %d %d %d %d %d %d %d", 
+    else ret = fscanf(stream,"%d %d %d %d %d %d %d %d %d", 
 		&type_number, &ID, &IV, &KC, &N1, &N2, &N3, &N4, &N5);
-      
+
+    /* Enrico, fixed infinite loop bug in case of misformed input file */
+    if(ret == -1) {
+        END = 1;
+        continue;
+    }
 
     switch (type_number) {
     case 25:
@@ -190,24 +212,30 @@ double *trans_vector;
 
 /* Simply read in 'num_line' lines from stream and dump. */
 
-waste_line(num_line,stream)
-  int num_line;
-  FILE *stream;
+void waste_line(int num_line, FILE *stream)
 {
   int c, tmp;
   tmp=num_line+1;
   while (tmp) {
     c=getc(stream);
-    if (c=='\n') tmp--;}
+    if (c=='\n') tmp--;
+    if (c == EOF) {
+      /* SRW -- OK if the last newline not found before EOF. */
+      if (tmp > 1) {
+        fprintf(stderr, "Premature end of file - bad format.\n");
+        exit(1);
+      }
+      return;
+    }
+  }
 }
 
 
 /* Save the title of the Neutral file. */
 
-file_title(stream)
-  FILE *stream;
+void file_title(FILE *stream)
 {
-  char line[BUFSIZ], *delcr();
+  char line[BUFSIZ];
   
   fgets(line, sizeof(line), stream);
   if(title[0] == '\0') strcpy(title, delcr(line));
@@ -218,8 +246,7 @@ file_title(stream)
    nodes, this function allocates spaces for nodes and elements, and sets up
    the global pointers to these arrays. */
 
-summary_data(stream)
-  FILE *stream;
+void summary_data(FILE *stream)
 {
   number_nodes = N1; number_elements = N2;
 
@@ -237,9 +264,7 @@ summary_data(stream)
    node array, list_nodes, which is preallocated by summary_data function. 
    Node_search_table is sorted by node ID to make indexing of a node easier. */
 
-node_data(stream, trans_vector)
-  FILE *stream;
-double *trans_vector;
+void node_data(FILE *stream, double *trans_vector)
 {
   double tmp_coord[3];
   int i;
@@ -259,8 +284,7 @@ double *trans_vector;
    function.  Element_search_table is sorted by element ID to make indexing 
    of an element easier.  */
 
-element_data(stream)
-  FILE *stream;
+void element_data(FILE *stream)
 {
   int num_nodes, corner[4], i, tmp;
   float tmp1;
@@ -289,9 +313,7 @@ element_data(stream)
    structure.  Start_grid is the global variable that points to the very 
    first GRID structure created.  */
 
-grid_data(stream, trans_vector)
-  FILE *stream;
-double *trans_vector;
+void grid_data(FILE *stream, double *trans_vector)
 {
   static GRID *prev_grid=0;
   GRID *current_grid;
@@ -321,8 +343,7 @@ double *trans_vector;
    structure.  Start_patch is the global variable that points to the very 
    first PATCH structure created.  */
 
-patch_data(stream)
-  FILE *stream;
+void patch_data(FILE *stream)
 {
   static PATCH *prev_patch=0;
   PATCH *current_patch;
@@ -341,7 +362,7 @@ patch_data(stream)
   if (prev_patch) prev_patch->next = current_patch;
 
   waste_line(9,stream);
-  fscanf(stream, "%f %f %f %d %d %d %d", 
+  fscanf(stream, "%lf %lf %lf %d %d %d %d", 
 	 &tmp, &tmp, &tmp, corner, corner+1, corner+2, corner+3);
   for (i=0; i<4; i++) current_patch->corner[i] = corner[i];
   prev_patch = current_patch;
@@ -355,8 +376,7 @@ patch_data(stream)
    first CFEG structure created.  CFEG table has the result from meshing 
    a patch. */
 
-CFEG_table(stream)
-  FILE *stream;
+void CFEG_table(FILE *stream)
 {
   static CFEG *prev_cfeg=0;
   CFEG *current_cfeg;
@@ -429,11 +449,10 @@ CFEG_table(stream)
   - the output routine looks at the first sm_patch struct associated with
     each NAME struct to determine the number of the corresponding cond name
 */
-name_data(stream)
-FILE *stream;
+void name_data(FILE *stream)
 {
   int len, iv, i, j, ntype, id, patch_cnt = 0;
-  char line[BUFSIZ], *delcr();
+  char line[BUFSIZ];
   SM_PATCH *current_patch = NULL;
 
   if(start_name == NULL) {	/* if first time on first patfront() call */
@@ -478,8 +497,13 @@ FILE *stream;
     fprintf(stderr, 
 	    "\nname_data: conductor '%s'\n  has no patch - redo naming so that one is included.\n", 
 	    current_name->name);
-    exit(0);
+    exit(1);
   }
+  // Enrico 2003/07/15 PATRAN input bug fix. If '21' statement
+  // ends with zeroes as in recent PATRAN versions
+  // and not with '\n' as in original MIT files, program hangs up.
+  // So must skip the rest of the line.
+  waste_line(0, stream);
 }
 
 /* This function checks for coordinate-wise equivalent grid points.  Each 
@@ -487,7 +511,7 @@ FILE *stream;
    from two grid points are within SMALL_NUMBER, defined in patran.h, then 
    they are equivalent.  */
 
-grid_equiv_check()
+void grid_equiv_check(void)
 {
   GRID *grid_ptr_1, *grid_ptr_2;
   int i;
@@ -530,8 +554,7 @@ grid_equiv_check()
 }
 
 
-int if_same_coord(coord_1, coord_2)
-  double coord_1[3], coord_2[3];
+int if_same_coord(double *coord_1, double *coord_2)
 {
   int i;
 
@@ -543,8 +566,7 @@ int if_same_coord(coord_1, coord_2)
 /*
   makes 1st \n in a string = \0 and then deletes all trail/leading wh space
 */
-char *delcr(str)
-char *str;
+char *delcr(char *str)
 {
   int i, j, k;
   for(k = 0; str[k] != '\0'; k++) if(str[k] == '\n') { str[k] = '\0'; break; }
@@ -570,8 +592,7 @@ char *str;
    patches that are connected by the grid point.  The end result table is
    symmetric.  */   
 
-fill_patch_patch_table(patch_patch_table)
-  int *patch_patch_table;
+void fill_patch_patch_table(int *patch_patch_table)
 {
   int patch_count, patch_count_save, *current_table_ptr, *corner, i;
   GRID *grid_ptr;
@@ -612,9 +633,7 @@ fill_patch_patch_table(patch_patch_table)
 /* Return 1 if ID matches grid_ptr's ID or IDs of its equivalent grids, 
    and 0 otherwise. */
 
-int if_same_grid(ID,grid_ptr)
-  int ID;
-  GRID *grid_ptr;
+int if_same_grid(int ID, GRID *grid_ptr)
 {
   int *equiv_ID, i;
 
@@ -631,8 +650,7 @@ int if_same_grid(ID,grid_ptr)
 /* This function searches through the patch_patch_table and finds groups of
    patches that are connected only among themselves. */
 
-assign_conductor(patch_patch_table)
-  int *patch_patch_table;
+void assign_conductor(int *patch_patch_table)
 {
   PATCH *patch_ptr;
   int patch_count=0, *current_table_ptr;
@@ -677,8 +695,8 @@ assign_conductor(patch_patch_table)
 /* This function searches through patch_patch_table recursively to
    find all patches that are somehow connected the current patch. */
 
-depth_search(patch_patch_table,current_table_ptr,conductor_count)
-  int *patch_patch_table, *current_table_ptr,conductor_count;
+void depth_search(int *patch_patch_table, int *current_table_ptr,
+    int conductor_count)
 {
   PATCH *patch_ptr;
   int i, *new_table_ptr;
@@ -706,8 +724,7 @@ depth_search(patch_patch_table,current_table_ptr,conductor_count)
   used with new naming functions---finds the patran name in the patran list
   - this code used to be in mksCapDump()
 */
-char *getPatranName(cond_num)
-int cond_num;
+char *getPatranName(int cond_num)
 {
   NAME *cname;
 
@@ -730,17 +747,16 @@ int cond_num;
 
 ****************************************************************************/
 
-charge *make_charges_all_patches(name_list, num_cond, surf_type, name_suffix)
-Name **name_list;		/* master list of conductor names */
-int *num_cond;			/* master conductor counter */
-int surf_type;
-char *name_suffix;
+charge *make_charges_all_patches(Name **name_list, int *num_cond,
+    int surf_type, char *name_suffix)
+/* Name **name_list;		master list of conductor names */
+/* int *num_cond;			master conductor counter */
 {
   CFEG *cfeg_ptr;
   int NELS, LPH_ID,conductor_ID,*element_list;
   char cond_name[BUFSIZ];
   PATCH *patch_ptr;
-  charge *first_pq=0,*current_pq,*make_charges_patch();
+  charge *first_pq=0,*current_pq;
 
   cfeg_ptr = start_cfeg;
   while (cfeg_ptr) {
@@ -789,8 +805,7 @@ char *name_suffix;
 
 /* This function creates the linked list of charges for a single patch. */
 
-charge *make_charges_patch(NELS,element_list,conductor_ID)
-  int NELS, *element_list, conductor_ID;
+charge *make_charges_patch(int NELS, int *element_list,int conductor_ID)
 {
   charge *pq, *current_pq;
   int i,element_number,*element_corner_ptr;
@@ -851,7 +866,7 @@ charge *make_charges_patch(NELS,element_list,conductor_ID)
   - checks one linked list against another, potentially n^2 => named
     regions should be kept small (as few patches as possible)
 */
-assign_names()
+void assign_names(void)
 {
   int quit, current_conductor, cnt = 0;
   PATCH *current_patch;
@@ -860,7 +875,7 @@ assign_names()
 
   if(start_name_this_time == NULL) {
     fprintf(stderr, "\nassign_names: no conductor names specified\n");
-    exit(0);
+    exit(1);
   }
 
   /* for each name struct, find cond no of each patch (can be n^2 loop) */
@@ -879,7 +894,7 @@ assign_names()
 	  else if(current_conductor != current_patch->conductor_ID) {
 	    fprintf(stderr,
 		    "\nassign_names: alleged conductor '%s'\n  has patches from more than one conductor - rename more carefully\n", cur_name->name);
-	    exit(0);
+	    exit(1);
 	  }
 	  quit = 1;
 	}
@@ -887,7 +902,7 @@ assign_names()
       }
       if(quit == 0) {
 	fprintf(stderr, "\nassign_names: in conductor '%s'\n  can't find named patch in master list\n", cur_name->name);
-	exit(0);
+	exit(1);
       }
       current_name_patch = current_name_patch->next;
     }
@@ -899,12 +914,12 @@ assign_names()
   if(cnt < conductor_count - 1) {
     fprintf(stderr, "\nassign_names: %d conductors have no names\n", 
 	    conductor_count - 1 - cnt);
-    exit(0);
+    exit(1);
   }
   if(cnt > conductor_count - 1) {
     fprintf(stderr, "\nassign_names: %d names given for %d conductors\n", 
 	    cnt, conductor_count - 1);
-    exit(0);
+    exit(1);
   }
 
     

@@ -1,0 +1,39 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../ramcell_cond.neu
+Surface ../ramcell_cond.neu has 306 quads and 282 tris
+  Input surfaces:
+   GROUP1
+    ramcell_cond.neu, conductor
+      title: `RAM CELL, CONDUCTOR SLICE'
+      outer permittivity: 1
+      number of panels: 588
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 17:43:00 2014
+  Host: frost
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 6
+  Overall permittivity factor: 1
+  Total number of panels: 588
+    Number of conductor panels: 588
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 2
+No expansions at level 6 (lowest)
+Percentage of multiplies done by multipole: 59.6%
+
+ITERATION DATA
+Starting on column 1 (BIT_LINE%GROUP1)
+1 2 3 4 5 6 
+Starting on column 2 (GND_PLANE%GROUP1)
+1 2 3 4 5 6 
+mksCapDump: Warning - capacitance matrix is not strictly diagonally dominant
+  due to row 1
+
+
+CAPACITANCE MATRIX, nanofarads
+                           1          2 
+BIT_LINE%GROUP1  1     0.2067    -0.2073
+GND_PLANE%GROUP1 2    -0.2073      1.767

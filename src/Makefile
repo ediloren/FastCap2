@@ -11,7 +11,7 @@ SHELL = /bin/sh
 AWK = awk
 RM = /bin/rm
 
-MAKETYPE = other
+MAKETYPE = 4
 # normally overidden by master Makefile
 TYPE = other
 
@@ -63,9 +63,9 @@ LIBS = -lm
 #  - also used to select the correct CC macro definition for AIX machines
 #
 # for generic machine use (timers not supported)
-CFLAGS = -O -DOTHER
+#CFLAGS = -O -DOTHER
 # for most machines running 4.2/3 use (only necessary if timers are needed)
-#CFLAGS = -O -DFOUR
+CFLAGS = -O -DFOUR
 # for most machines running System V use (only necessary if timers are needed)
 #CFLAGS = -O -DFIVE
 # for IBM AIX systems use
@@ -82,28 +82,22 @@ default:
 	@echo "  all - all of the above"
 
 fastcap: $(OBJS)
-	$(CC) -o temp.out $(CFLAGS) $(OBJS) $(LIBS)
-	mv temp.out $(BIN)/fastcap
+	$(CC) -o $(BIN)/fastcap $(CFLAGS) $(OBJS) $(LIBS)
 
 busgen: $(OBJSB)
-	$(CC) -o temp.out $(CFLAGS) $(OBJSB) $(LIBS)
-	mv temp.out $(BIN)/busgen
+	$(CC) -o $(BIN)/busgen $(CFLAGS) $(OBJSB) $(LIBS)
 
 capgen: $(OBJSP)
-	$(CC) -o temp.out $(CFLAGS) $(OBJSP) $(LIBS)
-	mv temp.out $(BIN)/capgen
+	$(CC) -o $(BIN)/capgen $(CFLAGS) $(OBJSP) $(LIBS)
 
 cubegen: $(OBJSC)
-	$(CC) -o temp.out $(CFLAGS) $(OBJSC) $(LIBS)
-	mv temp.out $(BIN)/cubegen
+	$(CC) -o $(BIN)/cubegen $(CFLAGS) $(OBJSC) $(LIBS)
 
 pyragen: $(OBJST)
-	$(CC) -o temp.out $(CFLAGS) $(OBJST) $(LIBS)
-	mv temp.out $(BIN)/pyragen
+	$(CC) -o $(BIN)/pyragen $(CFLAGS) $(OBJST) $(LIBS)
 
 pipedgen: $(OBJSI)
-	$(CC) -o temp.out $(CFLAGS) $(OBJSI) $(LIBS)
-	mv temp.out $(BIN)/pipedgen
+	$(CC) -o $(BIN)/pipedgen $(CFLAGS) $(OBJSI) $(LIBS)
 
 all : fastcap busgen capgen cubegen pyragen pipedgen
 

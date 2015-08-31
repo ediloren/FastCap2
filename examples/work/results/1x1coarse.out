@@ -1,0 +1,38 @@
+Running ../../bin/fastcap 2.0wr (18Sep92, mod 010114)
+  Input: ../1x1coarse.neu
+Surface ../1x1coarse.neu has 28 quads and 0 tris
+  Input surfaces:
+   GROUP1
+    1x1coarse.neu, conductor
+      title: `BUS X ONE COARSE MESH'
+      outer permittivity: 1
+      number of panels: 28
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Wed Jan  8 16:25:41 2014
+  Host: poe
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 28
+    Number of conductor panels: 28
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 2
+No expansions at level 3 (lowest)
+No expansions at level 2
+Percentage of multiplies done by multipole: 0%
+Warning: no multipole acceleration
+
+ITERATION DATA
+Starting on column 1 (CONDUCTOR1%GROUP1)
+1 2 3 4 5 
+Starting on column 2 (CONDUCTOR2%GROUP1)
+1 2 3 4 5 
+
+CAPACITANCE MATRIX, picofarads
+                            1          2 
+CONDUCTOR1%GROUP1 1      135.2     -56.55
+CONDUCTOR2%GROUP1 2     -56.55      135.2

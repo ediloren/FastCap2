@@ -1,36 +1,35 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
@@ -39,11 +38,21 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 static directops=0, upops=0, downops=0, evalops=0;
 #endif
 
+/* SRW */
+void mulDirect(ssystem*);
+void mulPrecond(ssystem*, int);
+void mulUp(ssystem*);
+void mulEval(ssystem*);
+void mulDown(ssystem*);
+#if OPCNT == ON
+void printops(void);
+#endif
+
+
 /* 
 Compute the direct piece. 
 */
-mulDirect(sys)
-ssystem *sys;
+void mulDirect(ssystem *sys)
 {
 int i, j, k, dsize, *is_dummy, *is_dielec;
 double pc, *p, *q, *qn, *pn, **mat;
@@ -92,9 +101,7 @@ cube *nextc;
 /*
 Block diagonal or Overlapped Preconditioner.
 */
-mulPrecond(sys, type)
-ssystem *sys;
-int type;
+void mulPrecond(ssystem *sys, int type)
 {
   int i, j, k, dsize, *is_dummy;
   double pc, *p, *q, *qn, *pn, **mat;
@@ -150,8 +157,7 @@ int type;
 /* 
 Loop through upward pass. 
 */
-mulUp(sys)
-ssystem *sys;
+void mulUp(ssystem *sys)
 {
 int i, j, k, l;
 int msize;
@@ -188,8 +194,7 @@ cube *nextc;
 /*
   evaluation pass - use after mulDown or alone. 
 */
-void mulEval(sys)
-ssystem *sys;
+void mulEval(ssystem *sys)
 {
   int i, j, k, size, *is_dielec;
   cube *nc;
@@ -224,8 +229,7 @@ ssystem *sys;
 /* 
 Loop through downward pass. 
 */
-mulDown(sys)
-ssystem *sys;
+void mulDown(ssystem *sys)
 {
   cube *nc;
   int depth, i, j, k, lsize;

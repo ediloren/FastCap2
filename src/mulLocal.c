@@ -1,39 +1,50 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
+
+/* SRW */
+void evalFacFra(double**, int);
+void evalSqrtFac(double**, double**, int);
+void evalSinCos(double, int);
+double sinB(int);
+double cosB(int);
+double **mulMulti2Local(double, double, double, double, double, double, int);
+double **mulLocal2Local(double, double, double, double, double, double, int);
+double **mulQ2Local(charge**, int, int*, double, double, double, int);
+double **mulLocal2P(double, double, double, charge**, int, int);
+
 
 /*
   globals used for temporary storage
@@ -45,9 +56,9 @@ double *sinmkB;			/* array used to look up sin[(m+-k)beta] */
 /*
   initializes the factorial fraction array used in M2L, L2L matrix calculation
 */
-void evalFacFra(array, order)
-int order;			/* array is 2*order+1 x 2*order+1 */
-double **array;			/* array[num][den] = num!/den! */
+void evalFacFra(double **array, int order)
+/* int order;			array is 2*order+1 x 2*order+1 */
+/* double **array;			array[num][den] = num!/den! */
 {
   int d, i;
   for(i = 0; i <= 2*order; i++) {
@@ -81,9 +92,7 @@ double **array;			/* array[num][den] = num!/den! */
 /*
   initializes sqrt((m+n)!/(n-m)!) lookup table (for L2L)
 */
-void evalSqrtFac(arrayout, arrayin, order)
-int order;
-double **arrayout, **arrayin;
+void evalSqrtFac(double **arrayout, double **arrayin, int order)
 {
   int n, m;			/* arrayout[n][m] = sqrt((m+n)!/(n-m)!) */
 
@@ -108,9 +117,7 @@ double **arrayout, **arrayin;
 /*
   initializes cos[(m+-k)beta] and sin[(m+-k)beta] lookup tables (M2L and L2L)
 */
-void evalSinCos(beta, order)
-int order;
-double beta;
+void evalSinCos(double beta, int order)
 {
   int i;
   double temp = beta;
@@ -124,8 +131,7 @@ double beta;
 /*
   looks up sin[(m+-k)beta]
 */
-double sinB(sum)
-int sum;
+double sinB(int sum)
 {
   if(sum < 0) return(-sinmkB[abs(sum)]);
   else return(sinmkB[sum]);
@@ -134,8 +140,7 @@ int sum;
 /*
   looks up cos[(m+-k)beta]
 */
-double cosB(sum)
-int sum;
+double cosB(int sum)
 {
   return(cosmkB[abs(sum)]);
 }
@@ -143,9 +148,9 @@ int sum;
 /* 
   Used for all but no local downward pass. 
 */
-double **mulMulti2Local(x, y, z, xp, yp, zp, order)
-int order;
-double x, y, z, xp, yp, zp;	/* multipole and local cube centers */
+double **mulMulti2Local(double x, double y, double z, double xp, double yp,
+    double zp, int order)
+/* double x, y, z, xp, yp, zp;	multipole and local cube centers */
 {
   int i, j, k, n, m;
   int terms = multerms(order);	/* the number of non-zero moments */
@@ -155,7 +160,6 @@ double x, y, z, xp, yp, zp;	/* multipole and local cube centers */
   double rhoJ, rhoN;		/* rho^j and (-1)^n*rho^(n+1) in main loop */
   double rhoFac;		/* = rhoJ*rhoN intermediate storage */
   double temp1, temp2, temp3;
-  double iPwr(), sinB(), cosB();
   extern double *tleg, *Ir, *Irn, *phi, *Mphi; /* external temporary storage */
 
   /* allocate the multi to local transformation matrix */
@@ -232,9 +236,9 @@ double x, y, z, xp, yp, zp;	/* multipole and local cube centers */
 /* 
   Used only for true (Greengard) downward pass - similar to Multi2Local
 */
-double **mulLocal2Local(x, y, z, xc, yc, zc, order)
-int order;
-double x, y, z, xc, yc, zc;	/* parent and child cube centers */
+double **mulLocal2Local(double x, double y, double z, double xc, double yc,
+    double zc, int order)
+/* double x, y, z, xc, yc, zc;	parent and child cube centers */
 {
   int i, j, k, n, m;
   int terms = multerms(order);	/* the number of non-zero moments */
@@ -244,7 +248,6 @@ double x, y, z, xc, yc, zc;	/* parent and child cube centers */
   double rhoJ, rhoN;		/* rho^j and (-1)^n*rho^(n+1) in main loop */
   double rhoFac;		/* = rhoJ*rhoN intermediate storage */
   double temp1, temp2, temp3;
-  double iPwr(), sinB(), cosB();
   extern double *tleg, *Ir, *Irn, *phi, *Mphi; /* external temporary storage */
 
   /* allocate the local to local transformation matrix */
@@ -334,14 +337,12 @@ double x, y, z, xc, yc, zc;	/* parent and child cube centers */
   form almost identical to mulQ2Multi - follows NB12 pg 32 w/m,n replacing k,j
   OPTIMIZATIONS INVOLVING is_dummy HAVE NOT BEEN COMPLETELY IMPLEMENTED
 */
-double **mulQ2Local(chgs, numchgs, is_dummy, x, y, z, order)
-double x, y, z;
-charge **chgs;
-int numchgs, order, *is_dummy;
+double **mulQ2Local(charge **chgs, int numchgs, int *is_dummy, double x,
+    double y, double z, int order)
 {
   int i, j, k, kold, n, m, start;
   int cterms = costerms(order), terms = multerms(order);
-  double **mat, temp, fact();
+  double **mat, temp;
   double cosA;			/* cosine of elevation coordinate */
   extern double *Rhon, *Rho, *Betam, *Beta, *tleg;
 
@@ -436,14 +437,11 @@ int numchgs, order, *is_dummy;
   follows NB10 equation marked circle(2A) except roles of j,k and n,m switched
   very similar to mulMulti2P()
 */
-double **mulLocal2P(x, y, z, chgs, numchgs, order)
-double x, y, z;
-charge **chgs;
-int numchgs, order;
+double **mulLocal2P(double x, double y, double z, charge **chgs,
+    int numchgs, int order)
 {
   double **mat;
   double cosTh;			/* cosine of elevation coordinate */
-  double fact();
   extern double *Irn, *Mphi, *phi, *Ir;
   int i, j, k, m, n, kold, start;
   int cterms = costerms(order), terms = multerms(order);

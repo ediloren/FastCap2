@@ -1,40 +1,163 @@
-/*!\page LICENSE LICENSE
- 
-Copyright (C) 2003 by the Board of Trustees of Massachusetts Institute of Technology, hereafter designated as the Copyright Owners.
- 
-License to use, copy, modify, sell and/or distribute this software and
-its documentation for any purpose is hereby granted without royalty,
-subject to the following terms and conditions:
- 
-1.  The above copyright notice and this permission notice must
-appear in all copies of the software and related documentation.
- 
-2.  The names of the Copyright Owners may not be used in advertising or
-publicity pertaining to distribution of the software without the specific,
-prior written permission of the Copyright Owners.
- 
-3.  THE SOFTWARE IS PROVIDED "AS-IS" AND THE COPYRIGHT OWNERS MAKE NO
-REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, BY WAY OF EXAMPLE, BUT NOT
-LIMITATION.  THE COPYRIGHT OWNERS MAKE NO REPRESENTATIONS OR WARRANTIES OF
-MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF THE
-SOFTWARE WILL NOT INFRINGE ANY PATENTS, COPYRIGHTS TRADEMARKS OR OTHER
-RIGHTS. THE COPYRIGHT OWNERS SHALL NOT BE LIABLE FOR ANY LIABILITY OR DAMAGES
-WITH RESPECT TO ANY CLAIM BY LICENSEE OR ANY THIRD PARTY ON ACCOUNT OF, OR
-ARISING FROM THE LICENSE, OR ANY SUBLICENSE OR USE OF THE SOFTWARE OR ANY
-SERVICE OR SUPPORT.
- 
-LICENSEE shall indemnify, hold harmless and defend the Copyright Owners and
-their trustees, officers, employees, students and agents against any and all
-claims arising out of the exercise of any rights under this Agreement,
-including, without limiting the generality of the foregoing, against any
-damages, losses or liabilities whatsoever with respect to death or injury to
-person or damage to property arising from or out of the possession, use, or
-operation of Software or Licensed Program(s) by LICENSEE or its customers.
- 
+/*
+Copyright (c) 1990 Massachusetts Institute of Technology, Cambridge, MA.
+All rights reserved.
+
+This Agreement gives you, the LICENSEE, certain rights and obligations.
+By using the software, you indicate that you have read, understood, and
+will comply with the terms.
+
+Permission to use, copy and modify for internal, noncommercial purposes
+is hereby granted.  Any distribution of this program or any part thereof
+is strictly prohibited without prior written consent of M.I.T.
+
+Title to copyright to this software and to any associated documentation
+shall at all times remain with M.I.T. and LICENSEE agrees to preserve
+same.  LICENSEE agrees not to make any copies except for LICENSEE'S
+internal noncommercial use, or to use separately any portion of this
+software without prior written consent of M.I.T.  LICENSEE agrees to
+place the appropriate copyright notice on any such copies.
+
+Nothing in this Agreement shall be construed as conferring rights to use
+in advertising, publicity or otherwise any trademark or the name of
+"Massachusetts Institute of Technology" or "M.I.T."
+
+M.I.T. MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED.  By
+way of example, but not limitation, M.I.T. MAKES NO REPRESENTATIONS OR
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR
+THAT THE USE OF THE LICENSED SOFTWARE COMPONENTS OR DOCUMENTATION WILL
+NOT INFRINGE ANY PATENTS, COPYRIGHTS, TRADEMARKS OR OTHER RIGHTS.
+M.I.T. shall not be held liable for any liability nor for any direct,
+indirect or consequential damages with respect to any claim by LICENSEE
+or any third party on account of or arising from this Agreement or use
+of this software.
 */
 
 #include "mulGlobal.h"
 #include "zbufGlobal.h"
+#include <ctype.h>
+
+#if SINGLE_FILE_INPUT == ON
+/*
+ * Modified 2/22/01 Steve Whiteley, stevew@wrcad.com, Whiteley Research Inc.
+ *
+ * This allows all input to go into a single list file.  The format is as
+ * follows:
+ *    (regular list file)
+ *    End
+ *    File <the_first_file>
+ *    (contents of <the_first_file>)
+ *    End
+ *    File <the_second_file>
+ *    (contents of <the_second_file>)
+ *    End
+ *    ...
+ *
+ * The characters following 'E' in "End" and following 'F' in "File" are
+ * optional.  Like the other keys, 'E' and 'F' are case-insensitive, and
+ * must be in the first text column.  The files are those referenced in
+ * the list file, and can be appended in any order.  The "End" after a
+ * neutral file is optional.
+ */
+
+/* struct to keep a list of file offsets to point to data */
+struct f_offset
+{
+    char *filename;
+    unsigned long offset;
+    struct f_offset *next;
+};
+static struct f_offset *list_file_offsets;
+
+/* name of list file, contains all input */
+static char *list_file_name;
+
+/* SRW */
+void setup_file_offsets(FILE*);
+FILE *fc_fopen(char*, char*);
+void read_list_file(surface**, int*, char*, int);
+void add_dummy_panels(charge*);
+char *hack_path(char*);
+void reassign_cond_numbers(charge*, NAME*, char*);
+void negate_cond_numbers(charge*, NAME*);
+int dump_ilist(void);
+int want_this_iter(ITER*, int);
+void get_ps_file_base(char**, int);
+charge *read_panels(surface*, Name**, int*);
+ITER *get_kill_num_list(Name*, char*);
+void parse_command_line(char**, int, int*, int*, double*, int*, int*,
+    char**, char**, int*);
+surface *read_all_surfaces(char*, char*, int, char*, double);
+surface *input_surfaces(char**, int, int*, int*, double*, int*, int*, char*);
+void dumpSurfDat(surface*);
+void remove_name(Name**, int);
+void remove_conds(charge**, ITER*, Name**);
+void resolve_kill_lists(ITER*, ITER*, ITER*, int);
+charge *input_problem(char**, int, int*, int*, double*, int*, int*, Name**,
+    int*);
+
+
+/* Function to generate a list of offsets into the list file to the data
+ * "files".  This is called if an 'E' line appears in the list file.
+ */
+void
+setup_file_offsets(FILE *fp)
+{
+    char buf[1024];
+    while (fgets(buf, 1024, fp) != NULL) {
+        if (buf[0] == 'F' || buf[0] == 'f') {
+            char *s = buf+1, *t;
+            while (*s && !isspace(*s))
+                s++;
+            while (isspace(*s))
+                s++;
+            t = s;
+            while (*t && !isspace(*t))
+                t++;
+            if (t > s) {
+                struct f_offset *f = (struct f_offset*)
+                    malloc(sizeof(struct f_offset));
+                if (!f) {
+                    fprintf(stderr, "Out of memory.\n");
+                    exit(1);
+                }
+                f->filename = (char*)malloc(t - s + 1);
+                if (!f->filename) {
+                    fprintf(stderr, "Out of memory.\n");
+                    exit(1);
+                }
+                strncpy(f->filename, s, t-s);
+                f->filename[t-s] = 0;
+                f->offset = ftell(fp);
+                f->next = list_file_offsets;
+                list_file_offsets = f;
+            }
+        }
+    }
+}
+
+
+/* This fopen() replaces the standard fopen() when opening subsidiary
+ * input files.  If the name is found in the offset list, the list file
+ * is opened, with the file pointer set to point at that "file".
+ */
+FILE *
+fc_fopen(char *filename, char *mode)
+{
+    if (list_file_name) {
+        struct f_offset *f;
+        for (f = list_file_offsets; f; f = f->next) {
+            if (!strcmp(filename, f->filename)) {
+                FILE *fp = fopen(list_file_name, mode);
+                if (!fp)
+                    break;
+                fseek(fp, f->offset, 0);
+                return (fp);
+            }
+        }
+    }
+    return (fopen(filename, mode));
+}
+#endif
 
 /*
   reads an input file list file (a list of dielectric i/f and conductor 
@@ -99,13 +222,11 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 	be renamed; this is helpful when idenifying conductors to omit
 	from capacitance calculations using the -k option
 */
-void read_list_file(surf_list, num_surf, list_file, read_from_stdin)
-int *num_surf, read_from_stdin;
-char *list_file;
-surface **surf_list;
+void read_list_file(surface **surf_list, int *num_surf, char *list_file,
+    int read_from_stdin)
 {
   int linecnt, end_of_chain, ref_pnt_is_inside, group_cnt;
-  FILE *fp, *fopen();
+  FILE *fp;
   char tline[BUFSIZ], file_name[BUFSIZ], plus[BUFSIZ], group_name[BUFSIZ];
   double outer_perm, inner_perm, tx, ty, tz, rx, ry, rz;
   surface *cur_surf;
@@ -117,10 +238,14 @@ surface **surf_list;
   }
   
   /* attempt to open file list file */
+#if SINGLE_FILE_INPUT == ON
+  if((fp = fc_fopen(list_file, "r")) == NULL) {
+#else
   if((fp = fopen(list_file, "r")) == NULL) {
+#endif
     fprintf(stderr, "read_list_file: can't open list file\n  `%s'\nto read\n", 
 	    list_file);
-    exit(0);
+    exit(1);
   }
 
   /* read file names and permittivities, build linked list */
@@ -135,7 +260,7 @@ surface **surf_list;
 	fprintf(stderr, 
 	       "read_list_file: bad conductor surface format, tline %d:\n%s\n",
 		linecnt, tline);
-	exit(0);
+	exit(1);
       }
 
       /* check if end of chain of surfaces with same conductor numbers */
@@ -183,7 +308,7 @@ surface **surf_list;
 	fprintf(stderr, 
 		"read_list_file: bad thin conductor on dielectric interface surface format, line %d:\n%s\n",
 		linecnt, tline);
-	exit(0);
+	exit(1);
       }
 
       /* check if end of chain of surfaces with same conductor numbers */
@@ -244,7 +369,7 @@ surface **surf_list;
 	fprintf(stderr, 
 		"read_list_file: bad dielectric interface surface format, line %d:\n%s\n",
 		linecnt, tline);
-	exit(0);
+	exit(1);
       }
 
       /* check to see if reference point is negative side of surface */
@@ -294,15 +419,33 @@ surface **surf_list;
       if(sscanf(&(tline[1]), "%s", group_name) != 1) {
 	fprintf(stderr,"read_list_file: bad group name format, line %d:\n%s\n",
 		linecnt, tline);
-	exit(0);
+	exit(1);
       }
     }
     else if(tline[0] == '%' || tline[0] == '*' ||
 	    tline[0] == '#'); /* ignore comments */
+#if SINGLE_FILE_INPUT == ON
+    else if (tline[0] == 'E' || tline[0] == 'e') {
+        list_file_name = (char*)malloc(strlen(list_file) + 1);
+        if (!list_file_name) {
+            fprintf(stderr, "Out of memory.\n");
+            exit(1);
+        }
+        strcpy(list_file_name, list_file);
+        setup_file_offsets(fp);
+        break;
+    }
+#endif
     else {
-      fprintf(stderr, "read_list_file: bad line format, line %d:\n%s\n", 
-		linecnt, tline);
-      exit(0);
+      /* SRW -- Added this test to allow blank lines. */
+      char *t = tline;
+      while (isspace(*t))
+        t++;
+      if (*t) {
+          fprintf(stderr, "read_list_file: bad line format, line %d:\n%s\n", 
+              linecnt, tline);
+          exit(1);
+      }
     }
   }
   fclose(fp);
@@ -317,12 +460,9 @@ surface **surf_list;
   can also be used with open surfaces: ref = point on - side, ref_inside = TRUE
   will not work if the surface folds back on itself (and other ways too)
 */
-void align_normals(panel_list, surf)
-surface *surf;
-charge *panel_list;
+void align_normals(charge *panel_list, surface *surf)
 {
   int i, flip_normal;
-  char *hack_path();
   charge *nc;
   double ctr_minus_n[3], ctr_plus_n[3], norm_minus, norm_plus, norm, norm_sq;
   double x, y, z, *normal, *direction, *tempd;
@@ -369,7 +509,7 @@ charge *panel_list;
 		nc->x, nc->y, nc->z);
 	fprintf(stderr, "  Normal: (%g %g %g)\n",
 		normal[0], normal[1], normal[2]);
-	exit(0);
+	exit(1);
       }
       if(ref_inside) flip_normal = TRUE;
     }
@@ -386,7 +526,7 @@ charge *panel_list;
 		nc->x, nc->y, nc->z);
 	fprintf(stderr, "  Normal: (%g %g %g)\n",
 		normal[0], normal[1], normal[2]);
-	exit(0);
+	exit(1);
       }	
       if(!ref_inside) flip_normal = TRUE;
     }
@@ -411,8 +551,7 @@ charge *panel_list;
   add dummy panel structs to the panel list for electric field evaluation
   - assumes its handed a list of DIELEC or BOTH type panels
 */
-void add_dummy_panels(panel_list)
-charge *panel_list;
+void add_dummy_panels(charge *panel_list)
 {
   double h;
   charge *dummy_list = NULL;
@@ -465,8 +604,7 @@ charge *panel_list;
 }
 
 /* returns a pointer to a file name w/o the path (if present) */
-char *hack_path(str)
-char *str;
+char *hack_path(char *str)
 {
   int i;
   int last_slash;
@@ -486,13 +624,10 @@ char *str;
   - dummy panels are skipped
   - dielectric panels, with conductor number 0, are also skipped
 */
-void reassign_cond_numbers(panel_list, name_list, surf_name)
-char *surf_name;
-NAME *name_list;
-charge *panel_list;
+void reassign_cond_numbers(charge *panel_list, NAME *name_list, char *surf_name)
 {
   int i, j, cond_nums[MAXCON], num_cond, cond_num_found, temp;
-  char str[BUFSIZ], *hack_path();
+  char str[BUFSIZ];
   charge *cur_panel;
   NAME *cur_name;
 
@@ -519,7 +654,7 @@ charge *panel_list;
     if(i == num_cond) {
       fprintf(stderr, 
        "reassign_cond_numbers: cant find conductor number that must exist\n");
-      exit(0);
+      exit(1);
     }
     cur_panel->cond = i+1;
   }
@@ -532,7 +667,7 @@ charge *panel_list;
     if(i == num_cond) {
       fprintf(stderr, 
 	   "reassign_cond_numbers: cant find conductor number in name list\n");
-      exit(0);
+      exit(1);
     }
 #if 1 == 0
     /* change the name given to this conductor if it was derived from the ID */
@@ -561,9 +696,7 @@ charge *panel_list;
   negates all the conductor numbers - used to make a panel list's conds unique
     just before renumbering
 */
-void negate_cond_numbers(panel_list, name_list)
-NAME *name_list;
-charge *panel_list;
+void negate_cond_numbers(charge *panel_list, NAME *name_list)
 {
   charge *cur_panel;
   NAME *cur_name;
@@ -582,7 +715,7 @@ charge *panel_list;
 /*
   for debug - dumps the iter list
 */
-int dump_ilist()
+int dump_ilist(void)
 {
   ITER *cur_iter;
   extern ITER *qpic_num_list;
@@ -632,9 +765,7 @@ int iter_num;
 /*
   checks if a particular iter is in the list; returns TRUE if it is
 */
-int want_this_iter(iter_list, iter_num)
-ITER *iter_list;
-int iter_num;
+int want_this_iter(ITER *iter_list, int iter_num)
 {
   ITER *cur_iter;
 
@@ -649,12 +780,10 @@ int iter_num;
 /*
   sets up the ps file base string
 */
-void get_ps_file_base(argv, argc)
-char *argv[];
-int argc;
+void get_ps_file_base(char **argv, int argc)
 {
   int i, j;
-  char temp[BUFSIZ], *hack_path();
+  char temp[BUFSIZ];
   extern char *ps_file_base;
 
   /* - if no list file, use input file; otherwise use list file */
@@ -695,19 +824,16 @@ int argc;
   align the normals of all the panels in each surface so they point
     towards the same side as where the ref point is (dielectric files only)
 */
-charge *read_panels(surf_list, name_list, num_cond)
-Name **name_list;
-int *num_cond;
-surface *surf_list;
+charge *read_panels(surface *surf_list, Name **name_list, int *num_cond)
 {
   int patran_file, num_panels, stdin_read, num_dummies, num_quads, num_tris;
-  charge *panel_list = NULL, *cur_panel, *patfront(), *panel_group, *c_panel;
+  charge *panel_list = NULL, *cur_panel, *panel_group, *c_panel;
   surface *cur_surf;
   extern NAME *start_name, *start_name_this_time;
   extern char *title;
   NAME *name_group;
-  FILE *fp, *fopen();
-  char surf_name[BUFSIZ], *hack_path();
+  FILE *fp;
+  char surf_name[BUFSIZ];
   int patran_file_read;
 
   /*title[0] = '\0';*/
@@ -716,17 +842,21 @@ surface *surf_list;
     if(!strcmp(cur_surf->name, "stdin")) {
       if(stdin_read) {
 	fprintf(stderr, "read_panels: attempt to read stdin twice\n");
-	exit(0);
+	exit(1);
       }
       else {
 	stdin_read = TRUE;
 	fp = stdin;
       }
     }
+#if SINGLE_FILE_INPUT == ON
+    else if((fp = fc_fopen(cur_surf->name, "r")) == NULL) {
+#else
     else if((fp = fopen(cur_surf->name, "r")) == NULL) {
+#endif
       fprintf(stderr, "read_panels: can't open\n  `%s'\nto read\n", 
 	      cur_surf->name);
-      exit(0);
+      exit(1);
     }
 
     /* input the panel list */
@@ -750,7 +880,7 @@ surface *surf_list;
 		     name_list, num_cond, surf_name);
       if(!patran_file && patran_file_read) {
 	fprintf(stderr, "read_panels: generic format file\n  `%s'\nread after neutral file(s) in same group---reorder list file entries\n", cur_surf->name);
-	exit(0);
+	exit(1);
       }
       patran_file_read = patran_file;
       cur_panel = cur_panel->next;
@@ -780,7 +910,7 @@ surface *surf_list;
     initcalcp(cur_surf->panels);/* get normals, edges, perpendiculars */
     if(cur_surf->type == DIELEC || cur_surf->type == BOTH) {
       /* if(patran_file) align_normals(cur_surf->panels);
-      align_normals(cur_surf->panels, cur_surf); /* now done in calcp */
+      align_normals(cur_surf->panels, cur_surf); */ /* now done in calcp */
       add_dummy_panels(cur_surf->panels); /* add dummy panels for field calc */
     }
 
@@ -794,13 +924,17 @@ surface *surf_list;
       else {
 	fprintf(stderr, "read_panels: bad panel shape, %d\n",
 		cur_panel->shape);
-	exit(0);
+	exit(1);
       }
+      /* SRW -- dummy panels don't have this set */
+      if (!cur_panel->surf)
+        cur_panel->surf = cur_surf;
+
       if(cur_panel->next == NULL) break;
     }
 
-    /*fprintf(stdout, "Surface %s has %d quads and %d tris\n", 
-	    cur_surf->name, num_quads, num_tris);*/
+    fprintf(stdout, "Surface %s has %d quads and %d tris\n", 
+	    cur_surf->name, num_quads, num_tris);
 
     cur_surf->num_panels = num_panels;
     cur_surf->num_dummies = num_dummies;
@@ -830,14 +964,12 @@ surface *surf_list;
   NOTFND => neither name by itself nor with group name is not in list
   - any unique leading part of the name%group_name string may be specified 
 */
-int getUniqueCondNum(name, name_list)
-char *name;
-Name *name_list;
+int getUniqueCondNum(char *name, Name *name_list)
 {
   int nlen, cond;
-  char name_frag[BUFSIZ], *last_alias(), *cur_alias;
+  char name_frag[BUFSIZ], *cur_alias;
   Name *cur_name, *prev_name;
-  int i, j, alias_match_name(), times_in_list;
+  int i, j, times_in_list;
 
   nlen = strlen(name);
   times_in_list = 0;
@@ -874,9 +1006,7 @@ Name *name_list;
   - conductor names can't have any %'s
   - redundant names are detected as errors
 */
-ITER *get_kill_num_list(name_list, kill_name_list)
-char *kill_name_list;
-Name *name_list;
+ITER *get_kill_num_list(Name *name_list, char *kill_name_list)
 {
   int i, j, start_token, end_token, end_name, cond;
   char name[BUFSIZ], group_name[BUFSIZ];
@@ -907,13 +1037,13 @@ Name *name_list;
       fprintf(stderr, 
    "get_kill_num_list: cannot find unique conductor name starting `%s'\n",
 	      name);
-      exit(0);
+      exit(1);
     }
     else if(cond == NOTFND) {
       fprintf(stderr,
 	      "get_kill_num_list: cannot find conductor name starting `%s'\n",
 	      name);
-      exit(0);
+      exit(1);
     }
 
     /* add conductor name to list of conductors to omit */
@@ -936,15 +1066,12 @@ Name *name_list;
 /*
   command line parsing routine
 */
-void parse_command_line(argv, argc, autmom, autlev, relperm, numMom, numLev, 
-			input_file, surf_list_file, read_from_stdin)
-int argc, *autmom, *autlev, *numMom, *numLev, *read_from_stdin;
-double *relperm;
-char *argv[], **input_file, **surf_list_file;
+void parse_command_line(char **argv, int argc, int *autmom, int *autlev,
+    double *relperm, int *numMom, int *numLev, char **input_file,
+    char **surf_list_file, int *read_from_stdin)
 {
   int cmderr, i;
   char **chkp, *chk;
-  long strtol();
   extern char *kill_name_list, *kinp_name_list;
   extern ITER *kill_num_list, *kinp_num_list;
   extern double iter_tol;
@@ -1137,7 +1264,11 @@ char *argv[], **input_file, **surf_list_file;
 	else if(!strcmp(&(argv[i][2]), "z") || !strcmp(&(argv[i][2]), "Z"))
 	    up_axis = ZI;
 	else {
-	  fprintf(stderr, "%s: bad up axis type `%s' -- use x, y or z\n");
+/* SRW -- error
+	  fprintf(stderr, "%s: bad up axis type `%s' -- use x, y or z\n"); */
+	  fprintf(stderr, "%s: bad up axis type `%s' -- use x, y or z\n",
+		  argv[0], &argv[i][2]);
+/* end fix */
           cmderr = TRUE;
           break;
         }
@@ -1169,7 +1300,10 @@ char *argv[], **input_file, **surf_list_file;
 	    "  distance = %g (0 => 1 object radius away from center)\n", 
 	    DEFDST);
     fprintf(stderr, "  scale = %g\n  linewidth = %g\n",
-	    DEFDST, DEFSCL, DEFWID);
+/* SRW -- error
+	    DEFDST, DEFSCL, DEFWID); */
+	    DEFSCL, DEFWID);
+/* end fix */
     if(DEFUAX == XI) fprintf(stderr, "  upaxis = x\n");
     else if(DEFUAX == YI) fprintf(stderr, "  upaxis = y\n");
     else if(DEFUAX == ZI) fprintf(stderr, "  upaxis = z\n");
@@ -1211,18 +1345,15 @@ char *argv[], **input_file, **surf_list_file;
 #endif
     fprintf(stderr, "  <cond list> = [<name>],[<name>],...,[<name>]\n");
     dumpConfig(stderr, argv[0]);
-    exit(0);
+    exit(1);
   }
 }
 
 /*
   surface information input routine - panels are read by read_panels()
 */
-surface *read_all_surfaces(input_file, surf_list_file, read_from_stdin, infile,
-			   relperm)
-int read_from_stdin;
-char *input_file, *surf_list_file, *infile;
-double relperm;
+surface *read_all_surfaces(char *input_file, char *surf_list_file,
+    int read_from_stdin, char *infile, double relperm)
 {
   int num_surf, i;
   char group_name[BUFSIZ];
@@ -1240,7 +1371,19 @@ double relperm;
     surf_list->type = CONDTR;	/* only conductors can come in stdin */
     CALLOC(surf_list->name, strlen("stdin")+1, char, ON, AMSC);
     strcpy(surf_list->name, "stdin");
+/*
+    Enrico, setting 'outer_perm' to 'relperm' was a FastCap bug
+    which lead to wrong results when a global permittivity factor
+    was specified with the -p option (probably left for first
+    FastCap version which handled only conductors in homogeneous
+    dielectic).  As a matter of fact, in mksCapDump() in
+    mulDisplay.c the results are multiplied again for 'relperm', so
+    the results, for non-list files, are multiplyed two times; see
+    also here below.  The bug was partially pointed out in
+    http://hana.physics.sunysb.edu/conpan/fastcap.html
     surf_list->outer_perm = relperm;
+*/
+    surf_list->outer_perm = 1.0;
     surf_list->end_of_chain = TRUE;
 
     /* set up group name */
@@ -1267,7 +1410,9 @@ double relperm;
     cur_surf->type = CONDTR;
     CALLOC(cur_surf->name, strlen(input_file)+1, char, ON, AMSC);
     strcpy(cur_surf->name, input_file);
-    cur_surf->outer_perm = relperm;
+    /* See note above. */
+    surf_list->outer_perm = 1.0;
+    /* cur_surf->outer_perm = relperm; */
     cur_surf->end_of_chain = TRUE;
 
     /* set up group name */
@@ -1297,14 +1442,10 @@ double relperm;
   - inputs surfaces (ie file names whose panels are read in read_panels)
   - sets parameters accordingly
 */
-surface *input_surfaces(argv, argc, autmom, autlev, relperm, 
-			numMom, numLev, infile)
-int argc, *autmom, *autlev, *numMom, *numLev;
-double *relperm;
-char *argv[], *infile;
+surface *input_surfaces(char **argv, int argc, int *autmom, int *autlev,
+    double *relperm, int *numMom, int *numLev, char *infile)
 {
   int read_from_stdin, num_surf;
-  surface *read_all_surfaces();
   char *surf_list_file, *input_file;
 
   /* initialize defaults */
@@ -1321,11 +1462,9 @@ char *argv[], *infile;
 /*
   dump the data associated with the input surfaces
 */
-void dumpSurfDat(surf_list)
-surface *surf_list;
+void dumpSurfDat(surface *surf_list)
 {
   surface *cur_surf;
-  char *hack_path();
 
   fprintf(stdout, "  Input surfaces:\n");
   for(cur_surf = surf_list; cur_surf != NULL; cur_surf = cur_surf->next) {
@@ -1357,7 +1496,7 @@ surface *surf_list;
     }
     else {
       fprintf(stderr, "dumpSurfDat: bad surface type\n");
-      exit(0);
+      exit(1);
     }
     fprintf(stdout,"      number of panels: %d\n", 
 	    cur_surf->num_panels - cur_surf->num_dummies);
@@ -1372,9 +1511,7 @@ surface *surf_list;
 /*
   replaces name (and all aliases) corresponding to "num" with unique string
 */
-void remove_name(name_list, num)
-int num;
-Name **name_list;
+void remove_name(Name **name_list, int num)
 {
   static char str[] = "%`_^#$REMOVED";
   Name *cur_name, *cur_alias;
@@ -1408,10 +1545,7 @@ Name **name_list;
 /*
   removes (unlinks from linked list) panels that are on conductors to delete
 */
-void remove_conds(panels, num_list, name_list)
-charge **panels;
-ITER *num_list;
-Name **name_list;
+void remove_conds(charge **panels, ITER *num_list, Name **name_list)
 {
   ITER *cur_num;
   charge *cur_panel, *prev_panel;
@@ -1447,9 +1581,8 @@ Name **name_list;
   -rc list: no restrictions
   -ri/-rs: can't exhaust all conductors with combination of these lists
 */
-void resolve_kill_lists(rs_num_list, q_num_list, ri_num_list, num_cond)
-ITER *rs_num_list, *q_num_list, *ri_num_list;
-int num_cond;
+void resolve_kill_lists(ITER *rs_num_list, ITER *q_num_list,
+    ITER *ri_num_list, int num_cond)
 {
   int i, lists_exhaustive;
   ITER *cur_num;
@@ -1460,7 +1593,7 @@ int num_cond;
     if(want_this_iter(rs_num_list, cur_num->iter)) {
       fprintf(stderr, 
  "resolve_kill_lists: a conductor removed with -ri is in the -rs list\n");
-      exit(0);
+      exit(1);
     }
   }
 
@@ -1472,7 +1605,7 @@ int num_cond;
        || want_this_iter(ri_num_list, cur_num->iter)) {
       fprintf(stderr, 
 "resolve_kill_lists: a conductor removed with -ri or -rs is in the -q list\n");
-      exit(0);
+      exit(1);
     }
   }
 
@@ -1487,24 +1620,20 @@ int num_cond;
   if(lists_exhaustive && !m_) {
     fprintf(stderr, 
 "resolve_kill_lists: all conductors either in -ri or -rs list\n");
-    exit(0);
+    exit(1);
   }
 }
 
 /*
   main input routine, returns a list of panels in the problem
 */
-charge *input_problem(argv, argc, autmom, autlev, relperm, 
-		      numMom, numLev, name_list, num_cond)
-int argc, *autmom, *autlev, *numMom, *numLev, *num_cond;
-double *relperm;
-char *argv[];
-Name **name_list;
+charge *input_problem(char **argv, int argc, int *autmom, int *autlev,
+    double *relperm, int *numMom, int *numLev, Name **name_list, int *num_cond)
 {
-  surface *surf_list, *input_surfaces();
-  char infile[BUFSIZ], *ctime(), hostname[BUFSIZ];
-  charge *read_panels(), *chglist;
-  long clock;
+  surface *surf_list;
+  char infile[BUFSIZ], hostname[BUFSIZ];
+  charge *chglist;
+  time_t clock;
   extern ITER *kill_num_list, *qpic_num_list, *kinp_num_list, *kq_num_list;
   extern char *kill_name_list, *qpic_name_list, *kinp_name_list;
   extern char *kq_name_list;
@@ -1517,14 +1646,13 @@ Name **name_list;
 
 #if DIRSOL == ON || EXPGCR == ON
   /*fprintf(stderr, "DIRSOL and EXPGCR compile options not implemented\n");
-  exit(0);*/
+  exit(1);*/
   *numLev = 0;	       	/* put all the charges in first cube */
   *autlev = OFF;
 #endif
 
-  strcpy(hostname, "18Sep92");
-  fprintf(stdout, "Running %s %.1f (%s)\n  Input: %s\n", 
-	  argv[0], VERSION, hostname, infile);
+  fprintf(stdout, "Running %s %s\n  Input: %s\n", 
+	  argv[0], VERSION_STRING, infile);
 
   /* input the panels from the surface files */
   *num_cond = 0;		/* initialize conductor count */
@@ -1552,9 +1680,11 @@ Name **name_list;
 
   time(&clock);
   fprintf(stdout, "  Date: %s", ctime(&clock));
+#ifndef NO_GETHOSTNAME
   if(gethostname(hostname, BUFSIZ) != -1)
       fprintf(stdout, "  Host: %s\n", hostname);
   else fprintf(stdout, "  Host: ? (gethostname() failure)\n");
+#endif
 
 #if CFGDAT == ON
   dumpConfig(stdout, argv[0]);
