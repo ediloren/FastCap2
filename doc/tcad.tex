@@ -1,0 +1,93 @@
+\documentstyle[12pt,twoside,maketitle_mod]{article}
+
+% latex requires full path names so setup \topdir before re-latexing
+\newcommand{\topdir}{/nfs/frobenius/users/ksn/fastcap/doc}
+\newcommand{\figuredir}{\topdir/figures}
+
+
+%
+% figure macro inserted by /nfs/sobolev/sobolev2/ksn/bin/rs6000/putfig
+\newcommand{\fig}[9]{ % filename label caption vsp placement horizo verto horizs verts
+\begin{figure}[#5]
+\vspace*{#4pt}
+\special{psfile=#1,hoffset=#6,voffset=#7,hscale=#8,vscale=#9}
+\caption{#3}
+\label{#2}
+\end{figure}
+}
+%
+%
+% short figure macro inserted by /nfs/sobolev/sobolev2/ksn/bin/rs6000/putfig
+\newcommand{\sfig}[7]{ % filename vsp placement horizo verto horizs verts
+\begin{figure}[#3]
+\vspace*{#2pt}
+\special{psfile=#1,hoffset=#4,voffset=#5,hscale=#6,vscale=#7}
+\end{figure}
+}
+%
+%
+% short figure (w/label) macro inserted by /nfs/sobolev/sobolev2/ksn/bin/rs6000/putfig
+\newcommand{\slfig}[8]{ % filename label vsp placement horizo verto horizs verts
+\refstepcounter{figure}
+\begin{figure}[#4]
+\vspace*{#3pt}
+\special{psfile=#1,hoffset=#5,voffset=#6,hscale=#7,vscale=#8}
+\label{#2}
+\end{figure}
+}
+%
+%%&^^
+\pagestyle{headings}
+
+\input{tcad-math}
+\input{tcad-moments}
+
+
+\setlength{\oddsidemargin}{0.25in}      % 1.25in left margin 
+\setlength{\evensidemargin}{0.00in}     % 1.00in left margin (even pages)
+\setlength{\topmargin}{0.0in}           % 1in top margin
+\setlength{\textwidth}{6.25in}          % 6.25in text
+\setlength{\textheight}{9in}            % Body ht for 1in margins
+\addtolength{\topmargin}{-\headheight}  % No header, so compensate
+\addtolength{\topmargin}{-\headsep}     % for header height and separation
+
+\newtheorem{Algorithm}{Algorithm}
+\newtheorem{Theorem}{Theorem}
+\newtheorem{Lemma}{Lemma}
+\newtheorem{Definition}{Definition}
+\newtheorem{Remark}{Remark}
+
+\newenvironment{Remarknonum}{\vspace{0.25in}\noindent {\bf Remark} \begin{em}}{\end{em}\vspace{0.25in}}
+
+
+\begin{document}
+
+\newcommand{\banner}{{\em IEEE Trans.\ on Computer Aided Design of Integrated  Cirucits and Systems}, 10(11):1447--1459, November 1991.}
+
+%\setcounter{page}{27}
+
+\title { FastCap: A Multipole Accelerated 3-D Capacitance Extraction Program }
+\author{ K.\ Nabors and J.\ White\\
+Research Laboratory of Electronics\\
+Dept. of Electrical Engineering and Computer Science\\
+Massachusetts Institute of Technology\\
+Cambridge, MA   02139   U.S.A.}
+\date{\mbox{}}
+\maketitle
+
+
+\input{tcad-abstract}
+\input{tcad-intro}
+\input{tcad-integral}
+\input{tcad-gcr}
+\input{tcad-accel}
+\input{tcad-results}
+
+\appendix
+
+\input{tcad-form}
+\newpage
+\input{tcad-ref}
+
+
+\end{document}

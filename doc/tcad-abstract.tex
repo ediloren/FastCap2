@@ -1,0 +1,26 @@
+
+\begin{abstract}
+
+In this paper a fast algorithm for computing the capacitance of a
+complicated 3-D geometry of ideal conductors in a uniform dielectric
+is described and its performance in the capacitance extractor FastCap
+is examined.  The algorithm is an acceleration of the boundary-element
+technique for solving the integral equation associated with the
+multiconductor capacitance extraction problem.  Boundary-element
+methods become slow when a large number of elements are used because
+they lead to dense matrix problems which are typically solved with
+some form of Gaussian elimination.  This implies that the computation
+grows as $ n^3 $, where $ n $ is the number of panels or tiles needed
+to accurately discretize the conductor surface charges.  In this paper
+we present a generalized conjugate residual iterative algorithm with a
+multipole approximation to compute the iterates.  This combination
+reduces the complexity so that accurate multiconductor capacitance
+calculations grow nearly as $ n m $, where $ m $ is the number of
+conductors.  Performance comparisons on integrated circuit bus
+crossing problems show that for problems with as few as twelve
+conductors the multipole accelerated boundary element method can be nearly
+500 times faster than Gaussian elimination based algorithms,
+and five to ten times faster than the iterative method alone,
+depending on required accuracy.
+
+\end{abstract}

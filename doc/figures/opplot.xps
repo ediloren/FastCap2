@@ -1,0 +1,428 @@
+%!PS-Adobe-1.0
+%%Creator: ksn
+%%Title: MATLAB Graph
+%%CreationDate:  5/11/1990  12: 1:26
+%%Pages: (atend)
+%%DocumentFonts: Times-Roman
+%%BoundingBox: 80 407 532 756
+%%EndComments
+
+% Note: The BoundingBox specified above is appropriate for a single graph on
+%       the top half of the paper.  To include graphs on the top and 
+%       bottom change the second number (407) to 36.
+
+% To make this file into an Adobe Encapsulated PostScript (EPS)
+% file, remove the 'initgraphics', 'erasepage', and 'copypage' commands.
+
+% initialize PostScript graphics state
+%initgraphics  erasepage
+
+% Rotation and scaling of pictures is controlled by modifying the 
+% rot_pic, scale_pic, tranx_pic, and trany_pic parameters.
+% The picture is originally scaled to allow two plots per page.
+% The font may be changed with the font_spec parameter.
+
+% procedure to set translation to inches
+/unscale {scale_pic div 72 mul} def
+
+% set scaling, rotation and translation parameters
+/rot_pic 0.0 def
+/scale_pic .5706 def
+/tranx_pic 1.1118 def    /trany_pic 5.65 def
+/font_spec {/Times-Roman findfont} def
+/ifont_spec {/Times-Italic findfont} def
+
+% control stuff for printing two pictures per page
+/move_up {0.0 unscale 5.15 unscale translate} def
+/move_down {0.0 unscale -5.15 unscale translate} def
+/switch 0 def
+/print_pic {switch 0 eq 
+	{move_down /switch 1 def} 
+	{copypage erasepage move_up /switch 0 def} 
+	ifelse } def
+
+% last page print control
+/print_last_page {switch 1 eq {copypage /switch 0 def} if} def
+
+% rotate, scale, and translate picture
+rot_pic rotate
+scale_pic scale_pic scale
+tranx_pic unscale trany_pic unscale translate
+
+% define font and font sizes for standard text and numbers and exponential
+% numbers.
+/largefont font_spec 2.000000e+01 scalefont def
+/largeifont ifont_spec 2.000000e+01 scalefont def
+%/largeifont font_spec 2.000000e+01 scalefont def
+/smallfont font_spec 1.400000e+01 scalefont def
+
+% line type setup
+/solid   { []        0 setdash } def
+%/dotted  { [0 4]     0 setdash } def
+/dotted  { [4 4 10 4]       0 setdash } def	% short dash, long dash
+/dashed  { [4]       0 setdash } def
+%/dotdash { [0 4 3 4] 0 setdash } def
+/dotdash { [4 4 4 4 14 4] 0 setdash } def	% 2 short, 1 long dash
+
+% centre and right justification procs
+/centre {stringwidth pop 2 div neg 0 rmoveto} def
+/right  {stringwidth pop neg 0 rmoveto} def
+/centre_rot90 
+{translate 90 rotate 0 0 moveto centre show 0 0 moveto -90 rotate translate} def
+% added for italics text placement
+/put_on_end	{moveto centre stringwidth rmoveto show} def
+/put_on_end_rot
+{translate 90 rotate 0 0 moveto centre stringwidth rmoveto show 0 0 moveto -90 rotate translate} def
+% the dot, square, diamond and triangle used to indicate data points
+/dotsize 3 def
+/size dotsize 2 mul def
+/putpnt {closepath gsave fill grestore} def
+% circle
+/dot {dotsize 0 360 arc putpnt} def
+% triangle
+/tri {size 2 div neg add exch size 3 sqrt div neg add exch 2 copy moveto
+size add exch size 2 div add exch 2 copy lineto
+size neg add exch size 2 div add exch lineto putpnt} def
+% square
+/sqr {size 2 div neg add exch size 2 div neg add exch 2 copy moveto
+size add 2 copy lineto
+exch size add exch 2 copy lineto
+size neg add lineto putpnt} def
+% diamond
+/dia {size 2 div neg add 2 copy moveto
+size 2 div add exch size 2 div neg add exch 2 copy lineto
+size 2 div add exch size 2 div add exch 2 copy lineto
+size 2 div neg add exch size 2 div add exch lineto putpnt} def
+
+
+%line width, line cap, and joint spec
+.5 setlinewidth   1 setlinecap   1 setlinejoin
+
+%macros for newpath, moveto, and {lineto} repeat stroke
+/N {newpath} def /M {moveto}  def /L { {lineto} repeat stroke} def
+
+%%EndProlog
+
+%%Page: 1 1
+
+%Begin graph number 1
+
+solid
+N
+78.09  77.33  757.00 77.33  757.00 570.67 78.09  570.67 78.09  77.33  
+M 4 L
+N
+78.09  77.33  84.83  77.33  
+M 1 L
+N
+750.27 77.33  757.00 77.33  
+M 1 L
+largefont setfont
+ 73.09  71.33 M
+(0)
+right
+(0) show
+N
+78.09  147.81 84.83  147.81 
+M 1 L
+N
+750.27 147.81 757.00 147.81 
+M 1 L
+largefont setfont
+ 73.09 141.81 M
+(5)
+right
+(5) show
+N
+78.09  218.28 84.83  218.28 
+M 1 L
+N
+750.27 218.28 757.00 218.28 
+M 1 L
+largefont setfont
+ 73.09 212.28 M
+(10)
+right
+(10) show
+N
+78.09  288.76 84.83  288.76 
+M 1 L
+N
+750.27 288.76 757.00 288.76 
+M 1 L
+largefont setfont
+ 73.09 282.76 M
+(15)
+right
+(15) show
+N
+78.09  359.24 84.83  359.24 
+M 1 L
+N
+750.27 359.24 757.00 359.24 
+M 1 L
+largefont setfont
+ 73.09 353.24 M
+(20)
+right
+(20) show
+N
+78.09  429.72 84.83  429.72 
+M 1 L
+N
+750.27 429.72 757.00 429.72 
+M 1 L
+largefont setfont
+ 73.09 423.72 M
+(25)
+right
+(25) show
+N
+78.09  500.19 84.83  500.19 
+M 1 L
+N
+750.27 500.19 757.00 500.19 
+M 1 L
+largefont setfont
+ 73.09 494.19 M
+(30)
+right
+(30) show
+N
+78.09  570.67 84.83  570.67 
+M 1 L
+N
+750.27 570.67 757.00 570.67 
+M 1 L
+largefont setfont
+ 73.09 564.67 M
+(35)
+right
+(35) show
+N
+78.09  77.33  78.09  82.53  
+M 1 L
+N
+78.09  565.47 78.09  570.67 
+M 1 L
+largefont setfont
+ 78.09  55.33 M
+(0)
+centre
+(0) show
+N
+191.24 77.33  191.24 82.53  
+M 1 L
+N
+191.24 565.47 191.24 570.67 
+M 1 L
+largefont setfont
+191.24  55.33 M
+(1000)
+centre
+(1000) show
+N
+304.40 77.33  304.40 82.53  
+M 1 L
+N
+304.40 565.47 304.40 570.67 
+M 1 L
+largefont setfont
+304.40  55.33 M
+(2000)
+centre
+(2000) show
+N
+417.55 77.33  417.55 82.53  
+M 1 L
+N
+417.55 565.47 417.55 570.67 
+M 1 L
+largefont setfont
+417.55  55.33 M
+(3000)
+centre
+(3000) show
+N
+530.70 77.33  530.70 82.53  
+M 1 L
+N
+530.70 565.47 530.70 570.67 
+M 1 L
+largefont setfont
+530.70  55.33 M
+(4000)
+centre
+(4000) show
+N
+643.85 77.33  643.85 82.53  
+M 1 L
+N
+643.85 565.47 643.85 570.67 
+M 1 L
+largefont setfont
+643.85  55.33 M
+(5000)
+centre
+(5000) show
+N
+757.00 77.33  757.00 82.53  
+M 1 L
+N
+757.00 565.47 757.00 570.67 
+M 1 L
+largefont setfont
+757.00  55.33 M
+(6000)
+centre
+(6000) show
+N
+167.71 86.17  261.40 114.32 387.67 182.84 546.54 318.92 737.99 556.75 
+M 4 L
+%dashed
+N
+167.71 83.02  261.40 93.14  387.67 106.08 546.54 128.72 737.99 151.57 
+M 4 L
+%dotted
+N
+167.71 80.63  261.40 85.48  387.67 92.84  546.54 103.42 737.99 113.47 
+M 4 L
+%dotdash
+N
+167.71 78.25  261.40 80.22  387.67 80.98  546.54 83.62  737.99 87.91  
+M 4 L
+% the dots on the curves
+N
+167.71 86.17  dot
+N
+261.40 114.32 dot
+N
+387.67 182.84 dot
+N
+546.54 318.92 dot
+N
+737.99 556.75 dot
+% start next trace
+N
+167.71 83.02  sqr
+N
+261.40 93.14  sqr
+N
+387.67 106.08 sqr
+N
+546.54 128.72 sqr
+N
+737.99 151.57 sqr
+% start next trace
+N
+167.71 80.63  tri
+N
+261.40 85.48  tri
+N
+387.67 92.84  tri
+N
+546.54 103.42 tri
+N
+737.99 113.47 tri
+% start next trace
+N
+167.71 78.25  dia
+N
+261.40 80.22  dia
+N
+387.67 80.98  dia
+N
+546.54 83.62  dia
+N
+737.99 87.91  dia
+%
+largefont setfont
+% data and procedure to write text sideways
+-14.00  -324.00
+(Millions of Multiply-Add Operations per   )
+(Millions of Multiply-Add Operations per   )
+ 14.00 324.00
+centre_rot90
+% figure where to write the italics
+largeifont setfont
+-14.00  -324.00
+(Pw)
+(Millions of Multiply-Add Operations per )
+(Millions of Multiply-Add Operations per   )
+ 14.00 324.00
+put_on_end_rot
+largefont setfont
+417.55  14.00 M
+(Number of Panels,  )
+centre
+(Number of Panels,  ) show
+largeifont setfont
+(n)
+(Number of Panels, )
+(Number of Panels,  )
+417.55  14.00 
+put_on_end
+solid
+N
+125.62 536.14 139.20 536.14 152.77 536.14 166.35 536.14 179.93 536.14 
+193.51 536.14 
+M 5 L
+N 125.62 536.14 dot
+N 193.51 536.14 dot
+largefont setfont
+207.09 536.85 M
+(GCR         ) show
+%dashed
+N
+125.62 501.60 139.20 501.60 152.77 501.60 166.35 501.60 179.93 501.60 
+193.51 501.60 
+M 5 L
+N 125.62 501.60 sqr
+N 193.51 501.60 sqr
+largefont setfont
+207.09 502.31 M
+(MGCR \() show
+largeifont setfont
+(l) show
+largefont setfont
+( = 2\)) show
+%dotted
+N
+125.62 467.07 139.20 467.07 152.77 467.07 166.35 467.07 179.93 467.07 
+193.51 467.07 
+M 5 L
+N 125.62 467.07 tri
+N 193.51 467.07 tri
+largefont setfont
+207.09 467.78 M
+(MGCR \() show
+largeifont setfont
+(l) show
+largefont setfont
+( = 1\)) show
+%dotdash
+N
+125.62 432.53 139.20 432.53 152.77 432.53 166.35 432.53 179.93 432.53 
+193.51 432.53 
+M 5 L
+N 125.62 432.53 dia
+N 193.51 432.53 dia
+largefont setfont
+207.09 433.25 M
+(MGCR \() show
+largeifont setfont
+(l) show
+largefont setfont
+( = 0\)) show
+
+%End graph number 1
+
+% print page
+%print_pic
+
+
+% print last page if neccessary
+%print_last_page
+
+%%Trailer
+%%Pages: 1

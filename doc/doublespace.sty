@@ -1,0 +1,119 @@
+% -*- Mode:LaTeX -*-
+% -*- Module: doublespace.sty
+
+% Document style option "doublespace"
+% -- usage:  \documentstyle[...,doublespace,...]{...}
+%
+% WARNING!
+%    This option is provided for those who are COMPELLED by powers
+%    beyond their control to double-space their documents. Known
+%    powers of this kind include copy-editors and dissertation
+%    rule-makers in some universities. Double spacing is one of the
+%    best ways to ruin the appearance of a document and to render
+%    it difficult to read (in this respect it is equalled only by
+%    adding too many characters on a line).
+%
+% This style option produces a double-spaced document by redefining
+% the LaTeX parameter \baselinestretch to 2.
+%
+% It also fixes a number of problems with standard LaTeX, as follows:
+%
+% 1. A new environment "singlespace" is provided, within which single
+%    spacing will apply. (Note that on entering this environment the
+%    \normalsize command is issued automatically.)
+% 2. Double spacing is turned off within footnotes and floats (figures
+%    and tables).
+% 3. Proper double spacing happens below tabular environments and in other
+%    places where LaTeX uses a strut.
+% 4. Slightly more space is inserted before footnotes.
+%
+% Note: This version sets a baselinestretch of 2. If this is too much,
+%    put  \setstretch{1.7}  (or some appropriate value) before the
+%    \begin{document} command. To print the document with single spacing
+%    again, without removing "singlespace" environments, just put a
+%    \setstretch{1} at the top of the document.
+%
+% Author: Stephen Page  -- sdpage@uk.ac.oxford.prg
+% Release date: 6 July 1986, documentation revised 24 September 1986
+%
+% Known bugs:
+%    . The \singlespace environment works sometimes (e.g. around titles)
+%      but not always. Suggestions for a fix are welcomed!
+%    . It might be nice if spacing before the footnote rule (\footins)
+%      were provided in a tidier way.
+%    . Increasing struts may possibly cause some other obscure part of
+%      formatting to fall over.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%---Set up double spacing
+
+\def\baselinestretch{2}
+
+
+%---New command "\setstretch" (slightly more mnemonic... and easier to type)
+
+\def\setstretch#1{\renewcommand{\baselinestretch}{#1}}
+
+
+%---New environment "singlespace".
+%   The baselinestretch only takes effect at a size change, so do one.
+
+\def\singlespace{\def\baselinestretch{1}\@normalsize}
+\def\endsinglespace{}
+
+
+%---Stretch the baseline BEFORE calculating the strut size. This improves
+%   spacing below tabular environments etc., probably...
+%   Comments are welcomed.
+
+\def\@setsize#1#2#3#4{\@nomath#1\let\@currsize#1\baselineskip
+   #2\baselineskip\baselinestretch\baselineskip
+   \setbox\strutbox\hbox{\vrule height.7\baselineskip
+      depth.3\baselineskip width\z@}
+   \normalbaselineskip\baselineskip#3#4}
+
+
+%---Increase the space between last line of text and footnote rule.
+%   This is a very untidy way to do it!
+
+\skip\footins 20pt plus4pt minus4pt
+
+
+%---Reset baselinestretch within footnotes and floats. Originally stolen
+%   from Stanford thesis style.
+
+\def\@xfloat#1[#2]{\ifhmode \@bsphack\@floatpenalty -\@Mii\else
+   \@floatpenalty-\@Miii\fi\def\@captype{#1}\ifinner
+      \@parmoderr\@floatpenalty\z@
+    \else\@next\@currbox\@freelist{\@tempcnta\csname ftype@#1\endcsname
+       \multiply\@tempcnta\@xxxii\advance\@tempcnta\sixt@@n
+       \@tfor \@tempa :=#2\do
+                        {\if\@tempa h\advance\@tempcnta \@ne\fi
+                         \if\@tempa t\advance\@tempcnta \tw@\fi
+                         \if\@tempa b\advance\@tempcnta 4\relax\fi
+                         \if\@tempa p\advance\@tempcnta 8\relax\fi
+         }\global\count\@currbox\@tempcnta}\@fltovf\fi
+    \global\setbox\@currbox\vbox\bgroup 
+    \def\baselinestretch{1}\@normalsize
+    \boxmaxdepth\z@
+    \hsize\columnwidth \@parboxrestore}
+\long\def\@footnotetext#1{\insert\footins{\def\baselinestretch{1}\footnotesize
+    \interlinepenalty\interfootnotelinepenalty 
+    \splittopskip\footnotesep
+    \splitmaxdepth \dp\strutbox \floatingpenalty \@MM
+    \hsize\columnwidth \@parboxrestore
+   \edef\@currentlabel{\csname p@footnote\endcsname\@thefnmark}\@makefntext
+    {\rule{\z@}{\footnotesep}\ignorespaces
+      #1\strut}}}
+
+
+% margins
+\textheight 8.1in 
+\textwidth 6.0in
+\topmargin 0in % to achieve 1"
+\headsep 0.5in
+\oddsidemargin 0.25in
+\evensidemargin 0.25in
+\setlength{\marginparwidth}{1.0in}
+\setlength{\marginparsep}{0.125in}
+\normalmarginpar

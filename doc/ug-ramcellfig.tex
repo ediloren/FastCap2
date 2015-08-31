@@ -1,0 +1,51 @@
+%
+% dram cell figure
+%
+% for fig2ug.awk
+%%%&^ side_view.ps
+%%%&^ nosini.ps
+%\documentstyle{article}
+%\input{psfig}
+%\begin{document}
+\newcommand{\ramcellcap}{The complete DRAM model, (a), and with the dielectric interfaces removed for clarity, (b).}
+\setlength{\unitlength}{1.0in}
+\begin{figure}
+\vbox{
+\centerline{
+\psfig{figure=\figuredir/side_view.ps,width=6.5in}
+}
+\vspace{0.25in}
+\centerline{
+\psfig{figure=\figuredir/nosini.ps,width=6.5in}
+}
+}
+\begin{picture}(6.4,0)
+\thicklines
+\put(2.35,0.0){(b)}
+\put(2.35,4){(a)}
+\put(0.2,0.2){\begin{tabular}{l} vias and \\ depletion regions\end{tabular}}
+\put(3.1,0.1){word lines}
+\put(4.4,0.1){cell plate}
+\put(5.2,3.3){bit lines}
+\put(5.5,6.5){\begin{tabular}{l}dielectric \\ interfaces\end{tabular}}
+% via and depletion... 
+\put(1.1,0.25){\vector(1,2){0.1}}
+% word lines
+\put(3.0,0.15){\vector(-1,1){0.4}}
+\put(3.3,0.25){\vector(-1,2){0.7}}
+\put(3.5,0.25){\vector(3,4){1.2}}
+\put(3.9,0.15){\vector(1,1){0.7}}
+% cell plate
+\put(5.1,0.15){\vector(1,1){0.25}}
+% bit lines
+\put(5.3,3.2){\vector(0,-1){0.4}}
+\put(5.5,3.2){\vector(0,-1){0.85}}
+\put(5.7,3.2){\vector(0,-1){1.5}}
+% dielectric interfaces
+\put(5.8,6.35){\vector(0,-1){0.15}}
+\put(6.05,6.35){\vector(0,-1){0.55}}
+\end{picture}
+\caption{\ramcellcap}
+\label{ramcell}
+\end{figure}
+%\end{document}

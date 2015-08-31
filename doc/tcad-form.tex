@@ -1,0 +1,374 @@
+%\documentstyle[11pt]{article}
+%\setlength{\topmargin}{-.65in}
+%\setlength{\footskip}{0in}
+%\setlength{\headheight}{0in}
+%\setlength{\headsep}{0in}
+%\setlength{\textheight}{10in}
+%\setlength{\oddsidemargin}{.4in}
+%\setlength{\textwidth}{5.7in}
+%\begin{document}
+
+%\input{moments}
+%\input{math}
+
+%\section*{Appendix: Multipole Algorithm Formulas}
+\section{Multipole Algorithm Formulas}
+\label{appfor}
+
+This appendix presents the multipole algorithm expansion, shift
+and conversion formulas used in the capacitance extraction algorithm
+implementation.
+The formulas used are equivalent to those
+in the original multipole algorithm formulation
+of \cite{gre,fft} but avoid complex arithmetic.
+They are obtained by combining complex conjugates in
+the original formulas to obtain expressions in the style of \cite{hob}. 
+Section~\ref{mopart} defines the real valued
+coefficients and the spherical harmonics which together are used to form
+the multipole formulas of Section~\ref{muform}.
+
+\subsection{Formula Components}
+\label{mopart}
+
+Each multipole or local expansion term involves a 
+coefficient multiplying a spherical harmonic. 
+When a real coefficient expansion is
+used this fact is obscured by the combination of complex conjugates.
+However, since the real coefficient expansions are just reorganizations of 
+the complex coefficient formulas, the
+same coefficients and spherical harmonics appear in slightly different form.
+
+\subsubsection{Real Valued Expansion Coefficients}
+
+Given a multipole or local expansion coefficient, $G_n^m$, the corresponding
+real valued coefficients are defined as
+\begin{eqnarray}
+\Gb{n}{m} &\trieq& \left\{
+\begin{array}{ll}
+\rule[-5mm]{0mm}{5mm}2\sqrt{\frac{(n+|m|)!}{(n-|m|)!}}\:\mbox{Re}\{G_n^m\}, & |m|>0,\: |m|\leq n;\\
+G_n^m, & m=0,\: m\leq n;\\
+0, &\mbox{otherwise;}
+\end{array}
+\right.\label{bardef}\\
+\Gbb{n}{m} &\trieq & \left\{
+\begin{array}{ll}
+\rule[-5mm]{0mm}{5mm}-2\sqrt{\frac{(n+m)!}{(n-m)!}}\:\mbox{Im}\{G_n^m\}, & m>0,\: m\leq n;\\
+\rule[-5mm]{0mm}{5mm}2\sqrt{\frac{(n+|m|)!}{(n-|m|)!}}\:\mbox{Im}\{G_n^m\}, & m<0,\: |m|\leq n;\\
+0, & \mbox{otherwise.}
+\end{array}
+\right.\label{dbrdef}
+\end{eqnarray}
+All the multipole algorithm formulas are converted to real coefficients using
+these substitutions for the complex coefficients.
+
+\subsubsection{Spherical Harmonics}
+
+The functions
+\begin{equation}
+Y_n^m(\theta, \phi)\trieq\sqrt{\frac{(n-|m|)!}{(n+|m|)!}}P_n^{|m|}(\cos\theta)e^{im\phi},
+\label{sphhar}
+\end{equation}
+are called surface spherical harmonics.  
+A surface spherical harmonic
+is part of a solution to Laplace's equation obtained by separation
+of variables. 
+Here, as in \cite{jac}, 
+a surface spherical harmonic is the product of the
+elevation ($\theta$) and azimuth ($\phi$) components of the solution.
+Unlike the usual definition, however,
+a normalization constant is omitted following \cite{gre,fft}.
+The complete solution is a product of $Y_n^m$ and a power of $r$, 
+the radial coordinate. The result, for example
+\begin{equation}
+\frac{1}{r^{n+1}}Y_n^m(\theta, \phi),
+\label{spfrac}
+\end{equation}
+is called a spherical harmonic.
+
+
+The function $P_n^{m}(\cos\theta)$ is the associated Legendre function 
+of the first kind with degree $n$ and order $m$. These functions are
+defined only when $n$ is a non-negative integer and $m$ is an integer
+such that $-n\leq m\leq n$. For convenience any $P_n^{m}(\cos\theta)$
+whose indices do not satisfy these restrictions is taken to be zero.
+
+%To apply the multipole formulas to order $l$ expansions,
+%all the possible associated Legendre
+%functions with $0\leq n\leq l$ or $2l$, 
+%depending on the formula, are required. For example an order $l=3$
+%multipole expansion shift requires the Legendre function evaluations
+%\[
+%\begin{array}{llll}
+%P_0^0(\cos\alpha)&&&\\
+%P_1^0(\cos\alpha)&P_1^1(\cos\alpha)&&\\
+%P_2^0(\cos\alpha)&P_2^1(\cos\alpha)&P_2^2(\cos\alpha)&\\
+%P_3^0(\cos\alpha)&P_3^1(\cos\alpha)&P_3^2(\cos\alpha)&P_3^3(\cos\alpha)\\
+%\end{array}
+%\]
+The recursion
+\begin{eqnarray}
+\lefteqn{(n-m) P_n^m(\cos\alpha)}\nonumber\\
+&&=(2n-1)\: \cos\alpha\: P_{n-1}^m(\cos\alpha) - (n+m-1)P_{n-2}^m(\cos\alpha),
+\label{nmrecl}
+\end{eqnarray}
+valid for $0\leq m\leq n-2$,
+and the formulas
+\begin{eqnarray}
+P_m^m(\cos\alpha)=\frac{(2m)!}{2^m m!} (-\sin\alpha)^m,&&0\leq m,\label{mmlegn}\\
+P_{m+1}^{m}(\cos\alpha)=(2m+1) \cos\alpha P_m^m(\cos\alpha),&&0\leq m,\label{mm1leg}
+\end{eqnarray}
+can be used to recursively evaluate the Legendre functions \cite{hob,mag}.
+%Formula (\ref{nmrecl})
+%is one standard recursion on $n$ and (\ref{mm1leg}) is a special case
+%of another standard recursion on $n$ \cite{hob, mag}. 
+%%\cite[pg.\ 54]{mag}. 
+%The expression (\ref{mmlegn}) follows
+%from the  definition 
+%\begin{equation}
+%P_n^m(\cos\alpha) \trieq (-\sin\alpha)^m \frac{d^m}{d(\cos\alpha)^m} P_n^0(\cos\alpha)
+%\end{equation}
+%and the form of $P_n^0(\cos\alpha)$. The table of evaluations is generated
+%one column at a time using the recursion (\ref{nmrecl}) with starting
+%values from (\ref{mmlegn}) and (\ref{mm1leg}). The standard recursion
+%on $m$ is avoided since it often produces errors due to 
+%cancellation \cite{low}.
+%%\cite[pg.\ xvii]{low}.
+
+\subsection{Real Coefficient Multipole Algorithm Formulas}
+\label{muform}
+
+Using the real valued coefficients and the spherical harmonics of the previous
+section, the multipole algorithm formulas used in the capacitance extraction
+algorithm are obtained. The resulting real coefficient formulas eliminate the
+need for complex arithmetic and square root calculations.
+
+\subsubsection{Multipole Expansion (Q2M, M2P)}
+
+The order $l$ multipole expansion approximation to the potential, $\psi$,
+at the point
+$(r, \theta, \phi)$ 
+is
+\begin{equation}
+\psi(r, \theta, \phi)\approx \sum_{n=0}^{l}\sum_{m=-n}^{n}\frac{M_n^m}{r^{n+1}}Y_n^m(\theta, \phi).
+\end{equation}
+Applying the definition of the surface spherical harmonic,
+$Y_n^m$,
+gives
+\begin{equation}
+\psi(r, \theta, \phi)\approx\sum_{n=0}^{l}\sum_{m=-n}^{n}\frac{M_n^m}{r^{n+1}}\sqrt{\frac{(n-|m|)!}{(n+|m|)!}}P_n^{|m|}(\cos\theta)e^{im\phi}.
+\end{equation}
+Substituting the real coefficients using (\ref{bardef}) and (\ref{dbrdef}) 
+yields
+the real coefficient multipole expansion,
+\begin{equation}
+\psi(r, \theta, \phi) \approx \sum_{n=0}^{l}\frac{1}{r^{n+1}}\sum_{m=0}^n
+\frac{(n-m)!}{(n+m)!}P_n^m(\cos\theta)
+\left[\Mb{n}{m}\cos(m\phi)+\Mbb{n}{m}\sin(m\phi)\right].
+\label{remult}
+\end{equation}
+The complex coefficient local expansion conversion is nearly identical.
+
+A multipole expansion is constructed from
+$k$ charges with strengths $q_i$ and positions
+$(\rho_i, \alpha_i, \beta_i)$, $i=1$, \ldots, $k$, using
+\begin{equation}
+M_n^m \trieq \sum_{i=1}^{k}\, q_i\, \rho_i^n\, Y_n^{-m}(\alpha_i, \beta_i).
+\end{equation}
+Substituting (\ref{bardef}) and (\ref{dbrdef}) gives expressions for
+the real multipole coefficients corresponding to a set of $k$ charges,
+\begin{eqnarray}
+\Mb{n}{m} &=& \left\{
+\begin{array}{ll}
+\rule[-5mm]{0mm}{5mm}2\sum_{i=1}^{k}\, q_i\, \rho_i^n\, P_n^{|m|}(\cos\alpha_i)\, \cos(m\beta_i), & |m|>0,\: |m|\leq n;\\
+\rule[-5mm]{0mm}{5mm}\sum_{i=1}^{k}\, q_i\, \rho_i^n\, P_n^{0}(\cos\alpha_i), & m=0,\: m\leq n;\\
+0, &\mbox{otherwise;}
+\end{array}
+\right.\label{barmul}\\
+\Mbb{n}{m} &=& \left\{
+\begin{array}{ll}
+\rule[-5mm]{0mm}{5mm}2\sum_{i=1}^{k}\, q_i\, \rho_i^n\, P_n^{|m|}(\cos\alpha_i)\, \sin(m\beta_i), & |m|>0,\: |m|\leq n;\\
+0, & \mbox{otherwise.}
+\end{array}
+\right.\label{dbrmul}
+\end{eqnarray}
+
+
+\subsubsection{Local Expansion (Q2L, L2P)}
+
+The order $l$ local expansion approximation to the potential, $\psi$,
+at the point
+$(r, \theta, \phi)$ 
+is
+\begin{equation}
+\psi(r, \theta, \phi) \approx \sum_{n=0}^{l}\sum_{m=-n}^{n}L_n^mY_n^m(\theta, \phi)r^n,
+\end{equation}
+or
+\begin{equation}
+\psi(r, \theta, \phi) \approx\sum_{n=0}^{l}\sum_{m=-n}^{n}L_n^m\sqrt{\frac{(n-|m|)!}{(n+|m|)!}}P_n^{|m|}(\cos\theta)e^{im\phi}r^n.
+\end{equation}
+Substituting the real coefficients using (\ref{bardef}) and (\ref{dbrdef}) 
+yields
+the real coefficient local expansion,
+\begin{equation}
+\psi(r, \theta, \phi) \approx
+\sum_{n=0}^{l}r^n\sum_{m=0}^n\frac{(n-m)!}{(n+m)!}
+P_n^m(\cos\theta)\left[\Lb{n}{m}\cos(m\phi)+\Lbb{n}{m}\sin(m\phi)\right].
+\label{relocl}
+\end{equation}
+
+A local expansion is constructed from
+$k$ charges with strengths $q_i$ and positions
+$(\rho_i, \alpha_i, \beta_i)$, $i=1$, \ldots, $k$, using
+\begin{equation}
+L_n^m \trieq \sum_{i=1}^{k}\, \frac{q_i}{\rho_i^{n+1}}\, Y_n^{-m}(\alpha_i, \beta_i).
+\end{equation}
+Substituting (\ref{bardef}) and (\ref{dbrdef}) gives expressions for
+the real multipole coefficients corresponding to a set of charges,
+\begin{eqnarray}
+\Lb{n}{m} &=& \left\{
+\begin{array}{ll}
+\rule[-5mm]{0mm}{5mm}2\sum_{i=1}^{k}\, \frac{q_i}{\rho_i^{n+1}}\, P_n^{|m|}(\cos\alpha_i)\, \cos(m\beta_i), & |m|>0,\: |m|\leq n;\\
+\rule[-5mm]{0mm}{5mm}\sum_{i=1}^{k}\, \frac{q_i}{\rho_i^{n+1}}\, P_n^{0}(\cos\alpha_i), & m=0,\: m\leq n;\\
+0, &\mbox{otherwise;}
+\end{array}
+\right.\label{barloc}\\
+\Lbb{n}{m} &=& \left\{
+\begin{array}{ll}
+\rule[-5mm]{0mm}{5mm}2\sum_{i=1}^{k}\, \frac{q_i}{\rho_i^{n+1}}\, P_n^{|m|}(\cos\alpha_i)\, \sin(m\beta_i), & |m|>0,\: |m|\leq n;\\
+0, & \mbox{otherwise.}
+\end{array}
+\right.\label{dbrloc}
+\end{eqnarray}
+
+\subsubsection{Multipole Expansion Shift (M2M)}
+
+Consider a multipole expansion about the point
+$(\rho, \alpha, \beta)$. The potential at a given point results when its
+coordinates relative to $(\rho, \alpha, \beta)$ are substituted into
+the expansion. If the expansion about $(\rho, \alpha, \beta)$
+has coefficients $O_n^m$, then the coefficients of a shifted multipole
+expansion about the origin, $N_j^k$, are given by
+\begin{equation}
+N_j^k = \sum_{n=0}^j\sum_{m=-n}^n\frac{\sqrt{(j+k)!(j-k)!}\:i^{|k|-|m|-|k-m|}\:Y_n^{-m}(\alpha, \beta)\:O_{j-n}^{k-m}\rho^n}{\sqrt{(j-n+k-m)!\:(j-n-k+m)!\:(n+m)!\:(n-m)!}}.
+\end{equation}
+Substituting for the surface
+spherical harmonics using (\ref{sphhar}) and for the
+complex coefficients with (\ref{bardef}) and (\ref{dbrdef}) gives the real
+coefficient multipole expansion shift formulas for
+$j\geq k\geq 0$, 
+\begin{eqnarray}
+\lefteqn{\Nb{j}{k}=
+(j+k)!\sum_{n=0}^j\rho^n\sum_{m=0}^nf_{M}(m, k)
+\frac{P_n^{m}(\cos\alpha)}{(n+m)!}}\nonumber\\
+&&\cdot\left\{\frac{i^{k-m-|k-m|}}{(j-n+|k-m|)!}
+\left[\Ob{j-n}{k-m}\cos(m\beta)-\Obb{j-n}{k-m}\sin(m\beta)\right]\right.
+\nonumber\\
+&&\left.+\frac{(-1)^m}{(j-n+k+m)!}
+\left[\Ob{j-n}{k+m}\cos(m\beta)+\Obb{j-n}{k+m}\sin(m\beta)\right]\right\};
+\\
+\lefteqn{\Nbb{j}{k}=
+(j+k)!\sum_{n=0}^j\rho^n\sum_{m=0}^nf_{M}(m, k)
+\frac{P_n^{m}(\cos\alpha)}{(n+m)!}}\nonumber\\
+&&\cdot\left\{\frac{i^{k-m-|k-m|}}{(j-n+|k-m|)!}
+\left[\Ob{j-n}{k-m}\sin(m\beta)+\Obb{j-n}{k-m}\cos(m\beta)\right]\right.
+\nonumber\\
+&&\left.+\frac{(-1)^m}{(j-n+k+m)!}
+\left[-\Ob{j-n}{k+m}\sin(m\beta)+\Obb{j-n}{k+m}\cos(m\beta)\right]\right\}.
+\end{eqnarray}
+Here
+\begin{equation}
+f_{M}(m, k)\trieq \left\{
+\begin{array}{ll}
+1,&m\neq 0,\: k\neq 0;\\
+1/2,&m=0,\: k\neq 0;\\
+1/2,&m\neq 0,\: k=0;\\
+1/2,&m=0,\: k=0.
+\end{array}\right.
+\end{equation}
+%Since $\Nb{j}{-k}=\Nb{j}{k}$ and $\Nbb{j}{-k}=-\Nbb{j}{k}$,
+%the real coefficients with negative superscripts are never explicitly calculated.
+%Furthermore no coefficients with negative subscripts are required in any of the
+%expansions and all of the coefficients with $|k|>j$ are zero by
+%definition. Thus the coefficients with  $j\geq k\geq 0$ form a complete
+%multipole expansion set. The same reasoning
+%applies to the coefficients calculated by the other shift and conversion
+%operations.
+
+\subsubsection{Multipole to Local Expansion Conversion (M2L)}
+
+An order $l$ multipole expansion about the point
+$(\rho, \alpha, \beta)$,
+with coefficients $O_n^m$, can be converted to an order $l$ local
+expansion about the origin, with coefficients $N_j^k$, using
+\begin{equation}
+N_j^k = \sum_{n=0}^l\sum_{m=-n}^n\frac{\sqrt{(j+n+m-k)!\:(j+n-m+k)!}\:i^{|k-m|}\:Y_{j+n}^{m-k}(\alpha, \beta)\:O_n^m}{\sqrt{(n+m)!\:(n-m)!\:(j+k)!\:(j-k)!}\:(-1)^n\:i^{|k|+|m|}\:\rho^{j+n+1}}.
+\end{equation}
+Substituting for the surface
+spherical harmonics using (\ref{sphhar}) and for the
+complex coefficients with (\ref{bardef}) and (\ref{dbrdef}) gives the real
+coefficient multipole to local expansion conversion formulas for
+$l\geq j\geq k\geq 0$,
+\begin{eqnarray}
+\lefteqn{\Nb{j}{k}=
+\frac{f_{L}(k)}{\rho^j(j-k)!}
+\sum_{n=0}^l\frac{(-1)^n}{\rho^{n+1}}\sum_{m=0}^n}\nonumber\\
+&&P_{j+n}^{|m-k|}(\cos\alpha)\frac{(j+n-|m-k|)!}{(n+m)!}\:i^{|k-m|-k-m}
+\nonumber\\
+&&\rule{0.25in}{0in}\cdot\left\{\Ob{n}{m}\cos[(m-k)\beta]+\Obb{n}{m}\sin[(m-k)\beta]\right\}\nonumber\\
+&&+P_{j+n}^{m+k}(\cos\alpha)\frac{(j+n-m-k)!}{(n+m)!}\nonumber\\
+&&\rule{0.25in}{0in}\cdot\left\{\Ob{n}{m}\cos[(m+k)\beta]+\Obb{n}{m}\sin[(m+k)\beta]\right\};
+\\
+\lefteqn{\Nbb{j}{k}=
+\frac{1}{\rho^j(j-k)!}
+\sum_{n=0}^l\frac{(-1)^n}{\rho^{n+1}}\sum_{m=0}^n}\nonumber \\
+&&P_{j+n}^{|m-k|}(\cos\alpha)\:\frac{(j+n-|m-k|)!}{(n+m)!}\:i^{|k-m|-k-m}\nonumber\\
+&&\rule{0.25in}{0in}\cdot\left\{-\Ob{n}{m}\sin[(m-k)\beta]+\Obb{n}{m}\cos[(m-k)\beta]\right\}\nonumber\\
+&&+P_{j+n}^{m+k}(\cos\alpha)\frac{(j+n-m-k)!}{(n+m)!}\nonumber\\
+&&\rule{0.25in}{0in}\cdot\left\{\Ob{n}{m}\sin[(m+k)\beta]-\Obb{n}{m}\cos[(m+k)\beta]\right\}.
+\end{eqnarray}
+Here
+\begin{equation}
+f_{L}(k) = \left\{
+\begin{array}{ll}
+1,&k\neq 0;\\
+1/2,&k=0.
+\end{array}\right.
+\label{fm2ldef}
+\end{equation}
+
+\subsubsection{Local  Expansion Shift (L2L)}
+
+An order $l$ local expansion about the point
+$(\rho, \alpha, \beta)$,
+with coefficients $O_n^m$, can be converted to an order $l$ local
+expansion about the origin, with coefficients $N_j^k$, using
+\begin{equation}
+N_j^k = \sum_{n=j}^l\sum_{m=-n}^n\frac{\sqrt{(n+m)!(n-m)!}\:i^{|m|-|k|-|m-k|}\:Y_{n-j}^{m-k}(\alpha, \beta)\:O_n^m\:\rho^{n-j}}{\sqrt{(n-j+m-k)!(n-j-m+k)!(j+k)!(j-k)!}\:(-1)^{n-j}}.
+\end{equation}
+Substituting for the surface
+spherical harmonics using (\ref{sphhar}) and for the
+complex coefficients with (\ref{bardef}) and (\ref{dbrdef}) gives the real
+coefficient local expansion shift formulas
+for $j\geq k\geq 0$,
+\begin{eqnarray}
+\lefteqn{\Nb{j}{k}=
+\frac{f_{L}(k)}{(-\rho)^j(j-k)!}
+\sum_{n=j}^l(-\rho)^n\sum_{m=0}^n}\nonumber\\
+&&P_{n-j}^{|m-k|}(\cos\alpha)
+\frac{i^{m-k-|m-k|}}{(n-j+|m-k|)!(n-m)!}\nonumber\\
+&&\rule{0.25in}{0in}\cdot\left\{\Ob{n}{m}\cos[(m-k)\beta]+\Obb{n}{m}\sin[(m-k)\beta]\right\}\nonumber\\
+&&+P_{n-j}^{m+k}(\cos\alpha)\frac{(-1)^k}{(n-j+m+k)!(n-m)!}\nonumber\\
+&&\rule{0.25in}{0in}\cdot\left\{\Ob{n}{m}\cos[(m+k)\beta]+\Obb{n}{m}\sin[(m+k)\beta]\right\};
+\\
+\lefteqn{\Nbb{j}{k}=
+\frac{1}{(-\rho)^j(j-k)!}
+\sum_{n=j}^l(-\rho)^n\sum_{m=0}^n}\nonumber\\
+&&P_{n-j}^{|m-k|}(\cos\alpha)
+\frac{i^{m-k-|m-k|}}{(n-j+|m-k|)!(n-m)!}\nonumber\\
+&&\rule{0.25in}{0in}\cdot\left\{-\Ob{n}{m}\sin[(m-k)\beta]+\Obb{n}{m}\cos[(m-k)\beta]\right\}\nonumber\\
+&&+P_{n-j}^{m+k}(\cos\alpha)\frac{(-1)^k}{(n-j+m+k)!(n-m)!}\nonumber\\
+&&\rule{0.25in}{0in}\cdot\left\{\Ob{n}{m}\sin[(m+k)\beta]-\Obb{n}{m}\cos[(m+k)\beta]\right\}.
+\end{eqnarray}
+The function $f_{L}(k)$ is given by (\ref{fm2ldef}).
+
+%\end{document}

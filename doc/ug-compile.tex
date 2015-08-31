@@ -1,0 +1,164 @@
+%
+% Description of output compile flag effects and compile procedure
+%
+\section{Compiling FastCap}
+\label{comfas}
+
+%\noindent{\sc Check particulars w/Miguel.}
+
+A tar file containing the source files for {\tt fastcap},
+{\tt busgen}, {\tt capgen}, {\tt cubgen} and this guide, as well as
+all the neutral files it describes, may be obtained on tape
+by sending a written
+request to
+\begin{quote}
+Prof.\ Jacob White\\
+Massachusetts Institute of Technology\\
+Department of Electrical Engineering and Computer Science\\
+Room 36-880\\
+Cambridge, MA 02139 U.S.A.
+\end{quote}
+This address may also be used for  general correspondence regarding 
+{\tt fastcap}, although electronic mail may be sent to
+{\tt fastcap-bug@rle-vlsi.mit.edu}, 
+for bug reports, and to {\tt fastcap@rle-vlsi.mit.edu}, for
+questions or comments, if it is more convenient.
+
+The tar file has the form
+\begin{quote}
+\begin{verbatim}
+fastcap-2.0-25May92.tar.Z
+\end{verbatim}
+\end{quote}
+and yields a two level directory tree when untarred with the commands
+\begin{quote}
+\begin{verbatim}
+uncompress fastcap-2.0-25May92.tar.Z
+tar xvf fastcap-2.0-25May92.tar
+\end{verbatim}
+\end{quote}
+The top-level directory is called {\tt fastcap} and has four subdirectories.
+The directory {\tt fastcap/src} contains all the C source files; 
+the \LaTeX\ 
+files for this manual are found in {\tt fastcap/doc},  
+and {\tt fastcap/examples} contains
+the example files. Executables are stored in the {\tt fastcap/bin}
+directory after compilation using the procedures described below.
+
+\subsection{Default Compilation Procedure}
+
+The default version of the executable {\tt fastcap} is 
+compiled\footnote{For IBM AIX systems, it is recommended that
+{\tt fastcap/src/Makefile} be reconfigured before compilation
+using the procedure described in
+Section~\ref{specom}.}
+by changing to the top-level directory, {\tt fastcap}, and typing 
+\begin{quote}
+\begin{verbatim}
+make all
+\end{verbatim}
+\end{quote}
+to install the executables {\tt fastcap}, 
+{\tt busgen}, {\tt capgen} and
+{\tt cubegen} in the {\tt fastcap/bin} directory. Alternatively any of the
+executables may be compiled alone. For example, ``{\tt make fastcap}''
+produces only {\tt fastcap}.
+
+\subsection{Special Compilation Procedures}
+\label{specom}
+
+If {\tt fastcap} is configured to print execution time information
+by setting the {\tt TIMDAT} flag in {\tt src/mulGlobal.h} to {\tt ON}
+(see Table~\ref{outpu}), an alternate compilation procedure is
+needed to account for operating system differences.
+To configure {\tt fastcap/src/Makefile}, change to the top-level
+directory, {\tt fastcap}, and  type
+\begin{quote}
+\begin{verbatim}
+config 4
+\end{verbatim}
+\end{quote}
+for 4.2 or 4.3 BSD systems,
+\begin{quote}
+\begin{verbatim}
+config 5
+\end{verbatim}
+\end{quote}
+for System V systems or
+\begin{quote}
+\begin{verbatim}
+config aix
+\end{verbatim}
+\end{quote}
+for IBM AIX systems. The AIX configuration is recommended for AIX systems
+even when {\tt fastcap} is not configured to print execution time
+information. Also certain DEC compilers run out of space during the
+compile.  For those machines use
+\begin{quote}
+\begin{verbatim}
+config dec
+\end{verbatim}
+\end{quote}
+The default configuration may be restored by typing
+\begin{quote}
+\begin{verbatim}
+config
+\end{verbatim}
+\end{quote}
+With {\tt fastcap/src/Makefile} configured, executables are
+compiled as in the default case.
+
+\subsection{Configuration Flags}
+\label{confla}
+
+The file {\tt src/mulGlobal.h} defines 
+flags that configure the discretization,
+multipole and output routines used in the executable {\tt fastcap}. 
+Table~\ref{outpu} describes the   output configuration flags in more detail.
+\begin{table}
+\begin{center}
+\begin{tabular}{lllp{3.5in}}\hline
+\multicolumn{1}{c}{Flag}& \multicolumn{1}{c}{Default} 
+&\multicolumn{2}{c}{Function}\\\hline
+{\tt MKSDAT} & {\tt ON} & {\tt ON} & Prints the symmetrized capacitance matrix.\\
+&& {\tt OFF} & Prints nothing.\\
+{\tt CMDDAT} & {\tt ON} & {\tt ON} & Prints the command line arguments.\\
+&& {\tt OFF} & Prints nothing.\\
+{\tt RAWDAT} & {\tt OFF} & {\tt ON} & Prints the unsymmetrized capacitance matix.\\
+&& {\tt OFF} & Prints nothing.\\
+{\tt ITRDAT} & {\tt OFF} & {\tt ON} & Prints the residual norm after each iteration.\\
+&& {\tt OFF} & Prints the iteration number after each iteration.\\
+{\tt TIMDAT} & {\tt OFF} & {\tt ON} & Prints a summary of CPU time and memory usage. Times are
+only reported if {\tt fastcap} is compiled using the procedure of 
+Section~\ref{specom}.\\
+&& {\tt OFF} & Prints nothing.\\
+{\tt CFGDAT} & {\tt OFF} & {\tt ON} & Prints core configuration flags.\\
+&& {\tt OFF} & Prints nothing.\\
+{\tt MULDAT} & {\tt OFF} & {\tt ON} & Prints brief multipole setup information.\\
+&& {\tt OFF} & Prints nothing.\\
+{\tt DISSYN} & {\tt OFF} & {\tt ON} & Prints summary of cube involvement by partitioning level.\\
+&& {\tt OFF} & Prints nothing.\\
+{\tt DMTCNT} & {\tt OFF} & {\tt ON} & Prints the number of multipole transformation matrices for all possible cube pairings.\\
+&& {\tt OFF} & Prints nothing.\\
+{\tt DISSRF} & {\tt ON} & {\tt ON} & Prints surface file information.\\
+&& {\tt OFF} & Prints nothing.\\\hline
+\end{tabular}
+\end{center}
+\caption{{\tt fastcap} output configuration compile flags (defined in {\tt fastcap/src/mulGlobal.h}).}
+\label{outpu}
+\end{table}
+
+\subsection{Producing this Guide and Related Documents}
+
+In the top-level directory, {\tt fastcap}, type
+\begin{quote}
+\begin{verbatim}
+make manual
+\end{verbatim}
+\end{quote}
+to produce three {\tt .dvi} files {\tt ug.dvi}, 
+{\tt tcad.dvi} and {\tt mtt.dvi} in the directory {\tt fastcap/doc}.
+The file {\tt ug.dvi} generates
+the user's guide, while {\tt tcad.dvi} and {\tt mtt.dvi}
+produce reprints of two articles describing the algorithm
+used by {\tt fastcap}.

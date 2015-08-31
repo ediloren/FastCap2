@@ -1,0 +1,75 @@
+\section{Introduction}
+
+In
+\newcommand{\introfoot}{
+% Manuscript received \today.
+This work was supported by the Defense Advanced Research Projects
+Agency contract N00014-87-K-825, the National Science Foundation
+and grants from I.B.M.\ and Analog Devices.
+
+The authors are with the  Research Laboratory
+of Electronics, Department of Electrical Engineering and Computer
+Science, Massachusetts Institute of Technology, Cambridge,
+MA, 02139, U.S.A.
+}
+\footnotetext{\introfoot}
+the design of high performance integrated circuits and integrated
+circuit packaging, there are many cases where accurate estimates of
+the capacitances of complicated three dimensional structures are
+important for determining final circuit speeds or functionality.  Two
+examples of complicated three-dimensional structures for which capacitance
+strongly affects performance are
+dynamic memory cells, and the
+chip carriers commonly used in high density
+packaging.  In these problems, capacitance extraction
+is made tractable by assuming the conductors are ideal and are
+embedded in a piecewise-constant dielectric medium.  Then to compute
+the capacitances, Laplace's equation is solved numerically over the
+charge free region with the conductors providing boundary conditions.
+
+Although there are a variety of numerical methods that can be used to
+solve Laplace's equation, for three-dimensional capacitance
+calculations the usual approach is to apply a boundary-element
+technique to the integral form of Laplace's
+equation \cite{rue,rao,Nin}.  In these approaches the
+surfaces or edges of all the conductors are broken into small panels
+or tiles and it is assumed that on each panel $ i $, a charge, $ q_i$, is
+uniformly or piece-wise linearly distributed.  The potential on each
+panel is then computed by summing the contributions to the potential
+from all the panels using Laplace's equation Green's functions.  In
+this way, a matrix of potential coefficients, $ P $, relating the set
+of $ n $ panel potentials and the set of $ n $ panel charges is
+constructed.  The resulting $ n \times n $ system of equations
+must be solved to compute capacitances.  Typically,
+Gaussian elimination or Cholesky factorization is used to solve the system of
+equations, in which case the number of operations is order $ n^3 $.
+Clearly, this approach becomes computationally intractable if the
+number of panels exceeds several hundred, and this limits the size of
+the problem that can be analyzed to one with a few conductors.
+
+An approach to reducing the computation time that is particularly
+effective for computing the diagonal terms of the capacitance matrix,
+also referred to as the self-capacitances, is to ignore small contributions
+to the potential coefficient matrix due to pairs of panels which are separated
+by large distances \cite{dew}.
+In this paper we present a similar approach, which approximates
+small potential coefficients with multipole expansions.
+We show that this approach produces an algorithm which accurately computes
+both the self and coupling capacitances, and has a computational
+complexity of nearly $ mn $, where $ m $ is the number of
+conductors.  Our algorithm, which is really the pasting together of
+three well-known algorithms  \cite{roh}, is presented in three
+sections.  To begin, in the next section one of the standard integral
+equation approaches is briefly described, and it is shown that the
+algorithm requires the solution of an $ n\times n $ dense nearly
+symmetric matrix.  Then, in Section~\ref{gcrsec}, a generalized
+conjugate residual algorithm is described, and is shown to reduce
+the complexity of the calculation to roughly order $ m n^2 $.  In
+Section~\ref{accsec}, it is shown that the major computation of the
+conjugate residual algorithm, evaluation of a potential field from a
+charge distribution, can be computed in order $ n $ time using a
+multipole algorithm.  In Section~\ref{ressec}, we describe some experimental
+results and in Section~\ref{consec} we present our conclusions and
+acknowledgments. Finally,
+some implementation details are presented in an appendix.
+

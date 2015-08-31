@@ -1,0 +1,58 @@
+%\begin{singlespace}
+\section{Solution by the Generalized Conjugate Residual Method}
+%\end{singlespace}
+\label{gcrsec}
+
+In order to solve for a complete $ m\times m $ capacitance matrix, the
+$ n\times n $ matrix of potential coefficients, $ P $, must be
+factored once, usually into $ P = LU $, where $L$ and $U$ are
+strictly lower and upper triangular respectively, and this requires order $
+n^3 $ operations.  Then, as there are $ m $ conductors, the factored
+system must solved $ m $ times with $ m $ different right-hand sides,
+and this requires order $ m n^2 $ operations.  Since $ n $ is the
+total number of panels into which the conductor surfaces are discretized, 
+$ m $ is necessarily much smaller than $ n $.  Therefore, the $ n^3 $
+time for 
+factorization dominates for large problems, but factorization
+can be avoided by
+using iterative methods to solve the $ m $ charge distribution problems.
+
+From the definition $ P $ given by   (\ref{eq:pcoeff}), it is clear
+that $ P $ is a positive nonsymmetric matrix and that the largest
+element in each row is the diagonal, though the matrix is {\it not }
+diagonally dominant.  Therefore, conjugate-descent methods like the
+generalized conjugate residual (GCR) algorithm  \cite{saa} given below
+in Algorithm 1, are  likely to be more effective than the more familiar
+Gauss-Seidel or Gauss-Jacobi style algorithms.
+%\begin{table}
+%\begin{singlespace}
+\begin{tabbing}
+{\bf Algorithm 1: GCR algorithm for solving $ Pq = p $}\\[0.2in]
+T \= \kill
+\>T \= \kill
+\>\>T \= \kill
+\>\>\>T \= \kill
+\> /* The Setup. Note the $ u^{iter}$'s are search directions and */ \\
+\> /* $ w $ is the residual. */\\
+\> \> $w = p$; $q = 0$.\\
+\> /* GCR Loop. */ \\
+\> For $ iter = 0, 1, 2, ... $ until converged {\bf \{ }\\
+\> \> $ u^{iter} = w $. \\
+\> \> $ pu^{iter} = P w $.\\
+\> \> /* P-orthogonalize $pu^{iter}$ with respect to $pu^m$, $ m < iter $. */\\
+\> \> For $ m = 0 $ to  $ iter $ {\bf \{ }\\
+\> \> \> $ \beta = pu^{iter\: T}pu^m $.\\
+\> \> \> $ u^{iter} = u^{iter} - \beta u^m $.\\
+\> \> \> $ pu^{iter} = pu^{iter} - \beta pu^m $.\\
+\> \> {\bf \} }\\
+\> \> /* Normalize the direction. */\\	
+\> \> $ pu^{iter} = pu^{iter}/\|pu^{iter}\| $.\\
+\> \> $ u^{iter} = u^{iter}/\|pu^{iter}\| $.\\
+\> \> /* Update the charge and the residual. */	\\
+\> \> $ \alpha = w^Tpu^{iter} $.\\
+\> \> $ q = q + \alpha u^{iter} $.\\
+\> \> $ w = w - \alpha pu^{iter} $.\\
+\> {\bf \} }\\
+\end{tabbing}
+%\end{singlespace}
+%\end{table}

@@ -1,0 +1,2 @@
+#! /bin/sh
+if test $1 ; then make setmake TYPE=$1 ; else make setmake TYPE=other ; fi

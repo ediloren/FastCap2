@@ -1,0 +1,47 @@
+% @(#)titlepage.sty	1.2  com/ship_tex_input,3.1,9021 4/30/90 12:34:38
+%%%% moded version of titlepage.sty in an attempt to allow banner on title pg
+%
+% COMPONENT_NAME: (CMDTEX) TeX and METAFONT
+%
+% FUNCTIONS:
+%
+% ORIGINS: 27,45,47,49
+%
+% (C) COPYRIGHT International Business Machines Corp. 1989
+% All Rights Reserved
+% Licensed Materials - Property of IBM
+%
+% US Government Users Restricted Rights - Use, duplication or
+% disclosure restricted by GSA ADP Schedule Contract with IBM Corp.
+%
+% titlepage.sty  27 Jan 85
+\def\maketitle{\begin{titlepage}
+\let\footnotesize\small \let\footnoterule\relax \setcounter{page}{0}
+\addtolength{\headsep}{0.375in}\addtolength{\topmargin}{-0.375in}
+\setlength{\unitlength}{1.0in}
+\begin{picture}(0,0)
+\put(0,0.5){
+\banner
+}
+\end{picture}
+\null
+\vfil
+%\vskip 60pt \begin{center}
+\vskip 40pt \begin{center}
+{\LARGE \@title \par} \vskip 3em {\large \lineskip .75em
+\begin{tabular}[t]{c}
+\@author 
+\end{tabular}\par} 
+\vskip 1.5em {\large \@date \par} \end{center} \par
+\@thanks
+\vfil
+\null
+\end{titlepage}
+\setcounter{footnote}{0} \let\thanks\relax
+\gdef\@thanks{}\gdef\@author{}\gdef\@title{}\let\maketitle\relax} 
+\def\abstract{\titlepage
+\null\vfil
+\begin{center}
+{\bf Abstract}
+\end{center}}
+\def\endabstract{\par\vfil\null\endtitlepage}

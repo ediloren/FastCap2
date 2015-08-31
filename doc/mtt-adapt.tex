@@ -1,0 +1,282 @@
+\section{Boundary-Element Oriented Adaptive Calculation}
+\label{adfamu}
+
+In general, when representing the charge in a region by a
+multipole expansion, the coefficients $M^m_n$ in (\ref{eq:multi})
+are determined from the charge density, $ q( \rho, \alpha, \beta) $, as
+\begin{equation}
+M^m_n = \int_{region} 
+q(\rho, \alpha, \beta) \rho^n Y^{-m}_n(\alpha , \beta) da'.
+\label{eq:mulmom}
+\end{equation}
+In this section, computing the multipole expansion coefficients for
+panel charges is examined in more detail, and is shown to lead
+naturally to an adaptive multipole algorithm.
+
+\subsection{Computing the Multipole Expansions}
+
+Returning to Figure~(\ref{mulevl}), the potential at the Cartesian
+equivalent of $(r_i,\phi_i,\theta_i)$, $(x_i, y_i, z_i)$, due to $d$
+distant panels may be approximated with a zeroth-order multipole
+expansion, which is equivalent to computing the potential due to a
+single charge equal to the sum of the $ d $ panel charges, and located
+at the center of the smallest ball enclosing the panels,
+\begin{equation}
+\psi(x_i,y_i,z_i)\approx\Mb{0}{0}\frac{1}{r_i}.
+\label{mulex0}
+\end{equation}
+Here $(x_i,y_i,z_i)$ is the $i$-th panel's center point relative to the
+center of the smallest ball enclosing the distant panels, 
+$r_i\trieq\sqrt{x_i^2+y_i^2+z_i^2}$, and
+\begin{equation}
+\Mb{0}{0}\trieq \sum_{j=1}^{d} q_j.
+\end{equation}
+The approximation
+\begin{equation}
+\psi_0(x_i,y_i,z_i)\trieq \Mb{0}{0}\frac{1}{r_i}
+\end{equation}
+is the zeroth-order multipole expansion for the potential due to the
+distant panels.
+For accuracy reasons, higher order expansions are typically used.
+For example, the first-order multipole expansion for $\psi$ is
+\begin{equation}
+\psi(x_i,y_i,z_i)\approx\psi_0(x_i,y_i,z_i)+\psi_1(x_i,y_i,z_i),
+\end{equation}
+with
+\begin{equation}
+\psi_1(x_i,y_i,z_i)\trieq\Mb{1}{0}\frac{z_i}{r_i^3}-\Mb{1}{1}\frac{x_i}{2r_i^3}-\Mbb{1}{1}\frac{y_i}{2r_i^3},
+\label{fstotr}
+\end{equation}
+where, for panels on which the charge is assumed uniformly distributed,
+\begin{eqnarray}
+\Mb{1}{0}&\trieq &\sum_{j=1}^{d}\frac{q_j}{a_j}\int_{panel_j}z' da';
+\label{moco1}\\
+\Mb{1}{1}& \trieq & -2\sum_{j=1}^{d}\frac{q_j}{a_j}\int_{panel_j}x' da';\\
+\Mbb{1}{1}& \trieq & -2\sum_{j=1}^{d}\frac{q_j}{a_j}\int_{panel_j}y' da'.
+\label{moco2}
+\end{eqnarray}
+The added potential $\psi_1$
+is the field due to a single dipole aligned along the vector
+\begin{equation}
+(x,y,z) = (\Mb{1}{0}, -\Mb{1}{1}/2, -\Mbb{1}{1}/2).
+\end{equation}
+In general, the $l$-th order multipole expansion in (\ref{eq:multi}) can
+be rewritten in the form
+\begin{equation}
+\psi(x_i,y_i,z_i)\approx\sum_{n=0}^l\psi_n(x_i,y_i,z_i),
+\label{mueval}
+\end{equation}
+with each $\psi_n$ cooresponding to the potential due to
+a $2^n$-pole charge constellation.
+
+\subsection{The Adaptive Algorithm}
+
+The simple multipole algorithm discussed in Section~\ref{mutapp}
+uses multipole expansions to represent potentials due to
+panel charges inside cubes which
+are far enough away from the evaluation point.
+The efficiency of this procedure depends on the number of panels in the cubes. 
+Consider, for example, a cube containing three panels whose
+potential is to be approximated using a first-order multipole
+expansion of the form (\ref{mueval}),
+\begin{equation}
+\psi(x_i,y_i,z_i)\approx\Mb{0}{0}\frac{1}{r_i}+\Mb{1}{0}\frac{z_i}{r_i^3}-\Mb{1}{1}\frac{x_i}{2r_i^3}-\Mbb{1}{1}\frac{y_i}{2r_i^3}.
+\label{1oeval}
+\end{equation}
+The exact potential due to the cube's panels has the form
+\begin{equation}
+\psi(x_i,y_i,z_i)=P_{i1}q_1+P_{i2}q_2+P_{i3}q_3,
+\label{eoeval}
+\end{equation}
+assuming the three panels are numbered 1, 2 and 3. 
+In the capacitance
+calculation, the geometry-dependent quantities in (\ref{1oeval}) 
+and (\ref{eoeval}) are calculated once and stored for repeated
+use in computing the iterates of Algorithm 1.  Thus evaluating
+(\ref{1oeval}) involves multiplying four, fixed, geometry-dependent quantities
+\begin{equation}
+\frac{1}{r_i},\rule{0.2in}{0in}\frac{z_i}{r_i^3},\rule{0.2in}{0in}\frac{x_i}{2r_i^3},\rule{0.2in}{0in}\frac{y_i}{2r_i^3}
+\end{equation}
+by the charge-dependent multipole coefficients $\Mb{0}{0}$,
+$\Mb{1}{0}$, $\Mb{1}{1}$ and $\Mbb{1}{1}$, while (\ref{eoeval})
+involves computing only the three products, multiplying the geometric
+quantities $P_{ij}$, $j=1$, \ldots, $3$, by the corresponding
+charges. Thus evaluating the exact potential from (\ref{eoeval}) requires
+one less operation than evaluating the approximate potential using
+(\ref{1oeval}), indicating that it will be more efficient to evaluate
+the potential due to panels in this cube using $P_{ij}q_j$ products
+rather by evaluating multipole expansions.
+
+An adaptive multipole algorithm can be derived from the simplified
+approach described in Section~\ref{mutapp} if the potential due to
+panel charges in a cube is always evaluated directly, rather than
+with a multipole approximation, whenever the number of expansion
+coefficients would exceed the number of panels.  A more precise
+definition of the computational procedure is given in Algorithm 2
+below, which uses some notation which we now introduce.
+
+The cube which contains the entire problem domain is referred to as
+the level 0 cube. If the volume of the cube is divided into eight
+equally sized child cubes, referred to as level 1 cubes, then each has
+the level 0 cube as its parent. The panels are distributed among the
+child cubes by associating a panel with a cube if the panel's center
+point is contained in the cube. This process can be repeated to
+produce $ L $ levels of cubes, and $ L $ partitionings of panels starting
+with an $8$-way partitioning and ending with an $ 8^L $-way partitioning.
+The number of levels, $ L $, is chosen so that the maximum number of
+panels in any finest, or $L$-th, level cube is less than some
+threshold (nine is a typical default).  A neighbor of a given cube is
+defined as any cube which shares a corner with the given cube or
+shares a corner with a cube which shares a corner with the given cube
+(note that a cube has a maximum of $ 124 $ neighbors).  Finally, in
+the algorithm below it is assumed that for each finest-level cube, a
+multipole list has been constructed using a recursive approach similar
+to that given in the two-dimensional example above.
+
+\begin{singlespace}
+\begin{quote}
+\begin{tabbing}
+{\bf Algorithm 2:} Adaptive Algorithm for Computing $ p = P q $.\\
+T \= \kill
+\>T \= \kill
+\>\>T \= \kill
+\>\>\>T \= \kill
+\>\>\>\>T \= \kill
+\>\>\>\>\>T \= \kill
+\>\>\>\>\>\>T \= \kill
+\> Comment: Compute the potential due to nearby charges directly.\\
+\>\> {\bf For each} finest-level cube $ i = 1 $ to $ 8^L $ \{ \\
+\>\>\> {\bf For each} panel $ j $ in finest-level cube $ i $ \{ \\
+\>\>\>\> {\bf Set} $ p_j = 0 $.\\
+\>\>\>\> {\bf For each} panel $ k $ in cube $ i $ or its neighbors \{ \\
+\>\>\>\>\> {\bf Add} $ P_{jk} q_k $ to $ p_j $.\\
+\>\>\>\> {\bf \}}\\
+\>\>\> {\bf \}}\\
+\>\> {\bf \}}\\
+\> Comment: Compute the multipole coefficients from the charge vector $ q $.\\
+\> Comment: $order$ is the order of the multipole expansion (typically 2).\\
+\>\> {\bf For each} level $ j = L$ to $2$  \{\\
+\>\>\> {\bf For each} level $j $ cube $ i = 1 $ to $ 8^j $ \{\\
+\>\>\>\> {\bf If} cube $ i $ contains more than $ (order+1)^2 $ panels \{\\
+\>\>\>\>\> {\bf Compute} the multipole coefficients for cube $ i $ using \\
+\>\>\>\>\> panel charges and/or coefficients of child cube multipole \\
+\>\>\>\>\> expansions.\\
+\>\>\>\> {\bf \}}\\
+\>\>\> {\bf \}}\\
+\>\> {\bf \}}\\
+\> Comment: Compute the potential due to distant panels.\\
+\>\> {\bf For each} finest-level cube $ i = 1 $ to $ 8^L $ \{\\
+\>\>\> {\bf For each} cube $j$ in cube $i$'s multipole list \{\\
+\>\>\>\> {\bf If} cube $ j $ contains more than $ (order+1)^2$ panels \{\\
+\>\>\>\>\> {\bf For each} panel $ k $ in cube $ i $ \{\\
+\>\>\>\>\>\> {\bf Evaluate} the multipole expansion for cube $j $ at\\
+\>\>\>\>\>\> $(x_k,y_k,z_k)$ and add to $ p_k $.\\
+\>\>\>\>\> {\bf \}}\\
+\>\>\>\> {\bf \}}\\
+\>\>\>\> {\bf Else} \{\\
+\>\>\>\>\> {\bf For each} panel $ k $ in cube $ i $ \{\\
+\>\>\>\>\>\> {\bf For each} panel $ l $ in cube $ j $ \{\\
+\>\>\>\>\>\>\> Add $ P_{kl} q_l $ to $ p_k $.\\
+\>\>\>\>\>\> {\bf \}}\\
+\>\>\>\>\> {\bf \}}\\
+\>\>\>\> {\bf \}}\\
+\>\>\> {\bf \}}\\
+\>\> {\bf \}}\\
+\end{tabbing}
+\end{quote}
+\end{singlespace}
+
+%%%%%%%%Insert this text just before section 5
+
+%%%%%%%%Jacob
+
+It should be again noted that, as mentioned at the end of
+Section~\ref{mutapp}, Algorithm 2 is a simplified version of the
+hierarchical multipole algorithm \cite{carrie,greeng88} used in
+FASTCAP \cite{nabors91}. The complete algorithm also adaptively
+applies local expansions to improve the efficiency of the process of
+gathering together multipole expansions.
+
+\subsection{Comparison to Previous Work}
+
+The above approach to making the multipole algorithm adaptive is
+specialized to the boundary-element problem.  A more general, but not
+as efficient, approach would be to extend to three-dimensions the
+two-dimensional adaptive algorithm described in \cite{carrie}.  In
+this earlier work, the multipole algorithm is made adaptive by
+breaking up the problem domain nonuniformly, in which case lowest level
+squares are of different sizes, where the size is chosen so that
+each lowest-level square has roughly the same number of panels.
+
+%
+% the greegard vs white adaptive alg comparison figure
+%
+%\begin{figure}
+%\centerline{\psfig{figure=/nfs/sobolev/sobolev2/ksn/multi/Doc/MTTfinal/figures/adaptg.eps,width=2.9in}\rule{0.2in}{0in}\psfig{figure=/nfs/sobolev/sobolev2/ksn/multi/Doc/MTTfinal/figures/adaptw.eps,width=2.9in}}
+%\caption{Partitionings used in Algorithm~2, (b), and by the adaptive algorithm
+%of \protect\cite{carrie}, (a).}
+%\label{adaptf}
+%\end{figure}
+%
+%
+%
+
+%%&^^
+\newcommand{\adaptfcap}{Partitionings used in Algorithm~2, (b), and by the adaptive algorithm of \protect\cite{carrie}, (a).}
+
+\begin{figure}
+\setlength{\unitlength}{1.0in}
+\begin{picture}(6.5,3.2)
+\put(0.25,0.2){
+\special{psfile=\figuredir/adaptg.eps,hoffset=-24,voffset=-106,hscale=0.715068,vscale=0.715068}
+}
+\put(3.35,0.2){
+\special{psfile=\figuredir/adaptw.eps,hoffset=-23,voffset=-105,hscale=0.710204,vscale=0.710204}
+}
+\put(1.65,0){(a)}
+\put(4.75,0){(b)}
+\end{picture}
+\caption{\adaptfcap}
+\label{adaptf}
+\end{figure}
+
+
+
+
+To see why an adaptive algorithm based on a nonuniform partitioning of
+the problem domain can be inefficient, consider computing the
+potential at the center of the panel labeled {\bf A}   in
+Figure~\ref{adaptf}a.  For this example, a two-dimensional square problem
+domain has been recursively quartered, the recursion being halted when
+a square had no more than one panel. To compute the potential at the
+center of panel  {\bf A} using a multipole algorithm based on this
+nonuniform partitioning requires: nine direct potential evaluations, 
+for the nine panels in nearest-neighbor squares bordering the square
+containing  {\bf A}, and eleven multipole evaluations for the eleven
+nonempty squares not bordering  {\bf A}.  Alternatively, if a uniform
+partitioning is used, as in Figure~\ref{adaptf}b, then it is easily seen
+that only {\it five} multipole evaluations are required.
+
+Such an increase in computational cost can not occur with the adaptive
+algorithm given above, as the following theorem states:
+\begin{Theorem}
+The computational cost of the adaptive approach given in
+Algorithm~2 is {\it never greater} than that of the
+corresponding nonadaptive algorithm.
+\end{Theorem}
+
+The proof follows directly from the fact that the adaptive multipole
+algorithm, Algorithm~2, evaluates the potential due to panel charges in a cube
+directly, rather than with a multipole approximation, whenever the
+number of expansion coefficients would exceed the number of panels.
+
+It should be noted that the overhead cost of maintaining a uniform
+domain partitioning has been ignored in this comparison.  If the
+distribution of panels is very nonuniform, a matching nonuniform
+partitioning, like the approach used in \cite{carrie}, will naturally
+generate fewer lowest-level partitions, and hence reduce bookkeepping
+overhead. Careful data organization can make this overhead negligible
+for typical capacitance calculation problems.  In the examples
+presented in Section~\ref{expres}, for which FASTCAP generates
+uniform domain partitionings with as many as $ 250,000 $ lowest-level
+cubes, the bookkeepping overhead is never significant.

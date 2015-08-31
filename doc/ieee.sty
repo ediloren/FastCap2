@@ -1,0 +1,241 @@
+%% Mods to table, figure, section and appendix numbering for Trans. on CAD
+%%  - used with article.sty e.g. (can't be inputed because of @'s)
+%%  \begin{document}[12pt,ieee,robinspace]{article}
+%
+%% number tables with cap roman 
+\renewcommand{\thetable}{\Roman{table}}
+%%%%%%%%%
+%% number all sections (before the appendix) with cap Roman numbers
+%%  and all subparts normally (e.g. section IV has a subsubsection 4.2.1)
+%%  (some articles, those w/o subsubsections, use italic Roman letters
+%%    for subsections)
+%% a note on periods: \ref's will produce things that don't end in periods
+%%  using the commands below (e.g. IV or 4.2.1) but the banners at the
+%%  start of each section use the \section, etc. commands below to
+%%  produce the periods (e.g. IV. or 4.2.1.) in the banner only
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+%
+%%%%%%%%%
+%% allow for one, unnumbered appendix but number its subsections eg A.2.3.
+%% - same comments as above re periods apply here
+%% - the actual title is done using \section*{Appendix: Blah Blah}
+%% - defines \section in the same old art12.sty way - shouldn't be necessary
+%%    (without it \section*{} banners get numbered)
+\def\appendix{\par
+	\setcounter{section}{1}		% assumes \section*{Appendix: Blah}
+	\setcounter{subsection}{0}
+	\renewcommand{\thesection}{\Alph{section}}
+	\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+	\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+	\def\section{\@startsection {section}{1}{\z@}{-3.5ex plus -1ex minus 
+ -.2ex}{2.3ex plus .2ex}{\Large\bf}}
+}
+%%%%%%%%%
+%% number all figures consecutively even if they're all at the end
+%\renewcommand{\thefigure}{\arabic{figure}}
+%% should now be taken care of by the figure macro
+%
+%% redefine the caption making macro so that it does 'Fig. 6.' not 'Figure 6:'
+%%   - also makes 'Table 6:' come out as 'TABLE VI'
+%%   - original macros from /usr/local/tex/macros/article.doc
+%
+%% the caption macro is different only in the args of the \hbox{} on 3rd line
+\long\def\@makecaption#1#2{
+   \vskip 10pt 
+   \setbox\@tempboxa\hbox{#1 #2}
+   \ifdim \wd\@tempboxa >\hsize   % IF longer than one line:
+       \unhbox\@tempboxa\par      %   THEN set as ordinary paragraph.
+     \else                        %   ELSE  center.
+       \hbox to\hsize{\hfil\box\@tempboxa\hfil}  
+   \fi}
+%
+%% figure numbers have different text and a period
+\def\fnum@figure{Fig. \thefigure.}
+%
+%% table numbers have different text
+\def\fnum@table{TABLE \thetable}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Make section headings come with a period after the number
+%%  - if the fonts could be found, this could be fixed to give \sc section
+%%	banners and \it smaller section banners
+%%  (must be a better way to do this)
+%%  new defs are based on stuff for \chapter in rep12.doc
+%%
+%%%%%%%%
+% \@makessectionhead {TEXT} : Makes the heading for the \section command.
+%
+\def\@makessectionhead#1{             % Heading for \section command
+%%%  \vspace*{50pt}                     % Space at top of page.
+  { \parindent 0pt \raggedright 
+    \vskip 11pt
+%%%    \Huge \bf                        % Title.
+    \Large \bf                        % Title.
+    \thesection. #1\par 
+    \nobreak                         % TeX penalty to prevent page break.
+    \vskip 7.4pt                      % Space (.3in) between title and text.
+  } }
+%%%%%%%%
+% \@makessectionhead {TEXT} : Makes the heading for the \section* command.
+%
+\def\@makessectionheadnonum#1{             % Heading for \section command
+%%%  \vspace*{50pt}                     % Space at top of page.
+  { \parindent 0pt \raggedright 
+    \vskip 11pt
+%%%    \Huge \bf                        % Title.
+    \Large \bf                        % Title.
+    #1\par 
+    \nobreak                         % TeX penalty to prevent page break.
+    \vskip 7.4pt                      % Space (.3in) between title and text.
+  } }
+
+% \secdef{UNSTARCMDS}{STARCMDS} :
+%    When defining a \chapter or \section command without using
+%    \@startsection, you can use \secdef as follows:
+%       \def\section { ... \secdef \CMDA \CMDB }
+%       \def\CMDA    [#1]#2{ ...   % Command to define \section[...]{...}
+%       \def\CMDB    #1{ ...       % Command to define \section*{...}
+
+%%%\def\section{\clearpage      % Starts new page.
+\def\section{
+%%%   \thispagestyle{plain}     % Page style of section page is 'plain'
+%%%   \global\@topnum\z@        % Prevents figures from going at top of page.
+   \@afterindentfalse        % Suppresses indent in first paragraph.  Change
+   \secdef\@section\@ssection}   % to \@afterindenttrue to have indent.
+
+\def\@section[#1]#2{\ifnum \c@secnumdepth >\m@ne
+        \refstepcounter{section}
+%%%        \typeout{\@chapapp\space\thesection.}
+        \addcontentsline{toc}{section}{\protect
+        \numberline{\thesection}#1}\else
+      \addcontentsline{toc}{section}{#1}\fi
+   \sectionmark{#1}
+%%   \addtocontents{lof}{\protect\addvspace{10pt}} % Adds between-section space
+%%   \addtocontents{lot}{\protect\addvspace{10pt}} % to lists of figs & tables.
+   \if@twocolumn                                 % Tests for two-column mode.  
+           \@topnewpage[\@makesectionhead{#2}]  
+     \else \@makessectionhead{#2}
+           \@afterheading                  % Routine called after section and
+     \fi}                                  % section heading.
+%% for star case
+\def\@ssection#1{\if@twocolumn \@topnewpage[\@makessectionhead{#1}]
+        \else \@makessectionheadnonum{#1} 
+              \@afterheading\fi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% end \section stuff - begin \subsection
+%%%%%
+\def\@makessubsectionhead#1{             % Heading for \subsection command
+%%%  \vspace*{50pt}                     % Space at top of page.
+  { \parindent 0pt \raggedright 
+    \vskip 6pt
+%%%    \Huge \bf                        % Title.
+    \large \bf                        % Title.
+    \thesubsection. #1\par 
+    \nobreak                         % TeX penalty to prevent page break.
+    \vskip 4pt                      % Space (.25in) between title and text.
+  } }
+%%%%%
+\def\@makessubsectionheadnonum#1{       % Heading for \subsection* command
+%%%  \vspace*{50pt}                     % Space at top of page.
+  { \parindent 0pt \raggedright 
+    \vskip 6pt
+%%%    \Huge \bf                        % Title.
+    \large \bf                        % Title.
+    #1\par 
+    \nobreak                         % TeX penalty to prevent page break.
+    \vskip 4pt                      % Space (.25in) between title and text.
+  } }
+
+% \secdef{UNSTARCMDS}{STARCMDS} :
+%    When defining a \chapter or \subsection command without using
+%    \@startsubsection, you can use \secdef as follows:
+%       \def\subsection { ... \secdef \CMDA \CMDB }
+%       \def\CMDA    [#1]#2{ ...   % Command to define \subsection[...]{...}
+%       \def\CMDB    #1{ ...       % Command to define \subsection*{...}
+
+%%%\def\subsection{\clearpage      % Starts new page.
+\def\subsection{
+%%%   \thispagestyle{plain}     % Page style of subsection page is 'plain'
+%%%   \global\@topnum\z@        % Prevents figures from going at top of page.
+   \@afterindentfalse        % Suppresses indent in first paragraph.  Change
+   \secdef\@subsection\@ssubsection}   % to \@afterindenttrue to have indent.
+
+\def\@subsection[#1]#2{\ifnum \c@secnumdepth >\m@ne
+        \refstepcounter{subsection}
+%%%        \typeout{\@chapapp\space\thesubsection.}
+        \addcontentsline{toc}{subsection}{\protect
+        \numberline{\thesubsection}#1}\else
+      \addcontentsline{toc}{subsection}{#1}\fi
+   \subsectionmark{#1}
+%%   \addtocontents{lof}{\protect\addvspace{10pt}} % Adds between-section space
+%%   \addtocontents{lot}{\protect\addvspace{10pt}} % to lists of figs & tables.
+   \if@twocolumn                                 % Tests for two-column mode.  
+           \@topnewpage[\@makesubsectionhead{#2}]  
+     \else \@makessubsectionhead{#2}
+           \@afterheading                  % Routine called after section and
+     \fi}                                  % section heading.
+%% for star case
+\def\@ssubsection#1{\if@twocolumn \@topnewpage[\@makessubsectionhead{#1}]
+        \else \@makessubsectionheadnonum{#1} 
+              \@afterheading\fi}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%
+%% end \subsection stuff - begin \subsubsection
+%%
+%%%%%%%
+\def\@makessubsubsectionhead#1{         % Heading for \subsubsection command
+%%%  \vspace*{50pt}                     % Space at top of page.
+  { \parindent 0pt \raggedright 
+    \vskip 6pt
+%%%    \Huge \bf                        % Title.
+    \normalsize \bf                        % Title.
+    \thesubsubsection. #1\par 
+    \nobreak                         % TeX penalty to prevent page break.
+%%%    \vskip 22pt                      % Space between title and text.
+  } }
+%%%%%%%
+\def\@makessubsubsectionheadnonum#1{    % Heading for \subsubsection* command
+%%%  \vspace*{50pt}                     % Space at top of page.
+  { \parindent 0pt \raggedright 
+    \vskip 6pt
+%%%    \Huge \bf                        % Title.
+    \normalsize \bf                        % Title.
+    #1\par 
+    \nobreak                         % TeX penalty to prevent page break.
+%%%    \vskip 22pt                      % Space between title and text.
+  } }
+
+% \secdef{UNSTARCMDS}{STARCMDS} :
+%    When defining a \chapter or \subsection command without using
+%    \@startsubsection, you can use \secdef as follows:
+%       \def\subsection { ... \secdef \CMDA \CMDB }
+%       \def\CMDA    [#1]#2{ ...   % Command to define \subsection[...]{...}
+%       \def\CMDB    #1{ ...       % Command to define \subsection*{...}
+
+%%%\def\subsection{\clearpage      % Starts new page.
+\def\subsubsection{
+%%%   \thispagestyle{plain}     % Page style of subsection page is 'plain'
+%%%   \global\@topnum\z@        % Prevents figures from going at top of page.
+   \@afterindentfalse        % Suppresses indent in first paragraph.  Change
+   \secdef\@subsubsection\@ssubsubsection}   % to \@afterindenttrue to have indent.
+
+\def\@subsubsection[#1]#2{\ifnum \c@secnumdepth >\m@ne
+        \refstepcounter{subsubsection}
+%%%        \typeout{\@chapapp\space\thesubsubsection.}
+        \addcontentsline{toc}{subsubsection}{\protect
+        \numberline{\thesubsubsection}#1}\else
+      \addcontentsline{toc}{subsubsection}{#1}\fi
+   \subsubsectionmark{#1}
+%%   \addtocontents{lof}{\protect\addvspace{10pt}} % Adds between-section space
+%%   \addtocontents{lot}{\protect\addvspace{10pt}} % to lists of figs & tables.
+   \if@twocolumn                                 % Tests for two-column mode.  
+           \@topnewpage[\@makesubsubsectionhead{#2}]  
+     \else \@makessubsubsectionhead{#2}
+           \@afterheading                  % Routine called after section and
+     \fi}                                  % section heading.
+%% for star case
+\def\@ssubsubsection#1{\if@twocolumn \@topnewpage[\@makessubsubsectionhead{#1}]
+        \else \@makessubsubsectionheadnonum{#1} 
+              \@afterheading\fi}

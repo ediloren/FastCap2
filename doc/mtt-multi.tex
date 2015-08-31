@@ -1,0 +1,165 @@
+\section{The Hierarchical Multipole Algorithm}
+\label{mutapp}
+
+A complete description of the hierarchical multipole
+algorithm is not given here; the original description is 
+in \cite{greeng87,greeng88}, and
+its application to capacitance extraction is described in
+\cite{nabors91}.  Instead we describe the expansion approximation
+and examine a simplified two-dimensional example which both exhibits
+the method's salient features, and motivates the adaptive algorithm
+and the preconditioner described in subsequent sections.
+
+\subsection{Multipole Expansions}
+
+%A standard approach for approximating the far-field due to a confined
+%charge distribution is to represent the charge with multipole
+%expansions\cite{jackson}.
+Multipole expansions are often used to approximate the far field due to
+a confined charge distribution \cite{jackso75}. 
+For example, consider evaluating the
+potential $p_i$ at the center of a panel $i$, 
+$(r_i, \phi_i , \theta_i )$, due to
+a collection of $ d $ distant panels, as in Figure~\ref{mulevl}.  The
+potential due to the surface charges on those $ d $ panels is given
+approximately by the truncated multipole expansion
+\begin{equation}
+\psi(r_i, \phi_i , \theta_i ) \approx \sum_{n=0}^{l} \sum_{m=-n}^{n}
+\frac{M^m_n}{r_i^{n+1}} Y^m_n(\phi_i , \theta_i )
+\label{eq:multi}
+\end{equation}
+where the spherical coordinates
+of the evaluation location are measured relative to
+the origin of the multipole expansion, $ Y^m_n (\phi_i , \theta_i ) $ 
+are the surface spherical harmonics, $ M^m_n $ are the multipole coefficents
+determined from the panel charges, and $ l $ is the expansion order.
+
+Given the multipole coefficients, the same multipole expansion can be
+used to quickly, but approximately, evaluate the potential at many
+panel centers. For example, in Figure~\ref{mulevl}, there are $ d $
+charged panels, and $d$ panel centers where the potential must be
+evaluated. A direct calculation of those potentials requires order
+$d^2$ operations, but only order $d$ operations are needed if the
+multipole expansion is used (assuming the expansion order $ l $ is fixed).
+
+In the Figure~\ref{mulevl} case,
+the error due to truncating the
+multipole expansion is bounded \cite{greeng88}, as in 
+\begin{equation}
+\left| \psi(r_i, \phi_i , \theta_i ) - 
+\sum_{n=0}^{l} \sum_{m=-n}^{n}
+\frac{M^m_n}{r_i^{n+1}} Y^m_n(\phi_i , \theta_i ) \right| \leq K_1
+\left( \frac{R}{r_i} \right)^{l+1} \leq K_1 \left( \frac{R}{r} \right)^{l+1}.
+\label{mulerr}
+\end{equation}
+The quantities $r$ and $R$ are as in Figure~\ref{mulevl} and $K_1$ is
+a constant independent of the multipole expansion order, $l$. The
+bound indicates that the multipole potential evaluations converge
+more rapidly with expansion order as the minimum distance between the
+panel charges and the evaluation points increases.
+
+\input{mtt-mulevl}
+In order to ensure that the error bound in (\ref{mulerr}) tightens
+sufficiently with each increase in expansion order $l$, the
+hierarchical multipole algorithm uses a
+multipole expansion  to represent the effect of charge in a
+region only if the radius of the region, $ R $, is less than half the
+distance between the region's center and the evaluation point, denoted
+$ r $. For example, in Figure~\ref{dblevl} two groups of panels
+are represented by a multipole expansions of order $l$, and by the
+above criteria, both can be used to evaluate the potential at panel
+$i$'s center, as $R/r=3R/3r<0.5$.
+\input{mtt-dblevl}
+
+\subsection{A Two-Dimensional Example}
+
+The aggregation of distant tiles into multipole expansions which can be
+used to evaluate potentials at many panel centers is the source of the
+hierarchical multipole algorithm's efficiency.  Maintaining this
+efficiency for general distributions of panels while controlling error
+is ensured by exploiting a hierarchical partitioning of the problem
+domain, the smallest cube containing all the conductors.
+\input{mtt-direval}
+
+Consider, for example, evaluating the potential at some point
+$(r_i,\phi_i,\theta_i)$ in Figure~\ref{direval} due to panel charges
+inside the illustrated problem domain. A first partitioning would be
+to break the problem into four smaller squares, leaving
+$(r_i,\phi_i,\theta_i)$ somewhere in the lower left square
+(Figure~\ref{direval}b)\footnote{ In the three-dimensional problem,
+the equivalent partitioning would be to divide a cube into eight
+smaller cubes.}.  To ensure that the errors due to truncating the
+multipole expansion shrink rapidly with increasing expansion order, multipole
+expansions will not be used to represent the charges in squares 1, 2
+and 3, when evaluating the potential at points in the lower-left
+square, because $R_1/r_{1}$, $R_2/r_{2}$ and $R_3/r_{3}$ in
+Figure~\ref{direval}b are all greater than $ 0.5 $.  For the
+particular example evaluation point in the lower-left square, the
+charge in square 2 is distant enough to satisfy the criteria for using
+multipole expansions.  However, a more detailed study of the
+hierarchical multipole algorithm than we will consider here would show
+that it is not efficient to exploit such special cases.
+
+Squares 1, 2 and 3 are each divided into four squares, as in
+Figure~\ref{direval}c, to produce smaller regions which can
+possibly satisfy the criteria for representation by a multipole
+expansion. In fact, many of the smaller squares do satisfy the
+criteria, as can be seen by examining the illustrated case, for which
+$R/r $ is less than $0.5$.  Thus, at the end of this
+partitioning step, all the charges in 
+the squares marked with an M in Figure~\ref{direval}c will 
+be represented with a 
+multipole expansion when evaluating
+the potential at points in the square containing $(r_i,\phi_i,\theta_i)$.
+
+In order for the multipole expansions to be used to represent the potential
+due to panel charges contained in the unmarked squares of
+Figure~\ref{direval}c, these squares are partitioned further, as in
+Figure~\ref{direval}d.  Then, as before, the distance criteria implies that
+multipole expansions can be used to represent the panel
+charges in all but a few squares near the square containing the
+evaluation point.  If it is determined not to partition any further
+than is indicated in Figure~\ref{direval}d, the potential $p_i$, at
+$(r_i,\phi_i,\theta_i)$, can then be computed by summing a ``near'' or
+direct term and a ``far'' or multipole term. That is, the ``near''
+contribution to $ p_i $ is due to panel charges in the nine unmarked
+squares in Figure~\ref{direval}d, and is computed directly from
+$P_{ij}q_j$ products.  The ``far'' contribution to $ p_i $ is due to
+distant panels charges and is determined by evaluating the $ 25 $
+mulitpole expansions indicated in Figure~\ref{direval}d.  In the next
+section, we will refer to the list of squares associated with those
+$25 $ multipole expansions as the {\it multipole list } for the square
+containing $(r_i,\phi_i,\theta_i)$.
+
+In general, the number of partitioning levels, $ L $, for a given
+problem domain is selected so that the squares on the finest level
+each have no more than $ k $ panels (typically $ k$ is of the order of
+ten).  Then for a uniform distribution of panels, the number of
+partitioning levels will be given by $ L = \log{\frac{n}{k}} $.  Since
+the number of multipole expansions on each partitioning level which
+contribute to $ p_i $ is bounded by a constant, each potential
+evaluation involves order $\log{n}$ multipole expansion evaluations.
+Also, since each lowest level square has no more than $ k $ panels,
+the direct contribution to $ p_i $ is bounded by a constant.
+Therefore, as evaluating the entire potential vector requires $n$
+evaluations of this type, the above multipole approach is an order
+$n\log{n}$ algorithm for computing an approximation 
+to $Pq$.\footnote{The analysis is similar
+for the three-dimensional case. The primary difference is that in the
+three-dimensional case space is partitioned into cubes, and when
+cubes are subpartitioned, they generate eight smaller cubes.} The
+hierarchical multipole algorithm given in~\cite{greeng88}, and used in
+the FASTCAP program described below, is more sophisticated than the
+above approach suggests. In particular, multipole evaluations are
+efficiently combined into local expansions in such a way as to reduce
+the number of operations to order $n$. However, for purposes of
+describing the adaptive algorithm and the preconditioning techniques
+below, the simplified algorithm above is sufficiently detailed.
+
+
+
+
+
+
+
+

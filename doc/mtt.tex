@@ -1,0 +1,140 @@
+%\documentstyle[12pt,doublespace,ieee,newthanks,titlepage_mod]{article}
+\documentstyle[12pt,doublespace,twoside,ieee,newthanks,maketitle_mod]{article}
+
+% latex requires full path names so setup \topdir before re-latexing
+\newcommand{\topdir}{/nfs/frobenius/users/ksn/fastcap/doc}
+\newcommand{\figuredir}{\topdir/figures}
+
+
+%
+% figure macro inserted by /nfs/sobolev/sobolev2/ksn/bin/rs6000/putfig
+\newcommand{\fig}[9]{ % filename label caption vsp placement horizo verto horizs verts
+\begin{figure}[#5]
+\vspace*{#4pt}
+\special{psfile=#1,hoffset=#6,voffset=#7,hscale=#8,vscale=#9}
+\caption{#3}
+\label{#2}
+\end{figure}
+}
+%
+%
+% short figure macro inserted by /nfs/sobolev/sobolev2/ksn/bin/rs6000/putfig
+\newcommand{\sfig}[7]{ % filename vsp placement horizo verto horizs verts
+\begin{figure}[#3]
+\vspace*{#2pt}
+\special{psfile=#1,hoffset=#4,voffset=#5,hscale=#6,vscale=#7}
+\end{figure}
+}
+%
+%
+% short figure (w/label) macro inserted by /nfs/sobolev/sobolev2/ksn/bin/rs6000/putfig
+\newcommand{\slfig}[8]{ % filename label vsp placement horizo verto horizs verts
+\refstepcounter{figure}
+\begin{figure}[#4]
+\vspace*{#3pt}
+\special{psfile=#1,hoffset=#5,voffset=#6,hscale=#7,vscale=#8}
+\label{#2}
+\end{figure}
+}
+%
+%%&^^
+\newcommand{\bibliocmd}{\bibliography{capieee,capart,capbook,capother,local}}
+
+
+\input{mtt-moments}
+\newcommand{\trieq}{\mbox{$\;\stackrel{\triangle}{=}\;$}}
+\def\multipole{{\ooalign{\hfil\raise.07ex\hbox{\scriptsize M}\hfil\crcr\mathhexbox20D}}}
+\def\local{{\ooalign{\hfil\raise.07ex\hbox{\scriptsize L}\hfil\crcr\mathhexbox20D}}}
+
+\newtheorem{Theorem}{Theorem}
+
+
+\setlength{\oddsidemargin}{0in}
+\setlength{\evensidemargin}{0in}
+\setlength{\textwidth}{6.5in}
+\setlength{\headsep}{0.0in}
+\setlength{\topmargin}{0.0in}
+\setlength{\textheight}{8.9in}
+\setlength{\footskip}{0.3in}
+\setlength{\footheight}{1.0in}
+
+%\setstretch{1.7}	%% used for version sent to MTT
+\setstretch{1}
+
+%\addtolength{\headsep}{0.375in}
+%\addtolength{\topmargin}{-0.375in}
+%\pagestyle{myheadings}
+%\markright{
+%  To appear in {\em IEEE Trans.\ on Microwave Theory and Techniques}, June 1992.
+%  \hfill
+%  Preprint --- Please do not re-distribute.
+% \hfill
+%}
+
+\begin{document}
+
+\newcommand{\banner}{{\em IEEE Trans.\ on Microwave Theory and Techniques}, 40(7):1496--1506, July 1992.}
+
+%% use the IEEE Transactions bib style suggested by Miguel
+\bibliographystyle{ieeetr}
+
+\begin{singlespace}
+
+\title {
+Fast Capacitance Extraction of General Three-Dimensional Structures
+}
+\author{ 
+  K.\ Nabors \and
+  S.\ Kim \and
+  J.\ White
+}
+\thanks{Manuscript received \today. 
+This work was supported by the Defense Advanced Research Projects
+Agency contracts N00014-91-J-1698 and MDA972-88-K-008, 
+the National Science Foundation contract (MIP-8858764 A02),
+F.B.I.\ contract J-FBI-88-067, and grants from Digital Equipment
+Corporation and I.B.M.}
+\thanks{The authors are with the
+Research Laboratory of Electronics and the Microsystems Technology Laboratory,
+Department of Electrical Engineering and Computer Science,
+Massachusetts Institute of Technology,
+Cambridge, MA   02139 U.S.A., (617) 253-2543.}
+\date{}
+
+\maketitle
+
+\begin{abstract}
+\input{mtt-abstract}
+\end{abstract}
+
+\end{singlespace}
+
+\input{mtt-intro}
+\input{mtt-multi}
+\input{mtt-adapt}
+\input{mtt-precond}
+\input{mtt-results}
+\input{mtt-conclu}
+\bibliocmd
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

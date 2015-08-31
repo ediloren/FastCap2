@@ -1,0 +1,172 @@
+\section{Preconditioning the Iterative Method}
+\label{precon}
+
+In general, the GMRES iterative method applied to solving
+(\ref{eq:qtop}) can be significantly accelerated by {\it
+preconditioning} if there is an easily computed good approximation to the
+inverse of $ P $.  We denote the approximation to $ P^{-1} $ by $
+\tilde{C} $, in which case preconditioning the GMRES algorithm is
+equivalent to using GMRES to solve
+\begin{equation}
+P \tilde{C} x = \overline{p}.
+\label{eq:pq}
+\end{equation}
+for the unknown vector $ x $, from which the charge density is
+computed by $ q = \tilde{C} x $.  Clearly, if $ \tilde{C} $ is
+precisely $ P^{-1} $, then (\ref{eq:pq}) is trivial to solve, but then
+$ \tilde{C} $ will be very expensive to compute.
+
+\subsection{A Simple Example}
+
+\input{mtt-screen}
+A good approximation to $ P^{-1} $ that is easily computed, and fits
+with the hierarchical multipole algorithm described previously, can be
+derived by exploiting the fact that $ P^{-1} $ is approximately the
+{\it detailed} capacitance matrix, by which we mean
+the $ n \times n $ capacitance matrix for the problem in which
+every panel or tile used to represent the conductor surfaces is
+treated as an independent conductor.  To see why this point of view
+leads to a preconditioner, consider the $ 7 \times 7 $ $ P $
+matrix, denoted $P(7)$, for the seven panel example 
+in Figure~\ref{screen}a.  The fourth 
+row of $ P(7) $, which is associated with the center panel in 
+Figure~\ref{screen}a, can be computed
+using the definition in (\ref{eq:pcoeff}) and is, in inverse-farads,
+\begin{equation}
+\begin{array}{ccccccc}
+P(7)_{4,1} & P(7)_{4,2} & P(7)_{4,3} &P(7)_{4,4} & 
+P(7)_{4,5} & P(7)_{4,6} & P(7)_{4,7}\\
+0.5785 & 0.8346 & 1.4261 & 3.1686 & 1.4261 & 0.8346 & 0.5785
+\end{array}
+\label{eq:panel7}
+\end{equation}
+where all the values have been multiplied by $10^{-10}$.
+The fourth row of $ P(7)^{-1} $ is, in picofarads,
+\begin{equation}
+\begin{array}{ccccccc}
+P(7)^{-1}_{4,1} & P(7)^{-1}_{4,2} & P(7)^{-1}_{4,3} & 
+P(7)^{-1}_{4,4} & P(7)^{-1}_{4,5} & P(7)^{-1}_{4,6} & 
+P(7)^{-1}_{4,7} \\ 
+-1.3080 &  -1.5898 & -15.4544 &  46.7864 & -15.4544 &  -1.5898 &  -1.3080
+\end{array}
+\label{invpanel}
+\end{equation}
+
+From the definition in (\ref{eq:pcoeff}), the matrix elements $
+P_{4,j} $ must decay as $ | j - 4 | $ grows, but notice that the terms
+in $ P^{-1}_{4,j} $ decay {\it much faster} as $ | j - 4 | $
+increases.  Viewing $ P^{-1} $ as an approximation to the detailed
+capacitance matrix makes clear that the very fast decay of terms in $
+P(7)^{-1} $ is just an example of classical electrostatic screening.  The
+effect of screening can also be seen by examining the row of $ P(5)^{-1}
+$ associated with the center panel in the five panel problem in 
+Figure~\ref{screen}b and in the row of $ P(3)^{-1} $ associated with the center
+panel in the three panel problem in Figure~\ref{screen}c, which
+are, in picofarads,
+\begin{equation}
+\begin{array}{ccccc}
+P(5)^{-1}_{3,1} & P(5)^{-1}_{3,2} & P(5)^{-1}_{3,3} & 
+P(5)^{-1}_{3,4} & P(5)^{-1}_{3,5} \\
+   -2.1593 & -15.5547 &  46.6990 & -15.5547  & -2.1593
+\end{array}
+\label{eq:panel5}
+\end{equation}
+and
+\begin{equation}
+\begin{array}{ccc}
+P(3)^{-1}_{2,1} & P(3)^{-1}_{2,2} & P(3)^{-1}_{2,3} \\
+  -16.5499 &  46.4573 & -16.5499 
+\end{array}
+\label{eq:panel3}
+\end{equation}
+respectively.  Comparing (\ref{invpanel}), (\ref{eq:panel5}) and
+(\ref{eq:panel3}) leads to the observation that a good estimate for
+the fourth row of $P(7)^{-1} $ can be
+derived from the third row of $ P(5)^{-1} $, which is a {\it smaller}
+problem, and that even the second row of $ P(3)^{-1} $
+provides a reasonable estimate.  Specifically,
+the estimate based on the five-panel problem is
+\begin{equation}
+\tilde{C}_{4,j} = \left\{
+\begin{array}{ll}
+P(5)^{-1}_{3,3 + (j - 4)}, & |j - 4| <  3;\\
+0, & \mbox{otherwise};
+\end{array}
+\right.
+\label{eq:est5}
+\end{equation}
+where $ \tilde{C} $ denotes the estimate to $ P(7)^{-1} $.
+
+\subsection{Preconditioning Algorithm}
+
+The above example suggests an approach to estimating $ P^{-1} $ for a
+general configuration of panels which fits with the
+hierarchical multipole algorithm in that the preconditioner $ \tilde{C} $ can
+be constructed and applied in a cube-by-cube fashion.  The preconditioner
+is formed by inverting a sequence of reduced $ P $ matrices, one associated
+with each finest-level cube, as in Algorithm 3 below.
+
+\begin{singlespace}
+\begin{quote}
+\begin{tabbing}
+T \= \kill
+\>T \= \kill
+\>\>T \= \kill
+\>\>\>T \= \kill
+\>\>\>\>T \= \kill
+\>\>\>\>\>T \= \kill
+\>\>\>\>\>\>T \= \kill
+{\bf Algorithm 3:} Forming $ \tilde{C} $.\\
+\>\>{\bf For each} finest-level cube $ i = 1 $ to $ 8^L $ \{ \\
+\>\>\>{\bf Form} $P^{i} $, the potential coefficient matrix for the\\
+\>\>\>reduced problem considering only the panels contained\\
+\>\>\>in cube $i $ and cube $i $'s neighbors.\\
+\>\>\>{\bf Compute} $ \tilde{C}^i = (P^i)^{-1} $.\\
+\>\>\>{\bf For each} panel $ k $ in cube $i $ or cube $i $'s neighbors \{\\
+\>\>\>\>{\bf if} panel $ k $ is not in cube $ i $ \{\\
+\>\>\>\>\> {\bf delete} row $ k $ from $ \tilde{C}^i $.\\
+\>\>\>\>{\bf \}}\\
+\>\>\>{\bf \}}\\
+\>\>{\bf \}}\\
+\end{tabbing}
+\end{quote}
+\end{singlespace}
+
+Note that $ \tilde{C}^i $ is not a square matrix and that
+\begin{equation}
+\sum_{i=1}^{8^L} (\# \; \; rows \; in \; \; \tilde{C}^{i}) = n 
+\end{equation}
+where again $ n $ is the total number of panels.
+By comparing Algorithm 3 with Algorithm 2, it is clear that
+$ P^{i} $ uses only those elements of the full $ P $ matrix which are
+already required in Algorithm 2, and therefore the computational cost
+in computing the preconditioner is only in inverting small $ P^{i} $ 
+matrices.  Then computing the product $ P \tilde{C} x^k $, 
+which would be used in a GMRES algorithm applied to
+solving (\ref{eq:pq}), is accomplished in two steps. First, the
+preconditioner is applied to form $ q^k = \tilde{C} x^k $ using
+Algorithm 4 below.  Then, $ P q^k $ is computed using Algorithm 2 in
+the previous section.
+
+\begin{singlespace}
+\begin{quote}
+\begin{tabbing}
+T \= \kill
+\>T \= \kill
+\>\>T \= \kill
+\>\>\>T \= \kill
+\>\>\>\>T \= \kill
+\>\>\>\>\>T \= \kill
+\>\>\>\>\>\>T \= \kill
+{\bf Algorithm 4:} Forming $ q = \tilde{C} x $.\\
+\>\> {\bf For each} finest-level cube $ i = 1 $ to $ 8^L $ \{ \\
+\>\>\> {\bf For each} panel $ j $ in finest-level cube $ i $ \{ \\
+\>\>\>\> {\bf For each} panel $ k $ in cube $ i $ or its neighbors \{ \\
+\>\>\>\>\> {\bf Add} $ \tilde{C}^i_{jk} x_k $ to $ q_j $.\\
+\>\>\>\> {\bf \}}\\
+\>\>\> {\bf \}}\\
+\>\> {\bf \}}\\
+\end{tabbing}
+\end{quote}
+\end{singlespace}
+

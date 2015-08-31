@@ -1,0 +1,2002 @@
+%
+% how to run Fastcap with examples
+%
+\section{Running FastCap}
+
+The basic form of the FastCap program command line is
+\begin{quote}
+\begin{verbatim}
+fastcap [-o<expansion order>] [-d<partitioning depth>] [<input file>]
+        [-p<permittivity factor>] [-rs<cond list>] [-ri<cond list>]
+        [-] [-l<list file>] [-t<iter tol>]
+\end{verbatim}
+\end{quote}
+Other options having to do with producing pictures of the geometry
+under analysis are discussed in Section~\ref{genpic}.
+
+Usually only the {\tt input file}, in neutral or generic format,
+or a {\tt list file}
+(see Section~\ref{all}), is specified.
+For example, the command
+\begin{quote}\tt
+fastcap sphere2.neu
+\end{quote}
+runs {\tt fastcap} on the example neutral file {\tt sphere2.neu}
+described in Section~\ref{sphrun}.
+The input file is taken from {\tt stdin} if
+{\tt input file} is not given. For example
+\begin{quote}\tt
+busgen | fastcap
+\end{quote}
+runs {\tt fastcap} on the $2\times 2$ bus crossing example discussed
+in Section~\ref{busxin}.
+More complicated geometries,
+in particular problems with multiple dielectric regions, are entered
+using a {\tt list file} (see Section~\ref{listif}). Thus
+\begin{quote}\tt
+fastcap -l1x1bus.lst
+\end{quote}
+runs {\tt fastcap} on the coated $1\times 1$ bus crossing problem mentioned in
+Section~\ref{listif}. The ``{\tt -}'' option forces a read from {\tt stdin}
+in conjunction with a {\tt list file} or {\tt input file} read. For
+example, the capacitance of a cube next to a sphere may be analyzed
+using
+\begin{quote}\tt
+cubegen -xo2 | fastcap - sphere2.neu
+\end{quote}
+The {\tt cubegen} generic-format file generator is described in
+Section~\ref{cubgen}. The output is written to {\tt stdout} except for
+the postscript files generated using the options described in
+Section~\ref{genpic}.
+
+
+
+The program automatically chooses the expansion
+order and spatial partitioning depth that maximize the efficiency of
+the multipole algorithm and still maintain 1\% accuracy\footnote{The linear
+system arising from the discretization is solved with 1\% accuracy. The
+discretization error must be controlled by the user through a
+sufficiently fine discretization.} 
+in the larger capacitance
+matrix entries. By default a uniform, free-space dielectric surrounding 
+the conductors is assumed.
+
+\subsection{Trading Off Accuracy, Memory Usage and Speed}
+\label{trdoff}
+
+The FastCap program's default 1\% accuracy is obtained using second
+order multipole expansions and a dynamically set number of partitioning
+levels. If lower accuracy is tolerable, faster calculations are possible
+by forcing {\tt fastcap} to use  lower order expansions. For example
+the command
+\begin{quote}\tt
+busgen | fastcap -o1 
+\end{quote}
+runs {\tt fastcap} on the $2\times 2$ bus crossing example 
+(see Section~\ref{busxin}) with first order
+expansions. 
+The iterates are calculated about twice as fast as for the default
+case but the capacitance matrix entries will have larger errors, with
+the greatest percentage error in the smaller matrix entries. 
+Using zero order expansions makes the
+iterate calculation about nine times faster but can produce significant
+errors, even in the diagonal capacitance matrix entries,
+and should not be used when accurate estimate the small
+coupling capacitances are needed.
+%
+%Specifying zero order expansions without setting
+%the partitioning depth with the {\tt -d} option forces {\tt fastcap} to
+%partition space into cubes containing at most one 
+%panel\footnote{In general an expansion order $l$ results in lowest level
+%cubes containing $(1+l)^2$ or fewer panels.}. Many partitioning levels are
+%required to accomplish this for larger problems, sometimes resulting
+%in excessive memory use. In those cases the number of partitioning levels
+%should be set using the {\tt -d} option 
+%to some number less than the automatically set amount. Using less than 
+%the automatically set partitioning depth usually decreases the fraction
+%of the iterate multiplications approximated by
+%the multipole algorithm. This typically leads to slightly longer run times and
+%more accurate results.
+When using zero order expansions, the partitioning depth should be set
+manually with the {\tt -d} option, otherwise excessive memory may be used.
+
+%{\sc Something about high memory use for \mbox{\tt -o1,0} with auto levels.}
+
+In cases where accuracy greater than 1\% is required, the tolerance
+on the iterative loop may be tightened using the {\tt -t} option.
+The default value {\tt 0.01} keeps errors to about 1\% of the larger
+self capacitances. The command
+\begin{quote}\tt
+busgen -n4 | fastcap -t0.001 -o3
+\end{quote}
+results in ten times more accurate solutions to the discretized problem.
+Third order expansions are specified with the {\tt -o3} option so that
+the accuracy of the iterates is consistent with the
+iterative loop tolerance. Also a finer paneling is used
+({\tt -n4} option) to bring discretization error down to the level of
+the tighter tolerance.
+
+%If calculation time is less important than accuracy, {\tt fastcap} can be
+%forced to compute iterates without using the multipole approximation. 
+%The command
+%\begin{quote}\tt
+%busgen | fastcap -d0 
+%\end{quote}
+%runs {\tt fastcap} on the $2\times 2$ bus crossing example with no
+%spatial partitioning,
+%causing the multipole algorithm
+%to calculate all charge interactions exactly.  The iteration is still
+%stopped when 1\% tolerance is reached but the iterates are calculated
+%explicitly.
+%In practice, the resulting capacitance matrix is only slightly more
+%accurate than that obtained using the default parameters, but can take much
+%longer to compute, especially for larger problems.
+
+\subsection{Changing the Dielectric Permittivity Factor}
+
+The {\tt -p} option can be used to specify a permittivity factor
+other than the default value of {\tt 1.0}.  The permittivity factor
+multiplies all the permittivities in the problem.  
+The default permittivity is the free-space value
+$8.8542\times 10^{-12}$ F/m but
+the relative permittivity may be changed\footnote{MKSA units are assumed throughout. In
+particular, conductor dimensions are assumed to be in meters.}.
+The command line
+\begin{quote}\tt
+fastcap -p3.5 sphere2.neu
+\end{quote}
+runs {\tt fastcap} on the spherical capacitor example embedded in
+a material with relative permittivity $3.5$. 
+
+The {\tt -p} option is
+typically not used with {\tt list file} input since all the permittivities
+are scaled by the same factor. For example
+\begin{verbatim}
+fastcap -p2.0 -lcoated_sph.lst
+\end{verbatim}
+figures the capacitance of a sphere with a permittivity {\tt 4.0} coating
+embedded in a permittivity {\tt 2.0} dielectric medium (see
+Section~\ref{listif} for a description of \verb~coated_sph.lst~).
+
+\subsection{Removing Conductors}
+
+The {\tt -rs} and {\tt -ri} options remove conductors from the solve
+and input lists respectively.
+The {\tt -rs} option is used to specify a list of conductors that are
+to be held at zero potential for all the calculations. For example,
+the problem of a $2\times 2$ bus crossing over a ground plane can
+be analyzed with the commands
+\begin{quote}
+\begin{verbatim}
+busgen > bus.qui
+cubegen -p -t -n20 -xo-1 -yo-1 -zo-1 -xh7 -yh7 -naGND \
+  | fastcap - bus.qui -rsG
+\end{verbatim}
+\end{quote}
+The ground plane is modeled using a {\tt cubegen}-generated square sheet 
+with conductor name {\tt GND}. The {\tt -rsG} argument tells {\tt fastcap}
+to hold the conductor {\tt GND} at zero volts for all the computations.
+Thus the problem of {\tt GND} at one volt, the four bus wires grounded
+need not be solved. In general, if the self capacitance of a conductor
+is not required, it can be removed from the solve list using
+the {\tt -rs} option. The conductor list argument {\tt <cond list>} is
+a comma separated list of conductor names of the form
+\begin{quote}\tt
+[<name>],[<name>],\ldots,[<name>]
+\end{quote}
+A {\tt <name>} token need only be enough of the conductor name's leading
+characters to specify it uniquely.
+
+The {\tt -ri} option is used exactly like {\tt -rs}. All the panels
+corresponding to conductors in
+a {\tt -ri} {\tt <cond list>} are completely removed from the list
+of input conductors. This option is useful for examining subproblems
+without altering the input. For example, the capacitance of two wires
+crossing over a single wire can be examined using
+\begin{quote}\tt
+busgen | fastcap -ri1
+\end{quote}
+
+
+
+%\subsection{Command Line Arguments}
+%
+%The first command line argument, the expansion order {\tt l} $\geq 0$, 
+%specifies the accuracy of the multipole algorithm.
+%Higher order expansions give more accurate results at the expense of
+%more computation. It is recommended that
+%second order expansions be used
+%since the corresponding level of accuracy is in keeping with the
+%default 1\% iterative loop tolerance\footnote{To change the tolerance,
+%change {\tt ABSTOL} in {\tt mulGlobal.h}.}. If 1\% accuracy is not
+%required, zero or first order expansions may be used to decrease computation.
+%
+%The second argument is
+%the number of levels, {\tt L} $\geq 0$, used in the
+%hierarchical partitioning of the
+%smallest cube enclosing all the conductors.
+%The cube is recursively
+%divided into eight smaller cubes, giving 8^{\tt L} cubes after 
+%{\tt L} partitionings.
+%A given partitioning of space has cubes on 
+%levels $0$, $1$, \ldots, {\tt L},
+%which decrease in size as the level number increases. 
+%
+%The number of
+%levels {\tt L} should be chosen so that all the lowest level cubes contain
+%roughly $(1 + \mbox{\tt l})^2$  panels, where {\tt l} 
+%is the expansion order specified on the command line.
+%Thus for second order  expansions, the chosen number of levels should give
+%approximately nine panels in each lowest level cube. 
+%Coarser
+%partitionings than this lead to somewhat higher accuracy at the expense
+%of more computation while finer partitionings do not result in any further
+%computational savings. 
+%As described in the next section,
+%Fastcap provides
+%several ways to monitor the effectiveness of the chosen partitioning.
+%
+%The final command line argument is the name of the neutral file specifying
+%the problem geometry. Input file generation is described in Section~\ref{}.
+%
+%%too finely, too coarsely
+%%finer discretization => less done directly
+%%rule of thumb based on panel size, structure size
+%
+
+\subsection{Calculating Capacitances}
+
+The output produced by the default version of {\tt fastcap} is described
+here by way of several examples. As documented in the file {\tt mulGlobal.h},
+{\tt fastcap} can be configured to output other information as well.
+
+The first part of the output summarizes the information from the 
+command line and
+the input file(s). The program then constructs multipole expansions for the
+potential  at all levels of the spatial partitioning. The adaptive nature
+of the algorithm ensures that only multipole expansions that lead to a
+reduction in computation are constructed.
+A message is printed
+if an entire partitioning level has no multipole or local expansions. With
+no options specified, {\tt fastcap} automatically sets the partitioning depth,
+often
+so that the lowest level is free of expansions. Thus a  message of
+the form
+\begin{quote}\tt
+No expansions at level 4 (lowest)
+\end{quote}
+is a normal condition. The final line of multipole setup information has
+the form
+\begin{quote}
+\begin{verbatim}
+Percentage of multiplies done by multipole: 73.1%
+\end{verbatim}
+\end{quote}
+The number of multiplications done in one {\tt fastcap} iteration for
+an $n$ panel problem is 
+considerably less than the $n^2$
+required for an explicit matrix-vector product. 
+In this example $73.1$\% of the $n^2$
+multiplications are approximated using the multipole algorithm, implying
+a significant reduction in computation. 
+
+With the expansions in place, the program begins iterating for the $m$
+columns of the capacitance matrix, where $m$ is the number of
+conductors taking into account those removed from the computation
+with the {\tt -rs} and {\tt -ri} options. 
+When the iterations are complete,
+the capacitance matrix entries are printed in MKSA units.
+
+Section~\ref{sphrun} presents 
+example input discretizations of the unit sphere in neutral
+file format. Other examples are generated by the programs
+{\tt cubegen} (Section~\ref{cubgen}), 
+{\tt capgen} (Section~\ref{parpla}) and {\tt busgen} (Section~\ref{busxin})
+in generic file format.  More complicated examples, which combine
+simple geometries generated using
+the programs {\tt cubegen}, {\tt pipedgen} and {\tt pyragen} with
+neutral file geometries
+are given in
+Sections~\ref{listeg} through \ref{dram}.
+The generic file generators are compiled with {\tt fastcap} and are all
+based on the rectangle and triangle
+discretization functions  {\tt disRect()} and {\tt disTri()} in the
+files {\tt disrect.c} and {\tt distri.c} respectively.
+
+\subsubsection{Spherical Capacitor}
+\label{sphrun}
+
+A conducting sphere in free space with one meter radius has capacitance 
+$
+4\pi\epsilon_0\:\mbox{F} \approx 0.111265\:\mbox{nF}
+$,
+as may be verified using Gauss's Law. The two example
+neutral files {\tt sphere1.neu} and {\tt sphere2.neu} describe the two
+discretizations of the unit sphere illustrated in Figure~\ref{spheres}.
+A third discretization, finer than that in {\tt sphere2.neu},
+is given in {\tt sphere3.neu}.
+
+%
+% two spheres next to each other
+%
+% next two lines exist only for fig2ug.awk to grab the files
+%%%&^ sphere1.ps
+%%%&^ sphere2.ps
+\begin{figure}
+\centerline{
+\psfig{figure=\figuredir/sphere1.ps,width=2.8in}\rule{0.4in}{0in}\psfig{figure=\figuredir/sphere2.ps,width=2.8in}
+}
+\caption{The {\tt sphere1.neu} (left) and {\tt sphere2.neu} discretizations of the unit sphere.}
+\label{spheres}
+\end{figure}
+
+All three discretizations are obtained by meshing a unit sphere
+primitive with quadrilaterals using the {\tt ISO} option in {\tt PATRAN}. 
+The {\tt sphere1.neu}
+case corresponds to $\mbox{\tt ELEM LEN} = \mbox{\tt 0.5}$ 
+while the {\tt sphere2.neu} and {\tt sphere3.neu} cases
+result when $\mbox{\tt ELEM LEN} = \mbox{\tt 0.2}$ and 
+$\mbox{\tt ELEM LEN} = \mbox{\tt 0.15}$
+respectively.  
+The panels in the  {\tt PATRAN} discretizations are nearly all nonplanar
+quadrilaterals. Since {\tt fastcap} requires planar panels, each 
+nonplanar quadrilateral
+in the input file is automatically broken into two planar triangles, resulting
+in the discretizations of Figure~\ref{spheres}.
+
+
+The command
+\begin{quote}\tt
+fastcap sphere1.neu
+\end{quote}
+produces the output below.
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: sphere1.neu
+  Input surfaces:
+   GROUP1
+    sphere1.neu, conductor
+      title: `SPHERE, RADIUS 1, ELEM LEN = 0.5'
+      outer permittivity: 1
+      number of panels: 104
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Mon May 25 15:22:40 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 104
+    Number of conductor panels: 104
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 3 (lowest)
+No expansions at level 2
+Percentage of multiplies done by multipole: 0%
+Warning: no multipole acceleration
+
+ITERATION DATA
+Starting on column 1 (SPHERE%GROUP1)
+1 2 3
+
+CAPACITANCE MATRIX, nanofarads
+                        1
+SPHERE%GROUP1 1     0.1063
+\end{verbatim}
+This output illustrates how {\tt fastcap} automatically calculates
+iterates explicitly for problems that are
+too small to warrant using multipole expansions. For such problems the
+multipole approximation of iterates is actually more costly  than the
+exact calculation.  In this case the coarseness of the discretization
+also leads to 4\% error in the sphere's self-capacitance.  Full rated
+accuracy  (default 1\%) can only be realized if the discretization error
+is negligible.
+
+This suggests using a finer discretization of the sphere.
+The command
+\begin{quote}\tt
+fastcap sphere2.neu
+\end{quote}
+produces the output below.
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: sphere2.neu
+  Input surfaces:
+   GROUP1
+    sphere2.neu, conductor
+      title: `SPHERE, RADIUS 1, ELEM LEN = 0.2'
+      outer permittivity: 1
+      number of panels: 768
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Mon May 25 15:24:37 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 768
+    Number of conductor panels: 768
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 3 (lowest)
+Percentage of multiplies done by multipole: 76.1%
+
+ITERATION DATA
+Starting on column 1 (SPHERE%GROUP1)
+1 2
+
+CAPACITANCE MATRIX, nanofarads
+                        1
+SPHERE%GROUP1 1     0.1105
+\end{verbatim}
+Compared to the analytic value, the capacitance calculated by {\tt fastcap}
+now has 0.7\% error.
+
+In practice, however, the lack of analytic capacitance values
+requires further refinement of the discretization until the capacitance
+values stabilize. 
+The command
+\begin{quote}\tt
+fastcap sphere3.neu
+\end{quote}
+produces the output below.
+\begin{verbatim}
+Running ../bin/fastcap 2.0 (25May92)
+  Input: sphere3.neu
+  Input surfaces:
+   GROUP1
+    sphere3.neu, conductor
+      title: `SPHERE, RADIUS 1, ELEM LEN = 0.15'
+      outer permittivity: 1
+      number of panels: 1200
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Mon May 25 15:32:28 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 1200
+    Number of conductor panels: 1200
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+Percentage of multiplies done by multipole: 77.8%
+
+ITERATION DATA
+Starting on column 1 (SPHERE%GROUP1)
+1 2
+
+CAPACITANCE MATRIX, nanofarads
+                        1
+SPHERE%GROUP1 1     0.1108
+\end{verbatim}
+The finer discretization in {\tt sphere3.neu} contains nearly twice as
+many panels as the {\tt sphere2.neu} case, leading to multipole
+expansions on the lowest level (level 3).
+
+Compared to the analytic value, the capacitance is correct
+to better than 1\%, as for the {\tt sphere2.neu} discretization.
+If the analytic capacitance were not known, it would still be possible to
+conclude that the sphere's capacitance is within 1\% of $0.1108$nF, since
+the discretization refinement changes the capacitance only slightly.
+
+Using a discretization refinement to check the capacitance values is
+not as costly using {\tt fastcap} as for other capacitance extraction
+programs. Doubling the number of panels when using a
+Gaussian elimination based algorithm leads to an eight-fold increase in run
+time.
+The {\tt fastcap} run time for {\tt sphere3.neu}, however, 
+is only about twice that required for {\tt sphere2.neu}.
+
+\subsubsection{Cubic Capacitor}
+\label{cubgen}
+
+The capacitance of a unit cube in free space may be investigated using
+the {\tt fastcap} input file generator {\tt cubegen}. The
+discretization, illustrated on the left in Figure~\ref{cubes}, uses five panels
+along each edge, with edge panel widths equal to 10\% of inner panel
+widths\footnote{A.\ E.\ Ruehli and P.\ A.\ Brennan,
+``Efficient Capacitance Calculations for Three-Dimensional
+                Multiconductor Systems,''
+{\em IEEE Transactions on Microwave Theory and Techniques}, 21(2):76--82, 
+February 1973.}. 
+A {\tt fastcap} generic format
+input file containing such a discretization is written to {\tt stdout}
+using the command
+\begin{quote}\tt
+cubegen -n5
+\end{quote}
+The {\tt cubegen} program has several options which are summarized
+in Section~\ref{quiref}. 
+%
+% two cubes next to each other
+%
+% for fig2ug.awk
+%%%&^ cubes.eps
+\begin{figure}
+\centerline{
+\psfig{figure=\figuredir/cubes.eps}
+}
+\caption{The {\tt cubegen -n5} (left) and {\tt cubegen -n7} discretizations of the unit cube.}
+\label{cubes}
+\end{figure}
+
+The command
+\begin{quote}\tt
+cubegen -n5 | fastcap 
+\end{quote}
+produces the output below.
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: stdin
+  Input surfaces:
+   GROUP1
+    stdin, conductor
+      title: `1mX1mX1m cube (n=5 e=0.1)'
+      outer permittivity: 1
+      number of panels: 150
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Mon May 25 15:37:48 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 150
+    Number of conductor panels: 150
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 3 (lowest)
+Percentage of multiplies done by multipole: 72.6%
+
+ITERATION DATA
+Starting on column 1 (1%GROUP1)
+1 2 3 4
+
+CAPACITANCE MATRIX, picofarads
+                   1
+1%GROUP1 1      73.28
+\end{verbatim}
+To check the fidelity of the capacitance value, the finer discretization 
+pictured on the right in 
+Figure~\ref{cubes},
+with seven panels along each edge, is used. The
+corresponding command
+\begin{quote}\tt
+cubegen -n7 | fastcap 
+\end{quote}
+produces the output below.
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: stdin
+  Input surfaces:
+   GROUP1
+    stdin, conductor
+      title: `1mX1mX1m cube (n=7 e=0.1)'
+      outer permittivity: 1
+      number of panels: 294
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Mon May 25 15:39:15 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 294
+    Number of conductor panels: 294
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+Percentage of multiplies done by multipole: 50%
+
+ITERATION DATA
+Starting on column 1 (1%GROUP1)
+1 2 3 4 5 6
+
+CAPACITANCE MATRIX, picofarads
+                   1
+1%GROUP1 1       73.4
+\end{verbatim}
+The small change in the capacitance value indicates that the self-capacitance
+of the cube is $73.4$pF to within 1\%. This compares well with 
+other numerical
+calculations giving values of $73.5$pF and
+$73.4$pF\footnote{M.\ A.\ Jaswon and G.\ T.\ Symm,
+{\em Integral Equation Methods in Potential Theory and Elastostatics},
+Academic Press, London, 1977.}.
+
+\subsubsection{Parallel Plate Capacitor}
+\label{parpla}
+
+%
+% two ||-plate capacitors next to each other
+%
+% for fig2ug.awk
+%%%&^ pltcap.eps
+\begin{figure}
+\centerline{
+\psfig{figure=\figuredir/pltcap.eps}
+}
+\caption{The {\tt capgen -n20} (left) and {\tt capgen -n25} discretizations of a parallel plate capacitor.}
+\label{pltcap}
+\end{figure}
+
+The capacitance of a parallel plate capacitor 
+can be investigated using the {\tt capgen} input file generator.
+The command
+\begin{quote}\tt
+capgen -n20 | fastcap
+\end{quote}
+runs {\tt fastcap} on the discretization pictured on the left
+in Figure~\ref{pltcap}.
+The parallel plates are infinitesimally thin, one meter on a side and
+$0.1$ meters apart. Each plate is discretized in the same manner as
+the cube faces in the previous example, although twenty
+panels per edge are used to better approximate the stronger
+singularity in the charge density on a thin plate. The {\tt capgen}
+command line options are summarized in Section~\ref{quiref}. The output
+is given below.
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: stdin
+  Input surfaces:
+   GROUP1
+    stdin, conductor
+      title: `1mX1m 2 || plate capacitor with 0.1m separation (n=20 e=0.1)'
+      outer permittivity: 1
+      number of panels: 800
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Mon May 25 15:52:45 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 4
+  Overall permittivity factor: 1
+  Total number of panels: 800
+    Number of conductor panels: 800
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 2
+No expansions at level 4 (lowest)
+Percentage of multiplies done by multipole: 85.7%
+
+ITERATION DATA
+Starting on column 1 (1%GROUP1)
+1 2 3
+Starting on column 2 (2%GROUP1)
+1 2 3 4
+
+CAPACITANCE MATRIX, nanofarads
+                   1          2
+1%GROUP1 1     0.1265    -0.1038
+2%GROUP1 2    -0.1038     0.1265
+\end{verbatim}
+
+The finer discretization illustrated  on the right in
+Figure~\ref{pltcap} is input
+to {\tt fastcap} using the command
+\begin{quote}\tt
+capgen -n25 | fastcap
+\end{quote}
+and produces the output below.
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: stdin
+  Input surfaces:
+   GROUP1
+    stdin, conductor
+      title: `1mX1m 2 || plate capacitor with 0.1m separation (n=25 e=0.1)'
+      outer permittivity: 1
+      number of panels: 1250
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Mon May 25 15:55:06 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 4
+  Overall permittivity factor: 1
+  Total number of panels: 1250
+    Number of conductor panels: 1250
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 2
+No expansions at level 4 (lowest)
+Percentage of multiplies done by multipole: 88.9%
+
+ITERATION DATA
+Starting on column 1 (1%GROUP1)
+1 2 3 4
+Starting on column 2 (2%GROUP1)
+1 2 3 4
+
+CAPACITANCE MATRIX, nanofarads
+                   1          2
+1%GROUP1 1     0.1267     -0.104
+2%GROUP1 2     -0.104     0.1267
+\end{verbatim}
+By the same argument used in previous examples, these capacitances
+are accurate to 1\%.
+%\end{document}
+%
+
+The entries in the capacitance matrix indicate that when a
+one volt\footnote{All potentials are referenced to the potential at infinity.}
+ source 
+is connected across the capacitor, $0.127$nC of charge accumulate on
+the plate at one volt and $-0.104$nC accumulate on the grounded plate.
+A small part of the charge on the positive plate, $0.127-0.104=0.023$nC,
+is induced to support stray electric field lines 
+terminating at infinity, while the remaining $0.104$nC of charge
+is induced by field lines starting on the positive plate
+and ending on the grounded plate. 
+%Thus the positive plate
+%may be thought of as a single conductor
+%capacitor with capacitance $0.127$nF whose,
+%relatively large charge capacity is due to the close proximity of the
+%grounded plate\footnote{The capacitance of a single plate is only $0.041$nF,
+%as may be verified with the command {\tt capgen -n25 -p1 | fastcap}}.
+If the grounded plate's potential is changed, then an electric field between
+it and infinity is produced, giving its charge a stray field
+component. Thus, the most accurate model for the structure in an electric
+circuit consists of three ideal capacitors: a $0.023$nF capacitor from
+each plate terminal to ground to model stray field effects,
+and a $0.104$nF capacitor between the two
+terminals. In contrast, the model obtained without {\tt fastcap}
+is a single capacitor between the terminals with value proportional
+to the inverse of the plate separation distance, 
+$\epsilon_0/0.1\mbox{F}=0.089$nF. This model completely neglects stray field
+effects.
+
+\subsubsection{Bus Crossing Problem}
+\label{busxin}
+
+The final simple
+example applies {\tt fastcap} to the bus crossing geometry illustrated
+in Figure~\ref{busses}. The illustrated discretization is generated
+in generic file format by the program {\tt busgen}, 
+whose options are summarized
+in Section~\ref{quiref}.  Using a common paneling strategy,
+%{\tt ref to Ruehli}
+{\tt busgen} first breaks the conductors into cubic sections
+(see Figure~\ref{sections}) and then breaks the exposed faces of each section
+in the same way as {\tt cubegen} (see Section~\ref{cubgen}).
+%
+% bus crossing problem with fine lines
+%
+% for fig2ug.awk
+%%%&^ busses.eps
+\begin{figure}
+\centerline{
+\psfig{figure=\figuredir/busses.eps,width=4in}
+}
+\caption{The {\tt busgen -n5} discretization of the $2\times 2$ bus crossing problem.}
+\label{busses}
+\end{figure}
+%
+% bus crossing problem with sections indicated
+%
+% for fig2ug.awk
+%%%&^ sections.eps
+\begin{figure}
+\centerline{
+\psfig{figure=\figuredir/sections.eps,width=4in}
+}
+\caption{The conductors are broken into sections based on where they overlap.}
+\label{sections}
+\end{figure}
+
+The discretization of Figure~\ref{busses} is input to {\tt fastcap}
+with the command
+\begin{quote}\tt
+busgen -n5 | fastcap
+\end{quote}
+and produces the output below.
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: stdin
+  Input surfaces:
+   GROUP1
+    stdin, conductor
+      title: `2X2 bus crossing problem with 1m wires (n=5 e=0.1)'
+      outer permittivity: 1
+      number of panels: 2200
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Mon May 25 15:57:35 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 4
+  Overall permittivity factor: 1
+  Total number of panels: 2200
+    Number of conductor panels: 2200
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 4
+Percentage of multiplies done by multipole: 89.3%
+
+ITERATION DATA
+Starting on column 1 (1%GROUP1)
+1 2 3 4 5 6
+Starting on column 2 (2%GROUP1)
+1 2 3 4 5 6
+Starting on column 3 (3%GROUP1)
+1 2 3 4 5 6
+Starting on column 4 (4%GROUP1)
+1 2 3 4 5 6
+
+CAPACITANCE MATRIX, picofarads
+                   1          2          3          4
+1%GROUP1 1      247.8     -85.01     -48.53     -48.53
+2%GROUP1 2     -85.01      247.8     -48.53     -48.54
+3%GROUP1 3     -48.53     -48.53      247.9     -84.99
+4%GROUP1 4     -48.53     -48.54     -84.99      247.9
+\end{verbatim}
+To check the capacitance values, the discretization of Figure~\ref{busses}
+is refined so that each section has seven panels on a side.
+The new discretization is input to {\tt fastcap} using
+\begin{quote}\tt
+busgen -n7 | fastcap
+\end{quote}
+which gives the output below.
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: stdin
+  Input surfaces:
+   GROUP1
+    stdin, conductor
+      title: `2X2 bus crossing problem with 1m wires (n=7 e=0.1)'
+      outer permittivity: 1
+      number of panels: 4312
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+  Date: Mon May 25 16:05:35 1992
+  Host: leibnitz
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 5
+  Overall permittivity factor: 1
+  Total number of panels: 4312
+    Number of conductor panels: 4312
+    Number of dielectric interface panels: 0
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 4
+Percentage of multiplies done by multipole: 95.3%
+
+ITERATION DATA
+Starting on column 1 (1%GROUP1)
+1 2 3 4 5 6 7 8 9 10 11
+Starting on column 2 (2%GROUP1)
+1 2 3 4 5 6 7 8 9 10 11
+Starting on column 3 (3%GROUP1)
+1 2 3 4 5 6 7 8 9 10 11
+Starting on column 4 (4%GROUP1)
+1 2 3 4 5 6 7 8 9 10 11
+
+CAPACITANCE MATRIX, picofarads
+                   1          2          3          4
+1%GROUP1 1      248.2     -85.18     -48.61     -48.61
+2%GROUP1 2     -85.18      248.1     -48.61      -48.6
+3%GROUP1 3     -48.61     -48.61      248.3      -85.2
+4%GROUP1 4     -48.61      -48.6      -85.2      248.2
+\end{verbatim}
+The small change in the capacitances after the refinement of the 
+discretization indicates that these values are accurate to 1\%.
+
+\subsubsection{Coated Spherical Capacitor}
+
+The list file \verb#coated_sph.lst# described in Section~\ref{listif}
+represents
+a unit radius sphere coated with a unit thickness dielectric as
+illustrated in Figure~\ref{cut_sph}.
+If the coating has relative permittivity 2 and the surrounding
+region is free space, the structure has capacitance
+$148.35$pF by Gauss's Law. The command
+\begin{quote}
+\verb#fastcap -lcoated_sph.lst#
+\end{quote}
+generates the output
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: coated_sph.lst
+  Input surfaces:
+   GROUP1
+    sphere2.neu, conductor
+      title: `SPHERE, RADIUS 1, ELEM LEN = 0.2'
+      outer permittivity: 2
+      number of panels: 768
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+   GROUP2
+    big_sphere1.neu, dielectric interface
+      title: `SPHERE, RADIUS 2, ELEM LEN = 0.5'
+      permittivities: 2 (inner) 1 (outer)
+      number of panels: 432
+      number of extra evaluation points: 864
+      translation: (0 0 0)
+  Date: Mon May 25 16:02:13 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 4
+  Overall permittivity factor: 1
+  Total number of panels: 1200
+    Number of conductor panels: 768
+    Number of dielectric interface panels: 432
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 1
+No expansions at level 4 (lowest)
+Percentage of multiplies done by multipole: 90.7%
+
+ITERATION DATA
+Starting on column 1 (SPHERE%GROUP1)
+1 2 3
+
+CAPACITANCE MATRIX, nanofarads
+                        1
+SPHERE%GROUP1 1     0.1484
+\end{verbatim}
+The computed capacitance is well within $1\%$ of the analytic value.
+
+\subsubsection{A Simple List File Example}
+\label{listeg}
+
+A simple example that uses a list file is generated with the command
+\begin{quote}\tt
+testgen.sh
+\end{quote}
+The script {\tt testgen.sh} uses the generic format
+input file generators {\tt cubegen}, {\tt busgen}
+and {\tt pyragen} to create input files that are
+linked together by a list file {\tt test.lst}, 
+\begin{verbatim}
+*
+* test geometry to show how interface works
+* - a pyramid, an L-shape and a 1x1 bus xing btwn gnd planes
+* - two dielectric slabs between ground planes
+*
+**   pyramid (single conductor in its own file)
+C ./pyramid.qui 1  0 3 0
+**   1x1 bus crossing (single file with multiple conductors)
+G BUS
+C ./bus.qui 1  0 0 0
+**   L-shaped conductor (single object built from 3 separate files)
+C ./lcntr.qui 1  0 0 0 +
+C ./lleft.qui 1  1 0 0 +
+C ./lright.qui 1  0 1 0
+**   ground planes (use of same file repeatedly)
+C ./plane.qui 1  -1 -1 -1 +
+C ./plane.qui 3  -1 -1 5
+**   dielectric interface (same file as ground planes)
+D ./plane.qui 3 1  -1 -1 4  0 0 5
+D ./skirt.qui 1 3  -1 -1 4  0 0 4.5 -
+\end{verbatim}
+The problem consists of a pyramid next to an L-shaped conductor and
+a $1\times 1$ bus crossing. The three conductors are between two horizontal
+ground planes. The upper ground plane has a dielectric coating
+with relative permittivity 3. The geometry is illustrated in 
+Figure~\ref{testpic}.
+%
+% test problem
+%
+% for fig2ug.awk
+%%%&^ testpic.ps
+\begin{figure}
+\centerline{
+\psfig{figure=\figuredir/testpic.ps,width=6.0in}
+}
+\caption{The simple test problem.}
+\label{testpic}
+\end{figure}
+
+
+The command 
+\begin{quote}\tt
+fastcap -ltest.lst
+\end{quote}
+produces the output
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: ./test.lst
+  Input surfaces:
+   GROUP1
+    pyramid.qui, conductor
+      title: `1mX1mX1m pyramid (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 37
+      number of extra evaluation points: 0
+      translation: (0 3 0)
+   BUS
+    bus.qui, conductor
+      title: `1X1 bus crossing problem with 1m wires (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 252
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+   GROUP3
+    lcntr.qui, conductor
+      title: `1mX1mX1m cube (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 36
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+    lleft.qui, conductor
+      title: `1mX1mX1m cube (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 45
+      number of extra evaluation points: 0
+      translation: (1 0 0)
+    lright.qui, conductor
+      title: `1mX1mX1m cube (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 45
+      number of extra evaluation points: 0
+      translation: (0 1 0)
+   GROUP4
+    plane.qui, conductor
+      title: `7mX6mX1m cube (n=10 e=0)'
+      outer permittivity: 1
+      number of panels: 110
+      number of extra evaluation points: 0
+      translation: (-1 -1 -1)
+    plane.qui, conductor
+      title: `7mX6mX1m cube (n=10 e=0)'
+      outer permittivity: 3
+      number of panels: 110
+      number of extra evaluation points: 0
+      translation: (-1 -1 5)
+   GROUP5
+    plane.qui, dielectric interface
+      title: `7mX6mX1m cube (n=10 e=0)'
+      permittivities: 1 (inner) 3 (outer)
+      number of panels: 110
+      number of extra evaluation points: 220
+      translation: (-1 -1 4)
+   GROUP6
+    skirt.qui, dielectric interface
+      title: `7mX6mX1m cube (n=2 e=0)'
+      permittivities: 3 (inner) 1 (outer)
+      number of panels: 104
+      number of extra evaluation points: 208
+      translation: (-1 -1 4)
+  Date: Mon May 25 16:38:47 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 4
+  Overall permittivity factor: 1
+  Total number of panels: 849
+    Number of conductor panels: 635
+    Number of dielectric interface panels: 214
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 5
+No expansions at level 4 (lowest)
+Percentage of multiplies done by multipole: 83.2%
+
+ITERATION DATA
+Starting on column 1 (PYRAMID%GROUP1)
+1 2 3 4 5 6 7 8
+Starting on column 2 (1%BUS)
+1 2 3 4 5 6 7 8
+Starting on column 3 (2%BUS)
+1 2 3 4 5 6 7 8 9
+Starting on column 4 (LSHAPE%GROUP3)
+1 2 3 4 5 6 7 8 9
+Starting on column 5 (GND%GROUP4)
+1 2 3 4 5 6 7 8 9
+
+CAPACITANCE MATRIX, picofarads
+                         1          2          3          4          5
+PYRAMID%GROUP1 1      67.54     -4.323      -3.63      -11.3     -43.27
+1%BUS          2     -4.323      189.5     -44.44     -17.04       -114
+2%BUS          3      -3.63     -44.44      177.3     -11.73     -108.2
+LSHAPE%GROUP3  4      -11.3     -17.04     -11.73      171.5     -117.6
+GND%GROUP4     5     -43.27       -114     -108.2     -117.6      960.4
+\end{verbatim}
+This example illustrates how the ``{\tt +}'' at the end of a 
+list file line can be used to group separated files together. In this
+case both {\tt GROUP3} and {\tt GROUP4} are formed this way, producing
+the conductors {\tt LSHAPE\%GROUP3} and {\tt GND\%GROUP4} respectively.
+In general all panels with the same conductor name in any group are
+considered to be part of the same conductor. Although this
+example does not show this, a group may contain
+more than one conductor.
+
+The group name is always appended to the conductor name read from the
+input to guarantee that {\tt fastcap}'s internal names are unique. 
+Here the second group has been renamed {\tt BUS}, rather than
+the default {\tt GROUP2}, using the {\tt G} line in the list file.
+It is the user's responsibility to rename groups in such a way
+that all the composite names are unique.
+
+The script {\tt testrun.sh} gives further examples using this problem.
+
+\subsubsection{Backplane Connector}
+
+The capacitances associated with several sizes of backplane conductors
+may be investigated using the shell scripts {\tt connector2.sh},
+{\tt connector3.sh} and {\tt connector4.sh}\footnote{
+The $4\times 4$ conductor connector is discussed in more detail
+in K.\ Nabors and J.\ White,
+   ``Multipole-accelerated 3-D capacitance extraction
+algorithms for structures with conformal
+dielectrics.'' {\em Proceedings of the 29th ACM/IEEE
+Design Automation Conference}, June 1992.
+}.  
+Each script generates
+a set of generic format files using {\tt cubegen} and {\tt pyragen}
+together with a list file that links the surface files  together to produce
+the final model.  The geometries analyzed are pictured in Figure~\ref{connect}.
+%
+% the three connector pictures
+%
+% for fig2ug.awk
+%%%&^ connector2.ps
+%%%&^ connector3.ps
+%%%&^ connector4.ps
+\begin{figure}
+\centerline{
+\psfig{figure=\figuredir/connector2.ps,width=1.9in}\rule{0.1in}{0in}\psfig{figure=\figuredir/connector3.ps,width=1.9in}\rule{0.1in}{0in}\psfig{figure=\figuredir/connector4.ps,width=1.9in}
+}
+\caption{The three backplane connector problems generated by the scripts
+{\tt connector2.sh} (left), {\tt connector3.sh} (center) and
+{\tt connector4.sh} (right). The actual discretizations used are
+finer than those pictured.}
+\label{connect}
+\end{figure}
+To analyze the smallest connector, first generate the discretization
+using the command
+\begin{quote} \tt
+connector2.sh 3.5 -n3
+\end{quote}
+The first argument specifies relative permittivity 3.5 for the U-shaped
+plastic connector body. The second argument is passed directly to
+{\tt cubegen} and {\tt pyragen} and sets the fineness of the discretization
+(see also Section~\ref{quiref} for more on {\tt cubegen} and {\tt pyragen}
+options). With the discretization generated, run {\tt fastcap} with
+the command
+\begin{quote}\tt
+fastcap -lconnector23.5-n3.lst
+\end{quote}
+which gives the output
+\begin{verbatim}
+Running fastcap 2.0 (25May92)
+  Input: connector23.5-d.lst
+  Input surfaces:
+   GROUP1
+    pin_end10.00.00.03.52-d.qui, conductor
+      title: `1.3mX1.3mX1m pyramid (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 4
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+    pin_long0.00.00.03.52-d.qui, conductor
+      title: `1.3mX1.3mX15m cube (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 4
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+    pin_sleeve0.00.00.03.52-d.qui, conductor
+      title: `1.3mX1.3mX5.2m cube (n=3 e=0.1)'
+      outer permittivity: 3.5
+      number of panels: 4
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+    pin_short0.00.00.03.52-d.qui, conductor
+      title: `1.3mX1.3mX7m cube (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 4
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+    pin_end20.00.00.03.52-d.qui, conductor
+      title: `1.3mX1.3mX-1m pyramid (n=3 e=0.1)'
+      outer permittivity: 1
+      number of panels: 4
+      number of extra evaluation points: 0
+      translation: (0 0 0)
+\end{verbatim}
+\noindent (Some surface information removed for brevity.)
+\begin{verbatim}
+   GROUP25
+    back23.5-d.qui, dielectric interface
+      title: `13mX13mX5.2m cube (n=4 e=0)'
+      permittivities: 3.5 (inner) 1 (outer)
+      number of panels: 2
+      number of extra evaluation points: 4
+      translation: (0 0 0)
+  Date: Tue May 26 01:02:47 1992
+  Host: hilbert
+
+INPUT SUMMARY
+  Expansion order: 2
+  Number of partitioning levels: 3
+  Overall permittivity factor: 1
+  Total number of panels: 132
+    Number of conductor panels: 80
+    Number of dielectric interface panels: 52
+    Number of thin conductor on dielectric interface panels: 0
+  Number of conductors: 4
+No multipole expansions at level 3 (lowest)
+Percentage of multiplies done by multipole: 64.9%
+
+ITERATION DATA
+Starting on column 1 (1%GROUP1)
+1 2 3 4 5 
+Starting on column 2 (1%GROUP6)
+1 2 3 4 5 
+Starting on column 3 (1%GROUP11)
+1 2 3 4 5 
+Starting on column 4 (1%GROUP16)
+1 2 3 4 5 
+
+CAPACITANCE MATRIX, nanofarads
+                    1          2          3          4 
+1%GROUP1  1     0.8842    -0.2647    -0.2519    -0.1014
+1%GROUP6  2    -0.2647     0.8825    -0.1005    -0.2521
+1%GROUP11 3    -0.2519    -0.1005     0.8825     -0.265
+1%GROUP16 4    -0.1014    -0.2521     -0.265     0.8818
+\end{verbatim}
+This output further illustrates how {\tt fastcap} groups parts of conductors
+that are chained together in the list file by means of the {\tt +}
+option (see Section~\ref{listif}). In this particular case, groups
+1, 6, 11 and 16, consisting of panels which are all associated with
+the conductor name ``{\tt 1}''
+in the input files, have their corresponding conductors renamed
+to {\tt 1\%GROUP1}, {\tt 1\%GROUP6}, {\tt 1\%GROUP11} and
+{\tt 1\%GROUP16} to avoid any ambiguity. 
+
+The input file dimensions are assumed to be in meters, giving
+capacitances in the nanofarad range. A more realistic connector
+would have dimensions on the order of millimeters, meaning that
+the reported capacitances should be interpreted as picofarads.
+
+
+The example problems
+for the larger conductors are generated and run in an analogous
+fashion.
+
+\subsubsection{DRAM Cells}
+\label{dram}
+
+The final example uses the shell script {\tt ramgen.sh} to generate
+a list file that combines generic format files and neutral files
+to produce a discretization of three adjoining DRAM cells as
+illustrated in Figure~\ref{ramcell}\footnote{
+This example is discussed in more detail in
+K.\ Nabors and J.\ White,
+`` An improved approach to including conformal dielectrics in
+        multipole-accelerated three-dimensional capacitance extraction.''
+To appear in {\em Proceedings of the Workshop on Numerical Modeling
+of Processes and Devices for Integrated Circuits: NUPAD IV}, May-June
+1992.
+}. 
+%
+% ramcell description and figure callouts
+%
+\input{ug-ramcellfig}
+The 
+structure is a simplified model
+of three adjacent DRAM cells.
+Each cell consists of a polycide
+bit line running across the cell, terminating
+in a via which connects to the drain of a transistor formed by
+a polycide line crossing the substrate at right angles to the
+bit line. The source of the transistor
+is connected to a  wide polycide plate through a heavily doped
+region to enhance capacitance. Three more word lines pass through the
+cells: a polycide line, and two
+aluminum lines above that line.
+The aluminum word lines are covered with
+a silicon nitride (permittivity 7.0) passivation layer, as represented
+by the two dielectric interfaces illustrated in 
+Figure~\ref{ramcell}a.  The material above the top interface is air
+while below the aluminum word lines silicon dioxide
+(permittivity 3.9) is assumed.
+In Figure~\ref{ramcell}b, the dielectric interfaces are removed to show
+the conductors more clearly.
+
+
+The command 
+\begin{quote}\tt
+ramgen.sh
+\end{quote}
+produces a discretization 
+summarized in the list file {\tt ramcell.lst}. 
+The 
+script calls the generic file generator programs {\tt pipedgen}
+and {\tt cubegen} whose options are itemized in
+Section~\ref{quiref}. Typing
+\begin{quote}\tt
+fastcap -lramcell.lst
+\end{quote}
+produces the output below given in the file {\tt ramcell.out}. 
+
+%The argument {\tt -rsGND} causes the
+%conductor \verb$GND_PLANE%GROUP15$, the ground plane, to be held
+%at zero volts for all the calculations. Thus the column of the capacitance
+%matrix corresponding to the ground plane is not calculated explicitly,
+%although {\tt fastcap} reports ground-plane coupling capacitances that
+%are calculated by solving for the other columns.
+
+As in the connector case the input scale is meters, while the true
+scale is much smaller.  The DRAM cell dimensions are on the order
+of microns, so the reported values must be scaled by $10^{-6}$ to
+obtain the actual capacitances of the DRAM geometry.
+
+\subsection{Producing Pictures}
+\label{genpic}
+
+The complete command line format of the FastCap program is
+\begin{verbatim}
+fastcap [-o<expansion order>] [-d<partitioning depth>] [<input file>]
+        [-p<permittivity factor>] [-rs<cond list>] [-ri<cond list>]
+        [-] [-l<list file>] [-t<iter tol>] [-a<azimuth>] [-e<elevation>]
+        [-r<rotation>] [-h<distance>] [-s<scale>] [-w<linewidth>]
+        [-u<upaxis>] [-q<cond list>] [-rc<cond list>] [-x<axeslength>]
+        [-b<.figfile>] [-m] [-rk] [-rd] [-dc] [-c] [-v] [-n] [-f] [-g]
+\end{verbatim}
+The first nine basic options 
+are described in previous sections. The remaining options are used
+to produce postscript format pictures of the geometry under analysis.
+Section~\ref{quiref} itemizes the options and this section gives
+several examples of their use.
+The pictures are two-dimensional renderings of the three-dimensional
+objects under analysis, and may be line drawings or shaded plots
+indicating the charge density or total charge on each panel.  The
+later plots are useful for gauging the effectiveness of a particular
+discretization. 
+
+\subsubsection{Line Drawings}
+
+When {\tt fastcap} is given the {\tt -m} option it changes from
+calculation to line-drawing mode.  Usually the default settings
+produce an acceptable plot for checking
+a discretization, but many adjustments are possible,
+the most important being the  view angles (relative to a coordinate
+system parallel to the input coordinates and centered on the 
+center of the object) which are adjusted using the
+{\tt -a} and {\tt -e} options.  Other options control view distance
+({\tt -h}), two-dimensional projection scale ({\tt -s}), rotation
+({\tt -r} and {\tt -u}) and line width ({\tt -w}). Axes of any length
+may be included  with the {\tt -x} option and lines, arrows and dots may be
+added using {\tt -b}. Finally, {\tt -rd} and {\tt -rc} are useful
+for removing dielectric-interface and conductor surfaces, respectively,
+that block the desired view.
+Table~\ref{dashmuse} gives the commands used to produce the line
+drawings in this guide as examples. 
+\begin{table}
+\begin{center}
+\begin{tabular}{clp{2.0in}}\hline
+\multicolumn{1}{c}{Figure} & \multicolumn{1}{c}{{\tt fasctap} Usage} &
+\multicolumn{1}{c}{Comments} \\ \hline
+\protect\ref{1x1bus} & {\tt fastcap -m -x3 cond\_air\_1x1.qui}& left figure \\
+& {\tt fastcap -m -x3 cond\_dielec\_1x1.qui} & center figure \\
+& {\tt fastcap -m -x3 -ltemp.lst} & right figure; {\tt temp.lst} is 
+{\tt 1x1bus.lst} with all the ``{\tt C}'' lines commented out\\
+\hline
+\protect\ref{spheres} & {\tt fastcap -m sphere1.neu} & left figure \\
+& {\tt fastcap -m sphere2.neu} & right figure \\
+\hline
+\protect\ref{cubes} & {\tt cubegen -n5 | fastcap -m} & right figure \\
+& {\tt cubegen -n7 | fastcap -m} & left figure \\
+\hline
+\protect\ref{testpic} & {\tt fastcap -ltest.lst -e75 -m} & \\
+\hline
+\protect\ref{connect} & {\tt fastcap -m -lconnector23.5-d.lst -s0.5} & left figure; input generated using  {\tt connector2.sh 3.5 -d}\\
+& {\tt fastcap -m -lconnector33.5-d.lst -s0.75} & center figure; input generated using  {\tt connector3.sh 3.5 -d}\\
+& {\tt fastcap -m -lconnector43.5-d.lst} & left figure; input
+generated using {\tt connector4.sh 3.5 -d}\\
+\hline
+\protect\ref{ramcell} & {\tt fastcap -m -lramcell-d.lst -a0 -e87}
+& figure (a); input generated using {\tt ramgen.sh -d}\\
+& {\tt fastcap -m -rd -lramcell-d.lst -a0 -e70}
+& figure (b); input generated using {\tt ramgen.sh -d}\\
+\hline
+\protect\ref{sphsha} & {\tt fastcap -q sphere1.neu} & use {\tt -dc} to display
+total panel charges rather that panel charge densities \\
+\hline
+\protect\ref{cubeeg} & {\tt cubegen -d | fastcap -m -x2 -bcubeeg.fig} &
+dots are in {\tt cubeeg.fig}; titling done in latex\\
+\hline
+\end{tabular}
+\caption{Commands used to generate some representative figures in this guide.}
+\label{dashmuse}
+\end{center}
+\end{table}
+
+\subsubsection{Charge Density and Total Charge Pictures}
+\label{chgplt}
+
+The {\tt -q} option provides a means of checking the charge distribution
+calculated by {\tt fastcap}. The command
+\begin{quote}\tt
+fastcap -q sphere1.neu
+\end{quote}
+causes {\tt fastcap} to write the postscript format file {\tt sphere11.ps}
+containing the picture in Figure~\ref{sphsha}.
+%
+% shaded sphere showing  charge dens
+%
+% for fig2ug.awk
+%%%&^ sphere1_q.ps
+\begin{figure}
+\centerline{
+\psfig{figure=\figuredir/sphere1_q.ps,width=5.5in}
+}
+\caption{The file {\tt sphere11.ps} resulting from the command {\tt fastcap -q sphere1.neu}, showing the charge density on each panel after the capacitance calculation.}
+\label{sphsha}
+\end{figure}
+A similar plot can be made for total panel charges using the same
+command with the {\tt -dc} option added. 
+
+For problems with more than
+one conductor, {\tt fastcap -q} writes a postscript file corresponding
+to the charge density present after each column calculation is completed.
+The results of any particular subset of the column calculations may be
+written to postscript files by specifying lists of columns to include
+with the {\tt -q} option.  For example, in the five conductor problem
+summarized by the list file {\tt test.lst} (see Section~\ref{listeg}),
+{\tt fastcap -q2 -ltest.lst} produces only one  postscript file,
+the one corresponding to conductor {\tt 2\%BUS}, and 
+{\tt fastcap -qPY,LS,2 -ltest.lst}
+writes a picture file for all but conductors {\tt 1\%BUS} and 
+{\tt GND\%GROUP4}.
+
+
+
+
+\subsection{Warnings and Errors}
+
+The errors and warnings most often encountered when using {\tt fastcap}
+are listed here in order of frequency with the most frequent appearing
+first.
+
+\begin{verbatim}
+Warning: no multipole acceleration
+\end{verbatim}\vspace{-\topsep}
+The multipole approximation is not being used to compute iterates.
+As explained in Section~\ref{sphrun}, this warning occurs most often when the 
+input problem is too small to warrant the use of the multipole approximation.
+The  message also appears when {\tt fastcap} is forced to calculate
+the iterates without the multipole approximation using the {\tt -d0} 
+command-line option. 
+%Since the iterates are calculated using explicit
+%multiplications when this message appears, the resulting capacitance values
+%are actually more accurate than usual.
+
+\begin{verbatim}
+resolve_kill_lists: a conductor removed with -ri is in the -rs list
+resolve_kill_lists: a conductor removed with -ri or -rs is in the -q list
+resolve_kill_lists: all conductors either in -ri or -rs list
+\end{verbatim}\vspace{-\topsep}
+These errors are caused by asking for plots or computation involving
+a conductor that has
+been removed from the problem (with {\tt -ri}) or is not having its
+column of the capacitance matrix calculated (in the
+{\tt -rs} list).
+
+\begin{verbatim}
+placeq: Warning, removing identical quadrilateral panel
+  rmved ctr = (-0.4375 3.43333 1.2) surf = `via.neu' trans = (0 0 0)
+  saved ctr = (-0.4375 3.43333 1.2) surf = `via.neu' trans = (0 0 0)
+\end{verbatim}\vspace{-\topsep}
+Two panels with the same center coordinates have been given as input.
+The most common cause of this error is extra panels in neutral files
+due to careless meshing of patches. The example file {\tt via.neu}
+contains six duplicate panels. The program removes the extra panels
+and continues with the calculation.
+
+\begin{verbatim}
+is1stFaceDeeper: Warning, face ordering test failure
+  alpha_fac, face 33 = 2.3498 alpha_facref, face 2 = 2.3489
+...
+\end{verbatim}\vspace{-\topsep}
+This error is usually caused by attempting 
+to produce a picture of an illegal discretization with
+superimposed panels, as can happen when using a list file with
+incorrect translation vectors.  Often the postscript file picture
+is still correct.
+
+\begin{verbatim}
+read_panels: generic format file
+  `../examples/cond_air_1x1.qui'
+read after neutral file(s) in same group---reorder list file entries
+\end{verbatim}\vspace{-\topsep}
+A generic format file occurs after a neutral file in the {\tt list file}
+and the files are grouped together using the ``{\tt +}'' option
+(see Section~\ref{listif}). This condition is not allowed due to
+the conductor renaming that can occur in generic format files.
+
+\begin{verbatim}
+name_data: conductor 'CONDUCTOR NAME'
+  has no patch - redo naming so that one is included
+assign_names: no conductor names specified
+assign_names: 2 conductors have no names
+assign_names: 2 names given for 4 conductors
+\end{verbatim}\vspace{-\topsep}
+The input {\tt PATRAN} neutral file contains conductors that are not
+named properly. As mentioned in Section~\ref{neuif}, {\tt fastcap}'s 
+neutral file
+interface numbers the input conductors in the order they appear in
+the input file. Since the user normally does not know this order, 
+a component containing at least one patch that is part of each conductor
+must be named using {\tt PATRAN}'s {\tt NAME} directive.
+
+\begin{verbatim}
+fastcap: out of memory in file `mulSetup.c' at line 135
+ (NULL pointer on 1024 byte request)
+Total Memory Allocated: 65135 kilobytes (brk = 0x13fff2d8)
+placeq: 7 levels set up
+\end{verbatim}\vspace{-\topsep}
+Virtual memory has been exhausted. As explained in Section~\ref{trdoff}
+the usual cause of this problem is running {\tt fastcap} with low order
+expansions on moderate to large problems. In those cases the number of
+partitioning levels should be set on the command line with the
+{\tt -d} option to the amount successfully allocated by 
+the multipole initialization subroutine {\tt placeq}. In
+this example the option {\tt -d7} should be used. 
+If the error
+did not occur during the multipole initialization, then the 
+line \verb~placeq: 7 levels set up~ is not printed. In that case the
+number of partitioning levels should be set to one less than that
+reported in the \verb~INPUT SUMMARY~ output section.
+% cube size = 192 bytes, charge size = 160 bytes
+
+\begin{verbatim}
+mksCapDump: Warning - capacitance matrix has non-negative off-diagonals
+  row 3 col 1
+mksCapDump: Warning - capacitance matrix is not strictly diagonally dominant
+  due to row 3
+\end{verbatim}\vspace{-\topsep}
+The capacitance matrix does not have the correct structure. The 
+warnings are usually encountered when {\tt fastcap} is forced to use lower
+order expansions. As discussed in Section~\ref{trdoff}, 
+results obtained using lower order 
+expansions are only reliable for the diagonal capacitance-matrix entries.
+Inaccuracies in the off-diagonal matrix entries can produce these warnings,
+even though the diagonal capacitances are accurate enough to be useful.
+The diagonal dominance  error is also caused by
+illegal discretizations with superimposed
+panels, poorly discretized dielectric regions, particularly with
+high permittivities, and poorly discretized conductor surfaces, especially
+when different conductors are very close together.
+
+
+%\begin{verbatim}
+%\begin{quote}
+%calcp: Warning - negative potential coefficient = -0.204
+%\end{quote}
+%\end{verbatim}
+%The coefficient matrix for the linear system corresponding to the 
+%capacitance problem, which must be a positive matrix, has a negative entry.
+%As explained in Section~\ref{sphrun}, {\tt fastcap} attempts to
+%break all nonplanar
+%quadrilaterals into two triangles. Quadrilateral panels that are almost
+%planar are occasionally not broken up by {\tt fastcap}
+
+\begin{verbatim}
+NONCONVERGENCE AFTER 2456 ITERATIONS
+\end{verbatim}\vspace{-\topsep}
+The iteration for the capacitance matrix has failed to converge. The
+default version of {\tt fastcap} halts after $n$ iterations for an
+$n$ panel problem if convergence has not occurred. 
+This error rarely occurs for practical problems since
+{\tt fastcap} uses a preconditioner.
+
+%tiles too big relative to cubes
+
+\input{ug-bugs}
+
+\subsection{Quick Reference}
+\label{quiref}
+
+%\subsubsection*{{\tt fastcap}: Capacitance Extractor}
+\subsubsection*{\tt fastcap}
+
+Run multipole accelerated capacitance extraction algorithm on specified 
+conductor geometry, optionally produce a postscript file picture of
+the charge distribution used in the calculation, or produce a postscript 
+file line drawing of the input geometry. Arguments can be specified in
+any order.
+\begin{verbatim}
+fastcap [-o<expansion order>] [-d<partitioning depth>] [<input file>]
+        [-p<permittivity factor>] [-rs<cond list>] [-ri<cond list>]
+        [-] [-l<list file>] [-t<iter tol>] [-a<azimuth>] [-e<elevation>]
+        [-r<rotation>] [-h<distance>] [-s<scale>] [-w<linewidth>]
+        [-u<upaxis>] [-q<cond list>] [-rc<cond list>] [-x<axeslength>]
+        [-b<.figfile>] [-m] [-rk] [-rd] [-dc] [-c] [-v] [-n] [-f] [-g]
+\end{verbatim}
+
+\begin{center}
+\begin{tabular}{ccll}
+\multicolumn{4}{c}{\mbox{\tt fastcap} Options}\\\hline
+\multicolumn{1}{c}{Option}&\multicolumn{1}{c}{Default}&
+\multicolumn{1}{c}{Range}&
+\multicolumn{1}{c}{Function}\\\hline
+\mbox{\tt -o}&\mbox{\tt 2}& \mbox{\tt 0, 1\ldots}
+&Specifies expansion order.\\
+\mbox{\tt -d}&auto&\mbox{\tt 0, 1\ldots}
+&Specifies spatial partitioning depth.\\
+\mbox{\tt -p}&\mbox{\tt 1.0}&$>$ \mbox{\tt 0.0}
+&Specifies relative permittivity factor.\\
+\mbox{\tt -rs}& \ddag & \ddag
+&Specifies conductors to remove from solve list.\\
+\mbox{\tt -ri}& \ddag & \ddag
+&Specifies conductors to remove from input.\\
+\mbox{\tt -}& --- & ---
+&Forces conductor surface read from \mbox{\tt stdin}.\\
+\mbox{\tt -l}& --- & ---
+&Specifies surface {\tt list file}.\\
+\mbox{\tt -t}& {\tt 0.01} & $>$ {\tt 0.0}
+&Specifies iterative loop tolerance on $\|residual\|_2$.\\
+\hline
+\mbox{\tt -a}& \mbox{\tt 50.0} & \dag
+&Specifies azimuth view angle in degrees.\\
+\mbox{\tt -e}& \mbox{\tt 50.0} & \dag
+&Specifies elevation view angle in degrees.\\
+\mbox{\tt -r}& \mbox{\tt 0.0} & \dag
+&Specifies final rotation of 2-D image in degrees.\\
+\mbox{\tt -h}& \mbox{\tt 2.0} & $\geq$ \mbox{\tt 0.0}
+&Specifies distance from surface of object in object radii.\\
+\mbox{\tt -s}& \mbox{\tt 1.0} & $>$ \mbox{\tt 0.0}
+&Specifies final scaling of 2-D image.\\
+\mbox{\tt -w}& \mbox{\tt 1.0} & $\geq$ \mbox{\tt 0.0}
+&Specifies postscript file line width.\\
+\mbox{\tt -u}& \mbox{\tt z} & \mbox{\tt x}, \mbox{\tt y}, or \mbox{\tt z}
+&Specifies which 3-D axis is mapped to y-axis in 2-D image.\\
+\mbox{\tt -q}& \ddag & \ddag
+&Causes charge distribution postscript files to be written.\\
+\mbox{\tt -rc}& \ddag & \ddag
+&Specifies conductors to remove from all pictures.\\
+\mbox{\tt -x}& \mbox{\tt 1.0} & $>$ \mbox{\tt 0.0}
+&Includes axes of length \mbox{\tt axeslength} in picture.\\
+\mbox{\tt -b}& $\diamond $ & $\diamond $
+&Specifies lines, dots and arrows to superimpose on picture.\\
+\mbox{\tt -m}& --- & ---
+&Causes postscript-file line drawing write.\\
+\mbox{\tt -rk}& --- & ---
+&Removes the shading key in charge distribution pictures.\\
+\mbox{\tt -rd}& --- & ---
+&Removes all dielectric surfaces from postscript file pictures.\\
+\mbox{\tt -dc}& --- & ---
+&Makes total charge, rather than charge density, {\tt -q} pictures.\\
+\mbox{\tt -c}& --- & ---
+&Puts the command line in postscript file pictures.\\
+\mbox{\tt -v}& --- & ---
+&Removes {\tt showpage} from postscript file.\\
+\mbox{\tt -n}& --- & ---
+&Numbers faces in order input.\\
+\mbox{\tt -f}& --- & ---
+&Suppresses hidden line removal.\\
+\mbox{\tt -g}& --- & ---
+&Prints the graph used to order the panels in postscript file.\\
+\hline
+\end{tabular}
+\end{center}
+\noindent\dag Range is unrestricted.
+
+\noindent\ddag Conductor list format: {\tt [<name>],...,[<name>]}. Name
+strings need only be specified with enough leading characters to be unique.
+Specifying {\tt -q} with no list is the same as giving a list of all the
+conductors.
+
+\noindent$\diamond $ See function {\tt readLines()} in {\tt src/zbufInOut.c}
+for a description of the {\tt .fig} file format.
+
+\subsubsection*{\tt cubegen}
+
+Generate a cubic capacitor problem for input to {\tt fastcap}. Arguments
+may be specified in any order.
+\begin{verbatim}
+cubegen [-xo<originx>] [-yo<originy>] [-zo<originz>]
+        [-xh<heightx>] [-yh<heighty>] [-zh<heightz>]
+        [-n<num panels/side>] [-e<rel edge panel width>] [-na<name>]
+        [-o] [-t] [-b] [-p] [-pfl] [-pfr] [-pbl] [-pbr] [-d]
+\end{verbatim}
+
+\begin{center}
+\begin{tabular}{ccll}
+\multicolumn{4}{c}{\mbox{\tt cubegen} Options}\\\hline
+\multicolumn{1}{c}{Option}&\multicolumn{1}{c}{Default}&
+\multicolumn{1}{c}{Range}&
+\multicolumn{1}{c}{Function}\\\hline
+\mbox{\tt -xo}&{\tt 0.0}& \dag
+&Specifies cube origin x coordinate in meters.\\
+\mbox{\tt -yo}&{\tt 0.0}& \dag
+&Specifies cube origin y coordinate in meters.\\
+\mbox{\tt -zo}&{\tt 0.0}& \dag
+&Specifies cube origin z coordinate in meters.\\
+\mbox{\tt -xh}&{\tt 1.0}& \dag
+&Specifies cube excursion from origin in x direction, meters.\\
+\mbox{\tt -yh}&{\tt 1.0}& \dag
+&Specifies cube excursion from origin in y direction, meters.\\
+\mbox{\tt -zh}&{\tt 1.0}& \dag
+&Specifies cube excursion from origin in z direction, meters.\\
+\mbox{\tt -n}&{\tt 3}&\mbox{\tt 1, 2\ldots}
+&Specifies number of panels per cube edge.\\
+\mbox{\tt -e}&{\tt 0.1}&$\geq$ \mbox{\tt 0.0}
+&Specifies edge to inner panel width ratio.\\
+{\tt -na} & `{\tt 1}' & \ddag
+&Specifies conductor name.\\
+{\tt -o} & --- & ---
+&Causes cube to be centered on the point (0 0 0).\\
+{\tt -t} & --- & ---
+&Removes panels on the top face, $z =$ {\tt zo + zh} plane$\diamond $.\\
+{\tt -b} & --- & ---
+&Removes panels on the bottom face, $z =$ {\tt zo} plane$\diamond $.\\
+{\tt -p} & --- & ---
+&Equivalent to {\tt -pfl -pfr -pbl -pbr}.\\
+{\tt -pfl} & --- & ---
+&Removes panels on the front left face, $x =$ {\tt xo + xh} plane$\diamond $.\\
+{\tt -pfr} & --- & ---
+&Removes panels on the front right face, $y =$ {\tt yo + yh} plane$\diamond $.\\
+{\tt -pbl} & --- & ---
+&Removes panels on the back left face, $y =$ {\tt yo} plane$\diamond $.\\
+{\tt -pbr} & --- & ---
+&Removes panels on the back right face, $x =$ {\tt xo} plane$\diamond $.\\
+{\tt -d} & --- & ---
+&Disables discretization of cube faces.\\
+\hline
+\end{tabular}
+\end{center}
+\noindent\dag Range is unrestricted.
+
+\noindent\ddag Any string with no spaces is allowed.
+
+\noindent$\diamond $ Face names are based on viewing the cube
+from the positive orthant. See also Figure~\ref{cubeeg}.
+\input{ug-cubeeg}
+
+%\subsubsection*{{\tt capgen}: Parallel Plate Capacitor Discretization Generator}
+\subsubsection*{\tt capgen}
+
+Generate a parallel plate capacitor problem for input to {\tt fastcap}.
+Arguments may be specified in any order.
+\begin{verbatim}
+capgen [-s<plate sep>] [-w<plate width>] [-p<num plates>]
+       [-n<num panels/plate width>] [-e<rel edge panel width>]
+       [-na<cond name>] [-d]
+\end{verbatim}
+
+\begin{center}
+\begin{tabular}{ccll}
+\multicolumn{4}{c}{\mbox{\tt capgen} Options}\\\hline
+\multicolumn{1}{c}{Option}&\multicolumn{1}{c}{Default}&
+\multicolumn{1}{c}{Range}&
+\multicolumn{1}{c}{Function}\\\hline
+\mbox{\tt -s}&{\tt 0.1}&$>$ \mbox{\tt 0.0}
+&Specifies plate separation in meters.\\
+\mbox{\tt -w}&{\tt 1.0}&$>$ \mbox{\tt 0.0}
+&Specifies plate width in meters.\\
+\mbox{\tt -p}&{\tt 2}&\mbox{\tt 1, 2\ldots}
+&Specifies number of parallel plates.\\
+\mbox{\tt -n}&{\tt 3}&\mbox{\tt 1, 2\ldots}
+&Specifies number of panels per plate width.\\
+\mbox{\tt -e}&{\tt 0.1}&$\geq$ \mbox{\tt 0.0}
+&Specifies edge to inner panel width ratio.\\
+{\tt -na} & \dag & \dag
+&Specifies conductor name base.\\
+{\tt -d} & --- & ---
+&Disables discretization of plates.\\
+\hline
+\end{tabular}
+\end{center}
+\noindent\dag Any string with no spaces is allowed. By default
+the conductors are given the first $p$ numbers as names, where
+$p$ is the number of panels specified with {\tt -p}.
+
+%\subsubsection*{{\tt busgen}: Bus Crossing Discretization Generator}
+\subsubsection*{\tt busgen}
+
+Generate a bus crossing problem for input to {\tt fastcap}. Arguments
+may be specified in any order.
+\begin{verbatim}
+busgen [-xo<originx>] [-yo<originy>] [-zo<originz>]
+       [-c<conductors/bus>] [-w<wire width>]
+       [-n<num panels/wire width>] [-e<rel edge panel width>]
+       [-na<name base>] [-d]
+\end{verbatim}
+
+\begin{center}
+\begin{tabular}{ccll}
+\multicolumn{4}{c}{\mbox{\tt busgen} Options}\\\hline
+\multicolumn{1}{c}{Option}&\multicolumn{1}{c}{Default}&
+\multicolumn{1}{c}{Range}&
+\multicolumn{1}{c}{Function}\\\hline
+\mbox{\tt -xo}&{\tt 0.0}& \dag
+&Specifies bus origin x coordinate in meters.\\
+\mbox{\tt -yo}&{\tt 0.0}& \dag
+&Specifies bus origin y coordinate in meters.\\
+\mbox{\tt -zo}&{\tt 0.0}& \dag
+&Specifies bus origin z coordinate in meters.\\
+\mbox{\tt -c}&{\tt 2}&\mbox{\tt 1, 2\ldots}
+&Specifies number of conductors per bus.\\
+\mbox{\tt -w}&{\tt 1.0}&$>$ \mbox{\tt 0.0}
+&Specifies conductor width in meters.\\
+\mbox{\tt -n}&{\tt 3}&\mbox{\tt 1, 2\ldots}
+&Specifies number of panels per wire width.\\
+\mbox{\tt -e}&{\tt 0.1}&$\geq$ \mbox{\tt 0.0}
+&Specifies edge to inner panel width ratio.\\
+{\tt -na} & \ddag & \ddag
+&Specifies conductor name base.\\
+{\tt -d} & --- & ---
+&Disables discretization of conductor faces.\\
+\hline
+\end{tabular}
+\end{center}
+\noindent\dag Range is unrestricted.
+
+\noindent\ddag Any string with no spaces is allowed. By default
+the conductors are given the first $2c$ numbers as names, where
+$c$ is the number of conductors per bus specified with {\tt -c}.
+
+%\subsubsection*{{\tt pipedgen}: Parallelepiped Discretization Generator}
+\subsubsection*{\tt pipedgen}
+
+Generate a parallelepiped problem for input to {\tt fastcap}.
+Arguments may be specified in any order.
+\begin{verbatim}
+pipedgen [-cr <x y z>] [-c1 <x y z>] [-c2 <x y z>] [-c3 <x y z>]
+         [-n<num panels/side>] [-e<rel edge panel width>]
+         [-na<name>] [-t] [-b] [-p] [-pfl] [-pfr] [-pbl] [-pbr] [-d]
+\end{verbatim}
+
+\begin{center}
+\begin{tabular}{ccll}
+\multicolumn{4}{c}{\mbox{\tt pipedgen} Options}\\\hline
+\multicolumn{1}{c}{Option}&\multicolumn{1}{c}{Default}&
+\multicolumn{1}{c}{Range}&
+\multicolumn{1}{c}{Function}\\\hline
+{\tt -cr} & {\tt (0 0 0)} & \dag
+&Specifies parallelepiped reference corner.\\
+{\tt -c1} & {\tt (1 0 0)} & \dag
+&Specifies first parallelepiped corner.\\
+{\tt -c2} & {\tt (0 1 0)} & \dag
+&Specifies second parallelepiped corner.\\
+{\tt -c3} & {\tt (0 0 1)} & \dag
+&Specifies third parallelepiped corner.\\
+\mbox{\tt -n}&{\tt 3}&\mbox{\tt 1, 2\ldots}
+&Specifies number of panels per face edge.\\
+\mbox{\tt -e}&{\tt 0.1}&$\geq$ \mbox{\tt 0.0}
+&Specifies edge to inner panel width ratio.\\
+{\tt -na} & `{\tt 1}' & \ddag
+&Specifies conductor name.\\
+{\tt -t} & --- & ---
+&Removes panels on the top face, {\tt c1-cr-c2} plane$\diamond $.\\
+{\tt -b} & --- & ---
+&Removes panels on the bottom face, parallel to top$\diamond $.\\
+{\tt -p} & --- & ---
+&Equivalent to {\tt -pfl -pfr -pbl -pbr}.\\
+{\tt -pfl} & --- & ---
+&Removes panels on the front left face, {\tt c1-cr-c3}  plane$\diamond $.\\
+{\tt -pfr} & --- & ---
+&Removes panels on the front right face, {\tt c2-cr-c3} plane$\diamond $.\\
+{\tt -pbl} & --- & ---
+&Removes panels on the back left face, parallel to front right$\diamond $.\\
+{\tt -pbr} & --- & ---
+&Removes panels on the back right face, parallel to front left$\diamond $.\\
+{\tt -d} & --- & ---
+&Disables discretization of parallelepiped faces.\\
+\hline
+\end{tabular}
+\end{center}
+\noindent \dag Range is unrestricted.
+
+\noindent\ddag Any string with no spaces is allowed.
+
+\noindent $\diamond $Face names are based on viewing the parallelepiped
+from the positive orthant. See also Figure~\ref{pipeeg}.
+\input{ug-pipeeg}
+
+
+\subsubsection*{\tt pyragen}
+
+Generate a pyramid capacitor problem for input to {\tt fastcap}. Arguments
+may be specified in any order.
+\begin{verbatim}
+pyragen [-xo<originx>] [-yo<originy>] [-zo<originz>]
+        [-xh<heightx>] [-yh<heighty>] [-zh<heightz>]
+        [-n<num panels/side>] [-e<rel edge panel width>]
+        [-na<name>] [-b] [-p] [-pfl] [-pfr] [-pbl] [-pbr] [-d]
+\end{verbatim}
+
+\begin{center}
+\begin{tabular}{ccll}
+\multicolumn{4}{c}{\mbox{\tt pyragen} Options}\\\hline
+\multicolumn{1}{c}{Option}&\multicolumn{1}{c}{Default}&
+\multicolumn{1}{c}{Range}&
+\multicolumn{1}{c}{Function}\\\hline
+\mbox{\tt -xo}&{\tt 0.0}& \dag
+&Specifies pyramid origin x coordinate in meters.\\
+\mbox{\tt -yo}&{\tt 0.0}& \dag
+&Specifies pyramid origin y coordinate in meters.\\
+\mbox{\tt -zo}&{\tt 0.0}& \dag
+&Specifies pyramid origin z coordinate in meters.\\
+\mbox{\tt -xh}&{\tt 1.0}& \dag
+&Specifies pyramid base excursion from origin in x direction, meters.\\
+\mbox{\tt -yh}&{\tt 1.0}& \dag
+&Specifies pyramid base excursion from origin in y direction, meters.\\
+\mbox{\tt -zh}&{\tt 1.0}& \dag
+&Specifies pyramid height at apex (z direction), meters.\\
+\mbox{\tt -n}&{\tt 3}&\mbox{\tt 1, 2\ldots}
+&Specifies number of panels per cube edge.\\
+\mbox{\tt -e}&{\tt 0.1}&$\geq$ \mbox{\tt 0.0}
+&Specifies edge to inner panel width ratio.\\
+{\tt -na} & `{\tt 1}' & \ddag
+&Specifies conductor name.\\
+{\tt -b} & --- & ---
+&Removes panels on the bottom face, $z =$ {\tt zo} plane$\diamond $.\\
+{\tt -p} & --- & ---
+&Equivalent to {\tt -pfl -pfr -pbl -pbr}.\\
+{\tt -pfl} & --- & ---
+&Removes panels on the front left face$\diamond $.\\
+{\tt -pfr} & --- & ---
+&Removes panels on the front right face$\diamond $.\\
+{\tt -pbl} & --- & ---
+&Removes panels on the back left face$\diamond $.\\
+{\tt -pbr} & --- & ---
+&Removes panels on the back right face$\diamond $.\\
+{\tt -d} & --- & ---
+&Disables discretization of cube faces.\\
+\hline
+\end{tabular}
+\end{center}
+\noindent\dag Range is unrestricted.
+
+\noindent\ddag Any string with no spaces is allowed.
+
+\noindent$\diamond $ Face names are based on viewing the pyramid
+from the positive orthant in a manner analogous to the {\tt cubegen}
+case. 
+
+
+\subsubsection*{Examples}
+
+Run {\tt fastcap} with tighter iterative loop tolerance
+on {\tt sphere2.neu} with
+dielectric relative permittivity  $3.5$:
+\begin{quote}\tt
+fastcap -p3.5 sphere2.neu -d3 -t0.001
+\end{quote}
+Run {\tt fastcap} on a finely discretized
+$5m\times 5m\times 5m$ cube with zero order expansions 
+for speed and seven partitioning
+levels to conserve memory:
+\begin{quote}\tt
+cubegen -n30 -s5.0 | fastcap -o0 -d7
+\end{quote}
+Run {\tt fastcap} on the $3\times 3$ bus crossing problem with five uniform
+panels along short edges:
+\begin{quote}\tt
+busgen -e1.0 -n5 -c3 | fastcap 
+\end{quote}
+Run {\tt fastcap} with order zero expansions to get a rough idea of the
+larger capacitances for a 2$\mu$m $4\times 4$ bus crossing embedded in 
+silicon dioxide:
+\begin{quote}\tt
+busgen -c4 -w2E-6 | fastcap -p3.9 -o0
+\end{quote}
+%
+% something with stdin and command line/list file

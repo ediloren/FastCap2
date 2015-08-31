@@ -1,0 +1,103 @@
+%
+% should be an appendix
+%
+\subsection{Bugs}
+
+This section attempts to itemize the major shortcomings of {\tt fastcap}
+and the input file generator programs. 
+The user is encouraged to report any other bugs by sending mail
+to \verb~fastcap-bug@rle-vlsi.mit.edu~.
+
+\subsubsection*{{\tt fastcap}}
+
+\begin{enumerate}
+\item List file provides for only translations, not rotations.
+\item Translations of panels input via {\tt stdin} or {\tt input file}
+are not possible.  Use a list file when translations are required.
+\item All input dimensions are assumed in meters. There is currently
+no way to scale the problem on the command line. The capacitance
+of the true geometry is equal to the calculated capacitance multiplied
+by the factor required to convert the input length units (always meters)
+to the desired units.
+\item Dielectric interfaces can only be input with a list file
+(only conductors can be input through {\tt stdin} and {\tt input file}).
+Use a list file for all dielectric interfaces.
+\item The  dielectric surrounding all conductors
+input through {\tt stdin} and {\tt input file} always has the 
+permittivity of free space
+multiplied by the permittivity factor specified with {\tt -p} (1.0 by
+default).
+Use a list file if other values are required.
+\item Dielectric interfaces have no names and therefore cannot be
+removed selectively from the input or charge distribution plots
+with command line options.
+To remove dielectric interfaces selectively from the input, comment out
+lines in the list file.  To remove all dielectric interfaces from
+charge plots use {\tt -rd}.
+\item Infinitesimally thin conductors on dielectric interfaces (included
+using lines starting with `{\tt B}' in list files), are not supported
+in this release.
+\item All surfaces are listed in the {\tt Input surfaces} part of
+the output even if all the conductors in some of them have been
+removed using {\tt -ri}.
+\item The PATRAN neutral file interface has very little error checking.
+If {\tt fastcap} is given an incorrect format neutral file it either
+hangs or dumps core.
+\item The actual postscript filenames used by {\tt fastcap -m} or 
+{\tt fastcap -q<cond list>} are derived from the input file names and cannot
+be directly changed by the user.
+\item Postscript files produced with {\tt fastcap -m} or 
+{\tt fastcap -q<cond list>} produce panel ordering errors (and
+usually print warning messages) when panels intersect. However, such
+discretizations are illegal.
+\item Occasionally the postscript pictures are incorrect even
+for legal discretizations. There are two known bugs leading
+to this problem.  The first is often avoided by changing
+the view angle slightly. The second is caused by problems with
+dimensions on the order of $10^{-4}$ or less. This problem can
+only be avoided by rescaling the input. 
+%
+% This error is due to two faces intersecting only at corners; ie
+% the line(s) of one pass(passes) through the corner(s) of the other
+% - no easy fix; right now all corner hits are not considered intersections
+% - very strong function of view angle, however, so can avoid (sa comp book)
+\item The panel sorting algorithm used to write out the postscript files
+takes time proportional to the number of panels squared.  This limits
+its usefulness to problems with less than a few thousand panels. For
+larger problems the paneling should be done hierarchically so that
+a coarser discretization can be used for pictures. For problems built
+using the generic input file generators, the {\tt -d} option provides
+this function.
+\item When axes are included in postscript files using the
+{\tt -x<axes length>} option, the axes' two-dimensional projections
+appear in the postscript file before the panel fills. This means
+that the object should be between the view point and the axes, otherwise
+the axes can be obscured strangely. 
+Thus
+the option works best when viewing objects that lie entirely in
+the positive orthant from a view point in the positive orthant.
+\item The bounding box in postscript files produced with {\tt -q} is
+incorrect if the shading key is included. The bounding box printed
+is that of the shaded image without the key.
+
+\end{enumerate}
+
+\subsubsection*{\tt cubegen}
+
+All the functions of the cube input file generator {\tt cubegen}
+can be performed by {\tt pipedgen}, although {\tt cubegen}'s interface
+is often more convenient.
+
+\subsubsection*{\tt pyragen}
+
+The pyramid input file generator {\tt pyragen} is currently
+only capable of the default discretization, with three panels on a
+side (also results from {\tt -n3}), and no discretization (using {\tt -d}).
+
+\subsubsection*{\tt capgen}
+
+All the functions of the 
+parallel plate capacitor input file generator {\tt capgen}
+can be performed by both {\tt cubegen} and {\tt pipedgen}, unless more
+than two plates are required.
+

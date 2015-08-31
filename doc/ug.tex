@@ -1,0 +1,109 @@
+% fastcap user's guide root latex file
+\documentstyle[12pt,twoside,psfig]{article}
+
+% latex requires full path names so setup \topdir before re-latexing
+\newcommand{\topdir}{/nfs/hilbert/bitbucket/ksn/doc}
+\newcommand{\figuredir}{\topdir/figures}
+
+
+%
+% figure macro inserted by /nfs/sobolev/sobolev2/ksn/bin/rs6000/putfig
+\newcommand{\fig}[9]{ % filename label caption vsp placement horizo verto horizs verts
+\begin{figure}[#5]
+\vspace*{#4pt}
+\special{psfile=#1,hoffset=#6,voffset=#7,hscale=#8,vscale=#9}
+\caption{#3}
+\label{#2}
+\end{figure}
+}
+%
+%
+% short figure macro inserted by /nfs/sobolev/sobolev2/ksn/bin/rs6000/putfig
+\newcommand{\sfig}[7]{ % filename vsp placement horizo verto horizs verts
+\begin{figure}[#3]
+\vspace*{#2pt}
+\special{psfile=#1,hoffset=#4,voffset=#5,hscale=#6,vscale=#7}
+\end{figure}
+}
+%
+%
+% short figure (w/label) macro inserted by /nfs/sobolev/sobolev2/ksn/bin/rs6000/putfig
+\newcommand{\slfig}[8]{ % filename label vsp placement horizo verto horizs verts
+\refstepcounter{figure}
+\begin{figure}[#4]
+\vspace*{#3pt}
+\special{psfile=#1,hoffset=#5,voffset=#6,hscale=#7,vscale=#8}
+\label{#2}
+\end{figure}
+}
+%
+%%&^^
+\pagestyle{headings}
+
+
+\setlength{\oddsidemargin}{0.25in}      % 1.25in left margin 
+\setlength{\evensidemargin}{0.00in}     % 1.00in left margin (even pages)
+\setlength{\topmargin}{0.0in}           % 1in top margin
+\setlength{\textwidth}{6.25in}          % 6.25in text
+\setlength{\textheight}{9in}            % Body ht for 1in margins
+\addtolength{\topmargin}{-\headheight}  % No header, so compensate
+\addtolength{\topmargin}{-\headsep}     % for header height and separation
+
+
+\begin{document}
+
+\begin{titlepage}
+\vskip 36pt
+\begin{center}
+{\bf FastCap USER'S GUIDE}
+\end{center}
+
+\vskip 18pt
+\begin{center}
+\hspace*{1.0in} K.\ Nabors \hfill S.\ Kim \hfill J.\ White \hfill S.\ Senturia \hspace*{1.0in}
+\end{center}
+
+\vskip 18pt
+\begin{center}
+Research Laboratory of Electronics \\
+Department of Electrical Engineering and Computer Science \\
+Massachusetts Institute of Technology \\
+Cambridge, MA  02139 U.S.A.
+\end{center}
+\vskip 18pt
+\begin{center}
+18 Sep 1992
+\end{center}
+
+\vfill
+\noindent This work was supported by the Defense Advanced Research Projects
+Agency contracts N00014-87-K-825, MDA972-88-K-008, and  N00014-91-J-1698,
+the National Science Foundation contract (MIP-8858764 A02),
+F.B.I.\ contract J-FBI-88-067, and grants from I.B.M.\,
+Digital Equipment Corporation, and Analog Devices.
+\end{titlepage}
+
+\begin{titlepage}
+$\;$
+\end{titlepage}
+
+\pagenumbering{roman}
+
+
+\input{ug-license}
+
+\tableofcontents
+\cleardoublepage
+
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\input{ug-intro}
+\input{ug-all}
+\input{ug-run}
+
+\appendix
+
+\input{ug-compile}
+
+\end{document}

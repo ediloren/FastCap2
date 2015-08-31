@@ -1,0 +1,6 @@
+This directory contains all the source files and makefiles required
+to produce the executable `fastcap' and its associated input file generation
+programs. Compilation should normally be done in this directory's parent.
+See ../README or the User's Guide for details.
+
+(27 May 92)

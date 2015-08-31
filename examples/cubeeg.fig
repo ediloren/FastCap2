@@ -1,0 +1,15 @@
+#
+# three dots to superimpose on cubegen -d | fastcap -m -x2 -bcubeeg.fig
+#
+# (1 0 0)
+1 0 0
+1.0001 0 0 2 0.001 2
+#
+# (0 0 1)
+0 0 1
+0.0001 0 1 2 0.001 2
+#
+# (0 1 0)
+0 1 0
+0.0001 1 0 2 0.001 2
+e

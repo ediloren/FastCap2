@@ -1,0 +1,181 @@
+\section{Experimental Results}
+\label{expres}
+
+In this section, results from computational experiments are presented
+to demonstrate the efficiency and accuracy of the
+preconditioned, adaptive, multipole-accelerated (PAMA) 3-D capacitance
+extraction algorithm described above.  In particular, the program
+FASTCAP, which can use both direct factorization and
+multipole-accelerated techniques, has been developed and incorporated
+into MIT's MEMCAD (Micro-Electrical-Mechanical Computer-Aided Design)
+system \cite{maseeh90}.  The structures described below were created
+with the solid modeling program in the MEMCAD system, PATRAN, or by
+computer program, and all capacitance calculations were performed
+using FASTCAP.  The multipole-accelerated algorithms in FASTCAP use,
+by default, second-order multipole expansions and a GMRES convergence
+tolerance (see Algorithm 1) of $ 0.01 $.
+
+\input{mtt-sphere2}
+
+\input{mtt-cuben5}
+
+To demonstrate absolute accuracy, the FASTCAP program was used to
+compute the capacitance of a unit sphere, discretized as in
+Figure~\ref{sphere2}, and a unit cube, discretized as in
+Figure~\ref{cuben5}.  In Table~\ref{simpres}, the capacitances
+computed using the PAMA algorithm are compared with the capacitances
+computed using direct factorization of $ P $ in (\ref{eq:qtop}) (Direct),
+and with analytic results for the unit sphere and with reference results
+for the unit cube.  As can be seen from the table, the results using
+the PAMA algorithm are easily within one percent of the analytic or
+reference results.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|c|}
+\hline
+Method & \multicolumn{2}{c|}{Problem} \\ \hline
+       & Sphere1 & Cube1 \\ 
+       & 768 panels & 150 panels \\ \hline
+Direct & 110.6   & 73.26  \\ \hline 
+PAMA  &  110.5   & 73.28  \\ \hline
+Other &	$111$\dag &  $73.5$,$73.4$\\ 
+ & & \\ \hline
+\end{tabular}
+\caption{Capacitance values (in pF) illustrating FASTCAP's accuracy. 
+\dag By analytic calculation. 
+\ddag From \protect\cite{ruehli73} \protect\cite{jawson77}.}
+\label{simpres}
+\end{center}
+\end{table}
+
+\input{mtt-weave}
+
+The PAMA algorithm is nearly as accurate as the direct factorization
+method even on more complex problems, such as the $ 2 \times 2$ woven bus
+structure in Figure~\ref{weave}.  The capacitances computed using the
+two methods are compared in Table~\ref{weavres}, using coarse, medium,
+and fine discretizations of the woven bus structure, also shown in
+Figure~\ref{weave}.  Note that the coupling capacitance $C_{12}$
+between conductors one and two, which is forty-times smaller than the
+self-capacitance $ C_{11} $, is computed nearly as accurately with the PAMA
+algorithm as with direct factorization.
+
+\begin{table}
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|c|}
+\hline
+Method & \multicolumn{6}{c|}{Problem} \\ \hline
+ & \multicolumn{2}{c|}{Woven1} 
+ & \multicolumn{2}{c|}{Woven2} 
+ & \multicolumn{2}{c|}{Woven3} \\ 
+ & \multicolumn{2}{c|}{1584 Panels} 
+ & \multicolumn{2}{c|}{2816 Panels} 
+ & \multicolumn{2}{c|}{4400 Panels} \\ \cline{2-7}
+       & $ C_{11} $ & $ C_{12} $ & $ C_{11} $ & $ C_{12} $ 
+       & $C_{11} $ & $ C_{12} $ \\ \hline
+%Direct & 251.6  &  $-6.352$  & 253.2 & $-6.447$ &  253.7 &  $-6.467$  \\\hline
+Direct & 251.6  &  $-6.353$  & 253.2 & $-6.446$ &  253.7 &   $-6.467$  \\\hline
+%PAMA  & 251.8  &  $-6.247$  & 253.4 & $-6.334$ & 253.9  &  $-6.377$  \\\hline
+PAMA  & 251.8  &  $-6.246$  & 253.3 & $-6.334$ & 253.9  &  $-6.377$  \\\hline
+\end{tabular}
+\caption{Capacitance values (in pF) 
+illustrating FASTCAP's accuracy for the complicated
+geometry of Figure~\protect\ref{weave}.}
+\label{weavres}
+\end{center}
+\end{table}
+
+\input{mtt-growth}
+
+The computational cost of using the FASTCAP program is roughly
+proportional to the product of the number of conductors, $ m $, and
+the number of panels $ n $.  This is experimentally verified using a
+parameterized version of the woven bus structure in
+Figure~\ref{weave}, that is, the structure is extented to make a $ 3
+\times 3 $ bus, a $ 4 \times 4 $ bus and a $ 5 \times 5 $ bus, with
+surfaces discretized as depicted in the $Woven1 $ example of
+Figure~\ref{weave}. In Figure~\ref{growth}, the CPU times for
+computing the capacitances of the woven bus structures are plotted as
+a function of $ mn $, and as the graph clearly demonstrates the
+computation time does grow linearly.
+
+\input{mtt-via}
+
+\input{mtt-sqd}
+
+To demonstrate the effectiveness of various aspects of the PAMA
+algorithm on a range of problems, in Table~\ref{main} the CPU times
+required to compute the capacitances of six different examples using
+four different methods are given.  The examples Cube2 and Sphere2
+are finer discretizations of the unit cube and sphere in
+Figures~\ref{sphere2} and \ref{cuben5}; the examples 2 $ \times $ 2
+Woven Bus and 5 $ \times $ 5  Woven Bus are described
+above; the example Via, shown in Figure~\ref{exam}, models a
+pair of connections between integrated circuit pins and a
+chip-carrier; and the example Diaphragm, shown in
+Figure~\ref{sqd}, is a model for a microsensor \cite{johnso91}.
+
+From Table~\ref{main}, it can be seen that using the adaptive
+multipole algorithm (AMA) typically reduces the computation time by a factor
+of two over using the multipole algorithm (MA) alone, and that using the
+preconditioner can reduce the computation time as much as a factor of
+three.  Also, note that the PAMA algorithm is more than two
+orders of magnitude faster than direct methods for the larger
+problems.
+
+\input{mtt-sqdconv}
+
+The reduction in execution time afforded by the adaptive algorithm
+is due to increased efficiency in calculating each iterative loop iteration,
+rather than in a reduction the total number of iterations.
+The convergence 
+plot in Figure~\ref{sqdconv} correspond to
+one of the linear system solutions associated with the Diaphragm problem and
+is representative of the general case.
+As is evident in the figure, the AMA algorithm generally computes
+nearly identical iterates to those calculated by the MA method but is faster,
+as reported in Table~\ref{main}. In contrast, the preconditioner
+leads to shorter computation time by 
+reducing the total number of iterations rather than making each
+iterate calculation less costly.  In fact one PAMA iterate requires
+more computation than an AMA iterate, but the difference is more than
+offset by the reduction in total number of 
+iterations, as is certainly the case in Figure~\ref{sqdconv}. 
+
+\begin{table}
+\footnotesize
+\begin{center}
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
+\hline
+Method & Cube2 & Sphere2 & 2x2 Woven Bus & Via & Diaphragm & 5x5 Woven Bus \\ 
+       & 294 Panels & 1200 Panels & 4400 Panels & 6185 Panels & 7488 Panels & 9630 Panels\\
+\hline
+%Direct & 0.08 & 4.4 & 185 & (490) & (890) & (1920)\\ \hline
+%MA     & 0.11 & 1.0 & 6.5 & 11    & 11    & 40\\ \hline
+%AMA    & 0.03 & 0.4 & 2.7 & 3.8   & 9.0   & 19\\ \hline
+%PAMA   & 0.03 & 0.4 & 1.9 & 3.1   & 3.0   & 12\\ \hline
+Direct & 0.11 & 3.2 & 185 & (490) & (890) & (1920)\\ \hline
+MA     & 0.06 & 0.3 & 6.0 & 11    & 8.7    & 42\\ \hline
+AMA    & 0.05 & 0.2 & 3.3 & 4.7   & 5.9   & 23\\ \hline
+PAMA   & 0.05 & 0.2 & 2.3 & 3.2   & 1.3   & 11\\ \hline
+\end{tabular}
+\caption{CPU times in minutes on an IBM RS6000/540, times in 
+parentheses are extrapolated.}
+\label{main}
+\end{center}
+\end{table}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
