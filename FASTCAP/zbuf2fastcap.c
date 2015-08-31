@@ -51,12 +51,12 @@ void dump_ps_geometry(chglist, q, cond, use_ttl_chg)
 charge *chglist;
 double *q;
 int cond;
+int use_ttl_chg;
 {
-  int i, j, k, numlines, numfaces, use_density;
+  int numlines, numfaces, use_density;
   face **faces, **sfaces, **fastcap2faces(), **depthSortFaces();
-  double normal[3], rhs, temp, dot(), *getAvg();
-  double *avg, pnt[3], radius, getSphere(), getNormal();
-  charge *cur_chg;
+  double normal[3], rhs, dot(), *getAvg();
+  double *avg, radius, getSphere(), getNormal();
   line **lines, **getLines();
   FILE *fp;
   char str[BUFSIZ];

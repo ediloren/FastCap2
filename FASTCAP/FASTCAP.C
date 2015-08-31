@@ -225,7 +225,9 @@ char *argv[];
 #endif
 
 #endif				/* DIRSOL == OFF */
-  dumpnums(ON, eval_size, up_size); /* save num/type of pot. coeff calcs */
+  // Enrico bug fix: function should have only 2 arguments
+  dumpnums(ON, eval_size); /* save num/type of pot. coeff calcs */
+//  dumpnums(ON, eval_size, up_size); /* save num/type of pot. coeff calcs */
 
   dirtimesav = dirtime;		/* save direct matrix setup time */
   dirtime = 0.0;		/* make way for direct solve time */
@@ -258,7 +260,9 @@ char *argv[];
   stoptimer;
   mulsetup = dtime;		/* save multipole matrix setup time */
 
-  dumpnums(OFF, eval_size, up_size);	/* dump num/type of pot. coeff calcs */
+  // Enrico bug fix: function should have only 2 arguments
+  dumpnums(OFF, eval_size);	/* dump num/type of pot. coeff calcs */
+//  dumpnums(OFF, eval_size, up_size);	/* dump num/type of pot. coeff calcs */
 
 #if DUMPPS == ALL
   dump_ps_mat(filename, 0, 0, eval_size, eval_size, argv, argc, CLOSE);

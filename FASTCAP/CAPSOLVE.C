@@ -36,6 +36,12 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 #include "../FCWindow.h" // Enrico
 #include "mulGlobal.h"
 
+// funcion prototypes
+int gmres(ssystem *sys, double *q, double *p, double *r, double *ap, double **bv, double **bh,
+	     int size, int maxiter, double tol, charge *chglist);
+void computePsi(ssystem *sys, double *q, double *p, int size, charge *chglist);
+void oldcomputePsi(ssystem *sys, charge *chglist);
+
 // static defs made global
 static double *c=NULL, *s=NULL, *g=NULL, *y=NULL;
 
@@ -102,7 +108,9 @@ int size, numconds, real_size;	/* real_size = total #panels, incl dummies */
     
     /* skip conductors in the -rs and the -ri kill list */
     if(want_this_iter(kill_num_list, cond)
-       || want_this_iter(kinp_num_list)) continue;
+       || want_this_iter(kinp_num_list, cond)) continue;
+	// Enrico bug fix; below is the original line with the bug
+//	|| want_this_iter(kinp_num_list)) continue;
 
     viewprintf(stdout, "\nStarting on column %d (%s)\n", cond, 
 	    getConductorName(cond, &name_list));
@@ -240,7 +248,10 @@ int size, maxiter, real_size;
     blkExpandVector(ap+1, size, real_size);
     blkExpandVector(r+1, size, real_size);
 #else
-    computePsi(sys, chglist);
+	// original code called here computePsi, but apparently this is the old version,
+	// with only two arguments
+	oldcomputePsi(sys, chglist);
+    //computePsi(sys, chglist);
 #endif
 
     starttimer;
@@ -309,7 +320,7 @@ set up and that the potential vector has been zeroed.  ARBITRARY
 VECTORS CAN NOT BE USED!
 */
 /* ultimately should not need to pass in chglist after E field rtn is fixed */
-oldcomputePsi(sys, chglist)
+void oldcomputePsi(sys, chglist)
 ssystem *sys;
 charge *chglist;
 {
@@ -482,7 +493,7 @@ charge *chglist;
 {
   int iter, i, j;
   double rnorm, norm, maxnorm=10.0;
-  double beta, hi, hip1, length;
+  double hi, hip1, length;
   extern double conjtime, prectime;
 #if EXPGCR == ON
   extern double *sqrmat;
@@ -650,7 +661,7 @@ charge and potential have already been set up and that the potential
 vector has been zeroed.  ARBITRARY VECTORS CAN NOT BE USED.
 */
 
-computePsi(sys, q, p, size, chglist)
+void computePsi(sys, q, p, size, chglist)
 ssystem *sys;
 double *q, *p;
 int size;

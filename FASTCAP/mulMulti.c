@@ -157,6 +157,9 @@ int e;				/* exponent, computes i^e */
   if(e % 2 != 0) {
     viewprintf(stderr, "iPwr: odd exponent %d\n", e);
     FCExit(FC_GENERIC_ERROR);
+	// return added to avoid compiler warning about not all control paths returning a value,
+	// but thread exits with FCExit()
+	return(-1.0);
   }
   else {
     e = e/2;			/* get power of negative 1 */
@@ -176,6 +179,9 @@ int x;
   else if(x < 0) {
     viewprintf(stderr, "fact: attempt to take factorial of neg no. %d\n", x);
     FCExit(FC_GENERIC_ERROR);
+	// return added to avoid compiler warning about not all control paths returning a value,
+	// but thread exits with FCExit()
+	return(-1.0);
   }
   else {
     while(x > 1) {
@@ -304,7 +310,7 @@ double cosA, *vector;
 int order;
 {
   int x;
-  int n, m;			/* as in Pn^m, both <= order */
+  int m;			/* as in Pn^m, both <= order */
   double sinMA;			/* becomes sin^m(alpha) in higher order P's */
   double fact;			/* factorial factor */
 
@@ -356,7 +362,7 @@ int numchgs, order, *is_dummy;
 {
   double **mat;
   double cosA;			/* cosine of elevation coordinate */
-  int i, j, k, kold, n, m, start;
+  int i, j, k, kold, n, m;
   int cterms = costerms(order), terms = multerms(order);
 
   /* Allocate the matrix. */
@@ -553,8 +559,7 @@ int numchgs, order;
 {
   double **mat;
   double cosTh;			/* cosine of elevation coordinate */
-  double factorial;		/* 1/factorial = (n-m)!/(n+m)! */
-  int i, j, k, m, n, kold, start;
+  int i, j, k, m, n, kold;
   int cterms = costerms(order), sterms = sinterms(order);
   int terms = cterms + sterms;
 

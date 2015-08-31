@@ -224,7 +224,8 @@ void CRunDialog::OnBrowseInputFile()
 char CRunDialog::generateCmdLine(int *argc, char ***argv)
 {
 	char argStr[256], *pointers[256], *strPnt;
-	int len, skip, i;
+	size_t len;
+	int skip, i;
 	BOOL iscomma;
 	
 	// initalize first argument with program name

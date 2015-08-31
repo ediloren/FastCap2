@@ -159,6 +159,8 @@ face *fac, *facplane;
 	      "\nwhichSide: strange corner, value = %g, rhs = %g, dot = %g\n",
 	      value[i], facplane->rhs, temp[i]);
       FCExit(FC_GENERIC_ERROR);
+	  // dummy return to avoid the compiler warning, but thread should be stopped by FCExit()
+	  return(SAME);
     }
   }
   if(neg > 0 && pos == 0) return(NEG);
@@ -169,6 +171,8 @@ face *fac, *facplane;
     viewprintf(stderr,"\nwhichSide: face has %d corners, %d pos %d neg %d zero\n",
 	    fac->numsides, pos, neg, zero);
     FCExit(FC_GENERIC_ERROR);
+	// dummy return to avoid the compiler warning, but thread should be stopped by FCExit()
+	return(SAME);
   }
 }
 
@@ -181,7 +185,7 @@ int doLinesIntersect(isect, from1, to1, from2, to2)
 double *from1, *to1, *from2, *to2, *isect;
 {
   double A[2][2], b[2];
-  double det, margin, temp1, temp2, margin1, margin2;
+  double det, temp1, temp2;
 
 #if DEBUGX == ON
   viewprintf(stdout, "seg1 = (%g %g) (%g %g) seg2 = (%g %g) (%g %g)\n",
@@ -242,9 +246,8 @@ double **corners1, **corners2, *com_pnt;
 int ccnt1, ccnt2;
 {
   int i, j, k, n, ccnt, zeros, pos, neg, ncnt;
-  double *sfrom, *sto, margin1, margin2, **refcor, **curcor;
+  double margin1, margin2, **refcor, **curcor;
   double innerpnt[2], side[2], pnt[2];
-  double temp;
 
   /* do cross products between sides of one face and vectors to first point
      of the other---must get same sign or zero for all if one inside other 
@@ -511,25 +514,17 @@ int is1stFaceDeeper(fac, facref, view, rhs, normal)
 face *fac, *facref;
 double *view, rhs, *normal;
 {
-  int i, j, k, olap[2], is_overlap, isect_cnt;
+  int i, j, k, is_overlap, isect_cnt;
   // static def moved to golbal - Enrico
   //static double ***cproj = NULL;	/* corners of faces in view plane */
   double alpha[2][MAXSIDES];	/* 1 => view point 0 => corner */
-  double minref[2], maxref[2];	/* bounding box coordinates */
-  double minfac[2], maxfac[2];
   double x[3], y[3];		/* coordinates of x and y in facref plane */
-  double dot(), temp, tvec[3], tvec1[3], margin, ovrlapmgn = 0.0, temp1;
-  double margin1;
-  double *cfr, *ctr, *cff, *ctf, avg[3], origin[3];
+  double dot(), temp, tvec[3], tvec1[3], margin, ovrlapmgn = 0.0;
+  double *cfr, *ctr, *cff, *ctf, origin[3];
   double isect_avg[3], isect[3]; /* intersection points */
-  double alpha_fac, alpha_facref, alpha_origin, alpha_x;
-  int all_pos, all_neg, intersect, same_normal;
+  double alpha_fac, alpha_facref;
+  int intersect, same_normal;
   face *curf;
-
-  if(fac->index == 8 && facref->index == 20
-     || fac->index == 20 && facref->index == 8) {
-    i = i + 0;
-  }
 
   /* allocate for local arrays on first call */
   if(cproj == NULL) {
@@ -933,7 +928,7 @@ int chkCycle(fac, ref, fp)
 face *fac, *ref;
 FILE *fp;
 {
-  int b, i;
+  int b;
 
   if(fac->mark == TRUE) return(FALSE);
 
@@ -961,8 +956,7 @@ face **faces;
 int numfaces;
 FILE *file;
 {
-  int i, f, j, b, *cycled, *cyclei, numcycle, cycle = FALSE;
-  face *fp;
+  int f, j, b, cycle = FALSE;
 
   /* for each face, chase behind pointers until a leaf or same face is found */
   /*fprintf(file, "\nRecursive behind lists\n");*/
@@ -994,17 +988,9 @@ face *fac;
   /* mark so this face won't be renumbered */
   fac->mark = TRUE;
 
-  if(fac->index == 193) {
-    i = i + 0;
-  }
-
   /* do adjacents if needed */
   for(i = 0; i < fac->numbehind; i++) {
     if((fac->behind[i])->mark == FALSE) setDepth(fac->behind[i]);
-  }
-
-  if(fac->index == 131 || fac->index == 193) {
-    i = i + 0;
   }
 
   /* set depth, update counter */

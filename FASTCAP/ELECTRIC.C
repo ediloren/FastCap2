@@ -50,7 +50,7 @@ ssystem *sys;
 charge *chglist;
 {
   charge *cp, *dummy;
-  double h, flux_density, *panel_voltages, *panel_charges;
+  double flux_density, *panel_voltages, *panel_charges;
   surface *surf;
 
   /* for each dielectric panel, do two divided differences to get the */

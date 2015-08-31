@@ -82,7 +82,8 @@ int i, j, siz;			/* row, column and size */
 	    i, j, siz);
     FCExit(FC_GENERIC_ERROR);
   }
-  else return(ret);
+  
+  return(ret);
 }
 
 /*
@@ -99,7 +100,8 @@ int i, j, siz;			/* row, column and size */
 	    i, j, siz);
     FCExit(FC_GENERIC_ERROR);
   }
-  else return(ret);
+  
+  return(ret);
 }
 
 /*
@@ -181,7 +183,7 @@ void wrMat(mat, siz, file, type)
 double *mat;
 int siz, file, type;		/* siz is #rows and cols */
 {
-  int i, j, sqrdex(), ds = sizeof(double), fdis;
+  int sqrdex(), ds = sizeof(double), fdis;
   int realsiz, actsiz;			/* size in chars */
   char name[3], *getName();			/* name of file */
 
@@ -221,7 +223,7 @@ void rdMat(mat, siz, file, type)
 double *mat;
 int siz, file, type;		/* siz is #rows and cols */
 {
-  int i, j, sqrdex(), fdis;
+  int sqrdex(), fdis;
   int realsiz;			/* size in chars */
   char name[3], *getName();   	/* name of file */
 
@@ -336,7 +338,7 @@ void subInnerProd(matsq, matri, siz, matl, matu)
 double *matsq, *matri;
 int siz, matl, matu;		/* size in doubles; matrices to multiply */
 {
-  int i, j, k, matrisiz, rowlim, rowliml, colimu, fdl, fdu, lowdex(), sqrdex();
+  int i, j, k, rowlim, rowliml, colimu, fdl, fdu, lowdex(), sqrdex();
   int froml, fromu, ds = sizeof(double), readl, readu;
   char *getName(), name[3];
   double *matriu, temp;
@@ -445,7 +447,7 @@ void blkSolve(x, b, siz, matri, matsq)
 int siz;
 double *x, *b, *matri, *matsq;			/* solution, rhs */
 {
-  int i, j, k;
+  int i, k;
   extern int fulldirops;
   extern double fullsoltime;
 
@@ -543,7 +545,7 @@ int numchgs, numchgs_wdummy, *is_dummy, **real_index;
 double **triArray, **sqrArray;	/* LINEAR arrays: 1 triangular, 1 square mat */
 cube *directlist;
 {
-  int i, j, fromp, fromq, top, toq, matsize, lowdex(), sqrdex(), uppdex(); 
+  int i, j, fromp, fromq, matsize, lowdex(), sqrdex(), uppdex(); 
   int k, l, i_real, j_real;
   double calcp();
   cube *pq, *pp;
@@ -797,7 +799,7 @@ void blkExpandVector(vec, num_panels, real_size)
 int num_panels, real_size;
 double *vec;
 {
-  int i, j, from, to, cur_real;
+  int i, j, from;
   extern int *real_index;	/* this index set relies on indexing from 0 */
 
   /* transfer to vector */

@@ -33,6 +33,21 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 
 */
 
+// includes for POSIX creat(), write(), close(), open(), read(), sbrk(), abort()
+//
+// #defines are to avoid the compiler warnings that the POSIX name for creat(), write(), etc.
+// are deprecated, and you should use _creat(), etc.; and that these functions are unsafe
+// 
+// Remark: MUST be at the beginning of the file, before any stdc or crt include
+#define _CRT_NONSTDC_NO_DEPRECATE
+#define _CRT_SECURE_NO_WARNINGS
+#include "io.h"
+// this last include is for abort() only
+#include "stdlib.h"
+// VS does not appear to have a proper include for sbrk(), though this functions is correctly linked;
+// so prototypes are added manually:
+void *sbrk(intptr_t increment);
+
 
 /* for NWS-3860 compatability */
 #ifdef NEWS
@@ -64,6 +79,59 @@ extern char *   realloc();
 // function prototype, needed for 64 bit version (otherwise ualloc() is considered a function
 // returning 'int', not 'char *'; this causes the addresses to be cut to 32 bits
 char *ualloc(unsigned int);
+
+// prototypes of functions defined in mulMulti.c
+int multerms(int order);
+void mulMultiAlloc(int maxchgs, int order, int depth);
+void xyz2sphere(double x, double y, double z, double x0, double y0, double z0, double *rho, double *cosA, double *beta);
+int costerms(int order);
+int sinterms(int order);
+void evalLegendre(double cosA, double *vector, int order);
+// prototypes of functions defined in mulMats.c
+void mulMatDirect(ssystem *sys);
+void olmulMatPrecond(ssystem *sys);
+void mulMatUp(ssystem *sys);
+void mulMatDown(ssystem *sys);
+void mulMatEval(ssystem *sys);
+// prototypes of functions defined in mulDisplay.c
+void mksCapDump(double **capmat, int numconds, double relperm, Name **name_list);
+void dumpConfig(FILE *fp, char *name);
+// prototypes of functions defined in mulLocal.c
+void evalFacFra(double **array, int order);
+// prototypes of functions defined in mulDo.c
+void mulDirect(ssystem *sys);
+void mulPrecond(ssystem *sys, int type);
+void mulUp(ssystem *sys);
+void mulEval(ssystem *sys);
+void mulDown(ssystem *sys);
+// prototypes of functions defined in input.c
+char *hack_path(char *str);
+int want_this_iter(ITER *iter_list, int iter_num);
+void get_ps_file_base(char *argv[], int argc);
+// prototypes of functions defined in zbuf2fastcap.c
+void dump_ps_geometry(charge *chglist, double *q, int cond, int use_ttl_chg);
+// prototypes of functions defined in electric.c
+void compute_electric_fields(ssystem *sys, charge *chglist);
+// prototypes of functions defined in calcp.c
+void dumpnums(int flag, int size);
+void initcalcp(charge *panel_list);
+// prototypes of functions defined in capsolve.c
+int capsolve(double ***capmat, ssystem *sys, charge *chglist, int size, int real_size, int numconds, Name *name_list);
+// prototypes of functions defined in savemat_mod.c
+void savemat_mod(FILE *fp, int type, char *pname, int mrows, int ncols,
+	int imagf, double *preal, double *pimag, int wr_flag, int mn);
+// prototypes of functions defined in direct.c
+int compressMat(double **mat, int size, int *is_dummy, int comp_rows);
+void invert(double **mat, int size, int *reorder);
+void expandMat(double **mat, int size, int comp_size, int *is_dummy, int exp_rows);
+void solve(double **mat, double *x, double *b, int size);
+// prototypes of functions defined in quickif.c
+int getConductorNum(char *name, Name **name_list, int *num_cond);
+// prototypes of functions defined in zbufinout.c
+void copyBody(FILE *fp);
+void dump_line_as_ps(FILE *fp, char *psline, double x_position, double y_position, double font_size);
+
+
 
 #define VERSION 2.0
 
@@ -132,17 +200,17 @@ extern long memMSC;
        if(FLAG == ON) FCExit(FC_OUT_OF_MEMORY);                                              \
      }                                                                      \
      else {                                                                 \
-       memcount += ((NUM)*sizeof(TYPE));                                    \
-       if(MTYP == AQ2M) memQ2M += ((NUM)*sizeof(TYPE));                     \
-       else if(MTYP == AQ2L) memQ2L += ((NUM)*sizeof(TYPE));                \
-       else if(MTYP == AQ2P) memQ2P += ((NUM)*sizeof(TYPE));                \
-       else if(MTYP == AL2L) memL2L += ((NUM)*sizeof(TYPE));                \
-       else if(MTYP == AM2M) memM2M += ((NUM)*sizeof(TYPE));                \
-       else if(MTYP == AM2L) memM2L += ((NUM)*sizeof(TYPE));                \
-       else if(MTYP == AM2P) memM2P += ((NUM)*sizeof(TYPE));                \
-       else if(MTYP == AL2P) memL2P += ((NUM)*sizeof(TYPE));                \
-       else if(MTYP == AQ2PD) memQ2PD += ((NUM)*sizeof(TYPE));              \
-       else if(MTYP == AMSC) memMSC += ((NUM)*sizeof(TYPE));                \
+       memcount += (long) ((NUM)*sizeof(TYPE));                                    \
+       if(MTYP == AQ2M) memQ2M += (long) ((NUM)*sizeof(TYPE));                     \
+       else if(MTYP == AQ2L) memQ2L += (long) ((NUM)*sizeof(TYPE));                \
+       else if(MTYP == AQ2P) memQ2P += (long) ((NUM)*sizeof(TYPE));                \
+	   else if(MTYP == AL2L) memL2L += (long) ((NUM)*sizeof(TYPE));                \
+	   else if(MTYP == AM2M) memM2M += (long) ((NUM)*sizeof(TYPE));                \
+	   else if(MTYP == AM2L) memM2L += (long) ((NUM)*sizeof(TYPE));                \
+	   else if(MTYP == AM2P) memM2P += (long) ((NUM)*sizeof(TYPE));                \
+	   else if(MTYP == AL2P) memL2P += (long) ((NUM)*sizeof(TYPE));                \
+	   else if(MTYP == AQ2PD) memQ2PD += (long) ((NUM)*sizeof(TYPE));              \
+	   else if(MTYP == AMSC) memMSC += (long) ((NUM)*sizeof(TYPE));                \
        else {                                                               \
          (void)viewprintf(stderr, "CALLOC: unknown memory type %d\n", MTYP);   \
          FCExit(FC_GENERIC_ERROR);                                                           \

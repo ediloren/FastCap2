@@ -276,7 +276,8 @@ BOOL CFastCapApp::InitInstance()
 BOOL CFastCapApp::parseCmdLine(int *argc, char ***argv, const char *commandStr)
 {
 	char argStr[256], *pointers[256], *cmdStr;
-	int res, skip, i;
+	int res, i;
+	size_t skip;
 	
 	// copy pointer, not to change 'commandStr'
 	// (required when function is called by automation passing a 'const')
@@ -319,9 +320,10 @@ BOOL CFastCapApp::parseCmdLine(int *argc, char ***argv, const char *commandStr)
 // Special version of sscanf which handles also file names with spaces inside,
 // provided they are surrounded by '"'.
 // Note that this routine is specialized to retrieve only strings
-int CFastCapApp::getSubstring(const char *buffer, char *substr, int *skip)
+int CFastCapApp::getSubstring(const char *buffer, char *substr, size_t *skip)
 {
-	int res, deltaClosePos, startPos;
+	int res, deltaClosePos;
+	size_t startPos;
 	unsigned int openPos;
 	const char *openPosPtr, *closePosPtr;
 	char tmpStr[256];

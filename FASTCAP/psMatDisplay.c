@@ -36,6 +36,8 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 #include "../FCWindow.h" // Enrico
 #include "mulGlobal.h"
 
+#include <string.h>
+
 // local vars made global - Enrico
 static FILE *fpstat = NULL;
 static int rows_aliased = FALSE;

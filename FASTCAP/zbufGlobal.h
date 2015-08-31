@@ -39,6 +39,23 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 /* zbuf data structures */
 #include "zbufStruct.h"
 
+// prototypes of functions defined in zbufProj.c
+void initFaces(face **faces, int numfaces, double *view);
+void image(face **faces, int numfaces, line **lines, int numlines, double *normal, double rhs, double *view);
+void flatten(face **faces, int numfaces, line **lines, int numlines, double rhs, double rotation, double *normal, double *view);
+void makePos(face **faces, int numfaces, line **lines, int numlines);
+void scale2d(face **faces, int numfaces, line **lines, int numlines, double scale, double *offset);
+// prototypes of functions defined in zbufSort.c
+void getAdjGraph(face **faces, int numfaces, double *view, double rhs, double *normal);
+void dumpCycles(face **faces, int numfaces, FILE *file);
+// prototypes of functions defined in zbufInOut.c
+void dumpFaceText(face **faces, int numfaces, FILE *fp);
+void dumpPs(face **faces, int numfaces, line **lines, int numlines, FILE *fp, char **argv, int argc, int use_density);
+// prototypes of functions defined in mulDisplay.c
+void dump_face(FILE *fp, face *fac);
+void dumpCorners(FILE *fp, double **mat, int rows, int cols);
+
+
 #ifndef MIN
 #define MIN(A,B)  ( (A) > (B) ? (B) : (A) )
 #endif

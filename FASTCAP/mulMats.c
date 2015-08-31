@@ -43,6 +43,10 @@ double **Q2P(), **Q2PDiag();
 double **mulMulti2P(), **mulQ2Multi(), **mulMulti2Multi();
 double **mulLocal2Local(), **mulLocal2P(), **mulQ2Local(), **mulMulti2Local();
 
+// additional function prototypes
+void find_flux_density_row(double **to_mat, double **from_mat, int eval_row, int n_chg, int n_eval, int row_offset,
+	int col_offset, charge **eval_panels, charge **chg_panels, int *eval_is_dummy, int *chg_is_dummy);
+
 int *localcnt, *multicnt, *evalcnt;	/* counts of builds done by level */
 
 int **Q2Mcnt, **Q2Lcnt, **Q2Pcnt, **L2Lcnt; /* counts of xformation mats */
@@ -52,7 +56,7 @@ int **M2Mcnt, **M2Lcnt, **M2Pcnt, **L2Pcnt, **Q2PDcnt;
 MulMatDirect creates the matrices for the piece of the problem that is done
 directly exactly.
 */
-mulMatDirect(sys)
+void mulMatDirect(sys)
 ssystem *sys;
 {
   cube *nextc, *nextnbr;
@@ -189,10 +193,8 @@ ssystem *sys;
   cube *nc, *kid, *kidnbr;
   double **mat, **nbrmat;
   int i, j, k, l, kidi;
-  int kidsize, nbrsize, size, row, col, first, offset;
-  double **ludecomp(), factor;
-  charge *pc;
-  surface *surf;
+  int kidsize, nbrsize, size, row, col, first;
+  double **ludecomp();
 
   for(nc=sys->precondlist; nc != NULL; nc = nc->pnext) {
 
@@ -285,7 +287,7 @@ ssystem *sys;
  ((nbr)->k == (nk)) && \
  ((nbr)->l == (nl)) )
 	
-olmulMatPrecond(sys)
+void olmulMatPrecond(sys)
 ssystem *sys;
 {
   cube *nc, *nnbr, *nnnbr;
@@ -293,11 +295,9 @@ ssystem *sys;
   int i, j, k, l, m;
   int maxsize, nsize, nnsize, nnnsize, *reorder;
   int nj, nk, nl, offset, noffset;
-  int dindex, *nc_dummy, *nnbr_dummy, *nnnbr_dummy;
+  int *nc_dummy, *nnbr_dummy, *nnnbr_dummy;
   static int *is_dummy;		/* local dummy flag vector, stays around */
-  charge **nnnbr_pc, **nnbr_pc, **nc_pc, **mpc, *dp;
-  surface *surf;
-  double factor;
+  charge **nnnbr_pc, **nnbr_pc, **nc_pc;
   // local var made global 
   //static int big_mat_size = 0;	/* size of previous mat */
 
@@ -507,7 +507,7 @@ ssystem *sys;
     SKIPDQ = ON=>don't do cancellation-prone add-subtract of identical
       influence of DIELEC/BOTH panels' charges on dummy panel pot. evals
 */
-find_flux_density_row(to_mat, from_mat, eval_row, n_chg, n_eval, row_offset,
+void find_flux_density_row(to_mat, from_mat, eval_row, n_chg, n_eval, row_offset,
 		      col_offset, eval_panels, chg_panels, eval_is_dummy, 
 		      chg_is_dummy)
 double **to_mat, **from_mat;
@@ -717,7 +717,7 @@ children's multipoles or charges. Note that only one set of
 multipole to multipole matrices is computed per level by exploiting the
 uniform break-up of three-space (ie many shifts have similar geometries).  
 */
-mulMatUp(sys) 
+void mulMatUp(sys) 
 ssystem *sys; 
 {
 cube *nextc, *kid;
@@ -899,7 +899,7 @@ double **multimats[8];
 void mulMatEval(sys)
 ssystem *sys;
 {
-  int i, j, k, ttlvects, vects;
+  int i, j, ttlvects;
   cube *na, *nc, *nexti;
 
   if(sys->depth < 2) return;	/* ret if upward pass not possible/worth it */
@@ -1011,7 +1011,7 @@ ssystem *sys;
   -mats that give potentials (M2P, L2P, Q2P) are calculated in mulMatEval()
   -this routine makes only L2L, M2L and Q2L matrices
 */
-mulMatDown(sys)
+void mulMatDown(sys)
 ssystem *sys;
 {
   int i, j, vects;

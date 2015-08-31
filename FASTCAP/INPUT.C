@@ -33,11 +33,17 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 
 */
 
-#include <stdlib.h>
-
 #include "../FCWindow.h" // Enrico
 #include "mulGlobal.h"
 #include "zbufGlobal.h"
+
+#include <stdlib.h>
+// include for _chdir()
+#include <direct.h>
+// include for isspace()
+#include <ctype.h>
+// include for strcmp(), strlen(), strcpy()
+#include <string.h>
 
 // to skip blank lines in input file, Enrico 2002/02/17
 BOOL isblankline(char *string)
@@ -338,7 +344,6 @@ surface *surf;
 charge *panel_list;
 {
   int i, flip_normal;
-  char *hack_path();
   charge *nc;
   double ctr_minus_n[3], ctr_plus_n[3], norm_minus, norm_plus, norm, norm_sq;
   double x, y, z, *normal, *direction, *tempd;
@@ -507,10 +512,13 @@ char *surf_name;
 NAME *name_list;
 charge *panel_list;
 {
-  int i, j, cond_nums[MAXCON], num_cond, cond_num_found, temp;
-  char str[BUFSIZ], *hack_path();
+  int i, cond_nums[MAXCON], num_cond, cond_num_found;
   charge *cur_panel;
   NAME *cur_name;
+#if 1 == 0
+  int temp;
+  char str[BUFSIZ];
+#endif
 
   /* get the conductor numbers currently being used */
   num_cond = 0;
@@ -675,7 +683,7 @@ char *argv[];
 int argc;
 {
   int i, j;
-  char temp[BUFSIZ], *hack_path();
+  char temp[BUFSIZ];
   extern char *ps_file_base;
 
   /* - if no list file, use input file; otherwise use list file */
@@ -728,7 +736,7 @@ surface *surf_list;
   extern char *title;
   NAME *name_group;
   FILE *fp, *fopen();
-  char surf_name[BUFSIZ], *hack_path();
+  char surf_name[BUFSIZ];
   int patran_file_read;
 
   /*title[0] = '\0';*/
@@ -860,7 +868,7 @@ Name *name_list;
   Name *cur_name, *prev_name;
   int i, j, alias_match_name(), times_in_list;
 
-  nlen = strlen(name);
+  nlen = (int)strlen(name);
   times_in_list = 0;
 
   /* fish through name list for name---check first nlen chars for match */
@@ -899,8 +907,8 @@ ITER *get_kill_num_list(name_list, kill_name_list)
 char *kill_name_list;
 Name *name_list;
 {
-  int i, j, start_token, end_token, end_name, cond;
-  char name[BUFSIZ], group_name[BUFSIZ];
+  int i, j, start_token, end_token, cond;
+  char name[BUFSIZ];
   ITER *kill_num_list;
   ITER *cur_cond;
 
@@ -1347,7 +1355,7 @@ int argc, *autmom, *autlev, *numMom, *numLev;
 double *relperm;
 char *argv[], *infile;
 {
-  int read_from_stdin, num_surf;
+  int read_from_stdin;
   surface *read_all_surfaces();
   char *surf_list_file, *input_file;
 
@@ -1398,7 +1406,6 @@ void dumpSurfDat(surf_list)
 surface *surf_list;
 {
   surface *cur_surf;
-  char *hack_path();
 
   viewprintf(stdout, "  Input surfaces:\n");
   for(cur_surf = surf_list; cur_surf != NULL; cur_surf = cur_surf->next) {
@@ -1453,7 +1460,7 @@ Name **name_list;
   Name *cur_name, *cur_alias;
   int i, slen;
 
-  slen = strlen(str);
+  slen = (int)strlen(str);
 
   for(i = 1, cur_name = *name_list; cur_name != NULL; 
       cur_name = cur_name->next, i++) {

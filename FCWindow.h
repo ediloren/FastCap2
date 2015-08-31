@@ -26,6 +26,9 @@ extern volatile float fSolveTime;
 extern volatile long lSolveMemory;
 
 extern void FCSetName(char *name);
+extern void FCOnClosing(int cause);
+extern void FCExit(int cause);
+extern int viewprintf();
 
 
 // prototypes for var initialization

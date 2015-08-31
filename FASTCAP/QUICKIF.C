@@ -37,6 +37,8 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 #include "mulGlobal.h"
 #include "quickif.h"
 
+#include <string.h>
+
 /*
   tells if any conductor name alias matches a string
 */
@@ -64,7 +66,7 @@ Name *cur_name;
   char name_frag[BUFSIZ];
   int nlen, j;
 
-  nlen = strlen(name);
+  nlen = (int) strlen(name);
 
   for(cur_alias = cur_name->alias_list; cur_alias != NULL;
       cur_alias = cur_alias->next) {
@@ -254,9 +256,9 @@ char *old_name, *new_name;
 int *num_cond;
 Name **name_list;
 {
-  Name *cur_name, *cur_name2, *prev_name;
+  Name *cur_name;
   int alias_match();
-  int i, j;
+  int i;
 
   /* check to see if old name is present in names or their aliases */
   /* if it is, add old name to the alias list */
@@ -290,17 +292,18 @@ charge *quickif(fp, line, title, surf_type, trans, num_cond, name_list,
 int surf_type, *num_cond;
 char *line, *title, *name_suffix; /* suffix for all cond names read */
 double *trans;
-Name *name_list;		/* name list pointer */
+// Enrico, bug fix (but this should have had no actual effect except a warning)
+Name **name_list;		/* name list pointer */
+//Name *name_list;		/* name list pointer */
 FILE *fp;
 {
-  int linecnt = 2, i, cond;
-  char *delcr(), temp[BUFSIZ], temp2[BUFSIZ], line1[BUFSIZ], *cp, *strtok();
+  int linecnt = 2;
+  char *delcr(), temp[BUFSIZ], temp2[BUFSIZ], line1[BUFSIZ], *strtok();
   char condstr[BUFSIZ];
   double x1, x2, x3, x4, y1, y2, y3, y4, z1, z2, z3, z4;
   quadl *fstquad = NULL, *curquad;
   tri *fsttri = NULL, *curtri;
   charge *chglst, *nq;
-  NAME *cname;
 
   chglst = NULL;
 

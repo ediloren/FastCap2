@@ -18,7 +18,7 @@
 
 void FCSetName(char *name)
 {
-	int val;
+	LRESULT val;
 
 	static const UINT UWM_SET_TITLE = RegisterWindowMessage(_T("UWM_SET_TITLE-FastCap-Enrico_Di_Lorenzo"));
 
@@ -65,7 +65,7 @@ int viewprintf(FILE *out, const char *fmt,...)
 {
 	int ret;
 	unsigned long color;
-	int val;
+	LRESULT val;
 
 	static const UINT UWM_OUTPUT_TEXT = RegisterWindowMessage(_T("UWM_OUTPUT_TEXT-FastCap-Enrico_Di_Lorenzo"));
 	static const UINT UWM_LOG_TEXT = RegisterWindowMessage(_T("UWM_LOG_TEXT-FastCap-Enrico_Di_Lorenzo"));

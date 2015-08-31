@@ -21,6 +21,10 @@
 #pragma once
 #endif // _MSC_VER >= 1000
 
+// to avoid the warning "_WIN32_WINNT not defined. Defaulting to _WIN32_WINNT_MAXVER (see WinSDKVer.h)"
+// The list of valid values for _WIN32_WINNT can be found at https://msdn.microsoft.com/en-us/library/aa383745%28VS.85%29.aspx
+#define _WIN32_WINNT _WIN32_WINNT_WINXP
+
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
 // disable deprecation of standard C functions like strcpy(), where the compiler

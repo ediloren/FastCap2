@@ -41,9 +41,19 @@
    `MORECORE()' (i.e. non-UNIX machines won't have brk(), sbrk())
  - no attempt is made to make allocation efficient in terms of virtual pages
 */
+
+// #defines avoid the compiler warnings about unsafe standard functions.
+// 
+// Remark: MUST be at the beginning of the file, before any stdc or crt include
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "../FCWindow.h" // Enrico
+
+
 
 #define NALLOC 8184		/* >= sizeof(HEADER)*NALLOC bytes sbrk()'d */
 #define MAGICN 0xaaaaaaaaL	/* used to check fidelity of allocated blks */
@@ -94,8 +104,9 @@ typedef union header HEADER;
   - an alternative to mocore() but should only be used if sbrk() doesnt zero
 */
 #define MORECORE(SIZE) (HEADER *)calloc(1, SIZE*sizeof(HEADER))
-char *calloc();
-char *malloc();
+// Enrico, prototypes not needed, as we #include now stdlib.h 
+//char *calloc();
+//char *malloc();
 
 static HEADER *base = NULL;    	/* base of allocated block list */
 static HEADER *allocp = NULL;	/* last allocated block */
@@ -172,7 +183,7 @@ char *ualloc(nbytes)
 unsigned int nbytes;
 {
   HEADER *mocore();
-  HEADER *p, *q;
+  HEADER *q;
   int nunits;			// size in number of sizeof(HEADER)'s 
   int brkunits;			// number to add to heap 
 #if UGDEBG == 2
@@ -207,7 +218,7 @@ unsigned int nbytes;
   //  - if it's big enough, use head (not tail) part of it
   //  - if it's not, break out more memory and discard the previous block
   
-  if(topblksize >= nunits) {	// if it's big enough 
+  if(topblksize >= (unsigned int) nunits) {	// if it's big enough 
 #if UGDEBG == 1 || UGDEBG == 2
     p = q;			// copy old top block pointer 
     q += (nunits - 1);	// make q new top block pointer 
@@ -284,7 +295,9 @@ unsigned int nbytes;
 */
 void ualloc_verify()
 {
+#if UGDEBG == 1 || UGDEBG == 2
   HEADER *p;
+#endif
   int cnt = 1;
 
 #if UGDEBG == 1 || UGDEBG == 2
@@ -435,6 +448,8 @@ void *drealloc(void *pointer, unsigned int size)
 	} while (1);
 
 	viewprintf(stderr, "WARNING, drealloc: cannot find pointer to be reallocated");
+
+	return NULL;
 }
 
 void dfree(void *pointer)

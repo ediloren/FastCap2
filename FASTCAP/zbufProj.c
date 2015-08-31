@@ -164,9 +164,9 @@ double rhs;
 double rotation;		/* rotation of image y axis rel to 1st line */
 {
   int i, j, k;
-  double dot(), temp, tvec[3], tvec1[3], crot, srot, alpha;
+  double dot(), temp, tvec[3], crot, srot;
   double y[3], x[3], z[3];		/* unit vectors */
-  double origin[3], sinth, costh, theta;
+  double origin[3];
   extern double ***axes;
   extern int x_, up_axis;
 
@@ -491,7 +491,7 @@ double *avg;
 int numfaces, numlines;
 {
   double radius = 0.0, dot(), temp[3];
-  int i, j, k, l;
+  int i, j, k;
   extern int x_;
   extern double ***axes;
 

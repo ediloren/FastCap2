@@ -44,6 +44,29 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 #include "../FCWindow.h" // Enrico
 #include "mulGlobal.h"
 
+#include <string.h>
+
+
+// function prototypes
+void input(FILE *stream, char *line, int surf_type, double *trans_vector);
+void fill_patch_patch_table(int *patch_patch_table);
+void assign_conductor(int *patch_patch_table);
+void assign_names();
+void file_title(FILE *stream);
+void summary_data(FILE *stream);
+void node_data(FILE *stream, double *trans_vector);
+void element_data(FILE *stream);
+void grid_data(FILE *stream, double *trans_vector);
+void patch_data(FILE *stream);
+void CFEG_table(FILE *stream);
+void name_data(FILE *stream);
+void waste_line(int num_line, FILE *stream);
+void grid_equiv_check();
+int if_same_coord(double coord_1[3], double coord_2[3]);
+int if_same_grid(int ID, GRID *grid_ptr);
+void depth_search(int *patch_patch_table, int *current_table_ptr, int conductor_count);
+
+
 #define BIG 35000              /* Size of element and node serach table. */
 #define SMALL_NUMBER 0.005     /* See functions if_same_coord() and 
 				 grid_equiv_check(). */
@@ -87,7 +110,6 @@ char *name_suffix;
   // line var renamed to staticline and made global - Enrico
   //static char *staticline = NULL;
   charge *make_charges_all_patches(), *firstq, *quickif();
-  double *corner0, *corner1, *corner2, *corner3;
 
   if(staticline == NULL) CALLOC(staticline, BUFSIZ, char, ON, AMSC);
 
@@ -143,7 +165,7 @@ char *name_suffix;
 
 ****************************************************************************/
 
-input(stream, line, surf_type, trans_vector)
+void input(stream, line, surf_type, trans_vector)
   char *line;
   FILE *stream;
 int surf_type;
@@ -210,7 +232,7 @@ double *trans_vector;
 
 /* Simply read in 'num_line' lines from stream and dump. */
 
-waste_line(num_line,stream)
+void waste_line(num_line,stream)
   int num_line;
   FILE *stream;
 {
@@ -225,7 +247,7 @@ waste_line(num_line,stream)
 
 /* Save the title of the Neutral file. */
 
-file_title(stream)
+void file_title(stream)
   FILE *stream;
 {
   char line[BUFSIZ], *delcr();
@@ -239,7 +261,7 @@ file_title(stream)
    nodes, this function allocates spaces for nodes and elements, and sets up
    the global pointers to these arrays. */
 
-summary_data(stream)
+void summary_data(stream)
   FILE *stream;
 {
   number_nodes = N1; number_elements = N2;
@@ -258,7 +280,7 @@ summary_data(stream)
    node array, list_nodes, which is preallocated by summary_data function. 
    Node_search_table is sorted by node ID to make indexing of a node easier. */
 
-node_data(stream, trans_vector)
+void node_data(stream, trans_vector)
   FILE *stream;
 double *trans_vector;
 {
@@ -280,7 +302,7 @@ double *trans_vector;
    function.  Element_search_table is sorted by element ID to make indexing 
    of an element easier.  */
 
-element_data(stream)
+void element_data(stream)
   FILE *stream;
 {
   int num_nodes, corner[4], i, tmp;
@@ -310,7 +332,7 @@ element_data(stream)
    structure.  Start_grid is the global variable that points to the very 
    first GRID structure created.  */
 
-grid_data(stream, trans_vector)
+void grid_data(stream, trans_vector)
   FILE *stream;
 double *trans_vector;
 {
@@ -343,7 +365,7 @@ double *trans_vector;
    structure.  Start_patch is the global variable that points to the very 
    first PATCH structure created.  */
 
-patch_data(stream)
+void patch_data(stream)
   FILE *stream;
 {
   // local var made global - Enrico
@@ -378,7 +400,7 @@ patch_data(stream)
    first CFEG structure created.  CFEG table has the result from meshing 
    a patch. */
 
-CFEG_table(stream)
+void CFEG_table(stream)
   FILE *stream;
 {
   // made global
@@ -453,7 +475,8 @@ CFEG_table(stream)
   - the output routine looks at the first sm_patch struct associated with
     each NAME struct to determine the number of the corresponding cond name
 */
-name_data(stream)
+
+void name_data(stream)
 FILE *stream;
 {
   int len, iv, i, j, ntype, id, patch_cnt = 0;
@@ -475,7 +498,7 @@ FILE *stream;
   /* get conductor name and store */
   fgets(line, sizeof(line), stream); /* eat CR */
   fgets(line, sizeof(line), stream);
-  len = strlen(line);
+  len = (int) strlen(line);
   CALLOC(current_name->name, len+1, char, ON, AMSC);
   delcr(line);
   strcpy(current_name->name, line);
@@ -516,10 +539,9 @@ FILE *stream;
    from two grid points are within SMALL_NUMBER, defined in patran.h, then 
    they are equivalent.  */
 
-grid_equiv_check()
+void grid_equiv_check()
 {
   GRID *grid_ptr_1, *grid_ptr_2;
-  int i;
 
   /* First, allocate spaces for equivalent grid arrays. */
   grid_ptr_1 = start_grid;
@@ -599,7 +621,7 @@ char *str;
    patches that are connected by the grid point.  The end result table is
    symmetric.  */   
 
-fill_patch_patch_table(patch_patch_table)
+void fill_patch_patch_table(patch_patch_table)
   int *patch_patch_table;
 {
   int patch_count, patch_count_save, *current_table_ptr, *corner, i;
@@ -660,7 +682,7 @@ int if_same_grid(ID,grid_ptr)
 /* This function searches through the patch_patch_table and finds groups of
    patches that are connected only among themselves. */
 
-assign_conductor(patch_patch_table)
+void assign_conductor(patch_patch_table)
   int *patch_patch_table;
 {
   PATCH *patch_ptr;
@@ -706,7 +728,7 @@ assign_conductor(patch_patch_table)
 /* This function searches through patch_patch_table recursively to
    find all patches that are somehow connected the current patch. */
 
-depth_search(patch_patch_table,current_table_ptr,conductor_count)
+void depth_search(patch_patch_table,current_table_ptr,conductor_count)
   int *patch_patch_table, *current_table_ptr,conductor_count;
 {
   PATCH *patch_ptr;
@@ -880,7 +902,7 @@ charge *make_charges_patch(NELS,element_list,conductor_ID)
   - checks one linked list against another, potentially n^2 => named
     regions should be kept small (as few patches as possible)
 */
-assign_names()
+void assign_names()
 {
   int quit, current_conductor, cnt = 0;
   PATCH *current_patch;

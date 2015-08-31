@@ -37,6 +37,13 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 #include "mulGlobal.h"
 #include "zbufGlobal.h"
 
+#include <string.h>
+
+// funciton prototypes
+void dischg(charge *pq);
+void dismat(double **mat, int rows, int cols);
+void disfchg(charge *pq);
+
 disExtrasimpcube(pc)
 cube *pc;
 {
@@ -54,7 +61,6 @@ cube *pc;
 dissimpcube(pc)
 cube *pc;
 {
-int i;
   viewprintf(stdout, "cube center: x=%g y=%g z=%g\n", pc->x, pc->y, pc->z);
   viewprintf(stdout, "index=%d dindex=%d level=%d loc_exact=%d mul_exact=%d numkids=%d\n",
 	 pc->index, pc->dindex, pc->level,
@@ -137,7 +143,7 @@ int i, j, k, l, side;
 
 
 
-dismat(mat, rows, cols)
+void dismat(mat, rows, cols)
 double **mat;
 int rows, cols;
 {
@@ -167,7 +173,7 @@ int i;
   viewprintf(stdout, "\n");
 }
 
-dischg(pq)
+void dischg(pq)
 charge *pq;
 {
   viewprintf(stdout, "cond=%d index=%d\n", pq->cond, pq->index);
@@ -180,7 +186,7 @@ charge *nq;
   for(nq = pq; nq != NULL; nq = nq->next) disfchg(pq);
 }
 
-disfchg(pq) 
+void disfchg(pq) 
 charge *pq;
 {
 /*
@@ -492,7 +498,7 @@ int listtype;			/* DIRECT, LOCAL or EVAL */
   int cnt[BUFSIZ];		/* # of cubes processed by level */
   int depth = sys->depth;
   int lev, nn;
-  int i, j, k;
+  int i, j;
   cube *nc;
   for(i = 0; i <= depth; i++) cnt[i] = 0;
   nc = sys->directlist;
@@ -562,7 +568,7 @@ int listtype;			/* DIRECT, LOCAL or EVAL */
 {
   int depth = sys->depth;
   int lev, nn;
-  int i, j, k;
+  int i;
   if(nc != NULL) {
     /* check number and level of neighbors */
     lev = nc->level;
@@ -633,7 +639,7 @@ void dump_face(fp, fac)
 face *fac;
 FILE *fp;
 {
-  int i, j;
+  int i;
   face **behind = fac->behind;
 
   fprintf(fp, "Face %d, %d sides, depth %d, mark %d, greylev %d\n", 
@@ -854,7 +860,6 @@ char *type;
 void dumpMatBldCnts(sys)
 ssystem *sys;
 {
-  int i;
   char type[BUFSIZ];
   extern int **Q2Mcnt, **Q2Lcnt, **Q2Pcnt, **L2Lcnt;
   extern int **M2Mcnt, **M2Lcnt, **M2Pcnt, **L2Pcnt, **Q2PDcnt;
@@ -1046,12 +1051,11 @@ Name **name_list;
 {
   int i, j, toobig, toosmall, maxlen, sigfig, colwidth, i_killed, j_killed;
   int first_offd;
-  double maxdiag = 0.0, minoffd, rowttl, rowdiag, scale = 1.0, **sym_mat;
+  double maxdiag = 0.0, minoffd, rowttl, scale = 1.0, **sym_mat;
   double mat_entry;
   char unit[BUFSIZ], name[BUFSIZ], *padName(), *spaces(), cond_name[BUFSIZ];
   char *getConductorName();
   extern NAME *start_name;	/* NAME structs giving conductor names */
-  Name *cname;
   extern ITER *kill_num_list, *kinp_num_list;
   extern double iter_tol;
   // Enrico
@@ -1168,12 +1172,12 @@ Name **name_list;
   /* get the length of the longest name */
   maxlen = 0;
   for(i = 1; i <= numconds; i++) {
-    maxlen = MAX(strlen(getConductorName(i, name_list)), maxlen);
+    maxlen = (int) MAX(strlen(getConductorName(i, name_list)), maxlen);
   }
 
   /* print the matrix */
 
-  sigfig = 2+log10(1.0/iter_tol);	/* get no. significant figs to prnt */
+  sigfig = (int) (2+log10(1.0/iter_tol));	/* get no. significant figs to prnt */
   colwidth = sigfig+6;		/* field width for cap mat columns */
 
   if(ITRDAT == OFF) 
@@ -1287,7 +1291,7 @@ void dumpMulSet(sy, numLev, order)
 ssystem *sy;
 int numLev, order;
 {
-  int numcubes, numsides, i, multerms();
+  int numcubes, numsides, i;
 
   for(numcubes = 1, i = 0; i < numLev; numcubes *= 8, i++);
   for(numsides = 1, i = 0; i < numLev; numsides *= 2, i++);
@@ -1336,7 +1340,6 @@ int type;			/* 1=>dump P and C; 2=>P only; 3=>C only */
 {
   int num_panels, i, j;
   charge *pp, *pi;
-  cube *cp;
   double calcp();
   FILE *fp;
 
@@ -1552,7 +1555,7 @@ struct exception *exc;
 /*
   debug only - check a vector to make sure it has zeros in dummy entries
 */
-int chkDummy(vector, is_dummy, size)
+void chkDummy(vector, is_dummy, size)
 double *vector;
 int *is_dummy;
 int size;

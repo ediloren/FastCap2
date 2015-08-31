@@ -36,6 +36,14 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 #include "../FCWindow.h" // Enrico
 #include "mulGlobal.h"
 
+// prototypes
+int flip_normal(charge *panel);
+void Cross_Product(double vector1[], double vector2[], double result_vector[]);
+int planarize(charge *pq);
+void centroid(charge *pp, double x2);
+void ComputeMoments(charge *pp);
+void dp(charge *panel);
+
 #ifndef FALSE
 #define FALSE 0
 #endif
@@ -85,7 +93,7 @@ static int num2ndsav=0, num4thsav=0, numexactsav=0;
 static int maxorder = 0;
 
 
-initcalcp(panel_list)
+void initcalcp(panel_list)
   charge *panel_list;
 {
   charge *pq, *npq;
@@ -319,12 +327,11 @@ charge *panel;
   - this function uses 0.0 as a breakpoint when really machine precision
     weighted checks should be done (really not an issue if ref point far)
 */
-flip_normal(panel)
+int flip_normal(panel)
 charge *panel;
 {
-  int i;
   double x, y, z;
-  double ctr_minus_n[3], ctr_plus_n[3], norm_minus, norm_plus, norm, norm_sq;
+  double norm, norm_sq;
   surface *surf = panel->surf;
   int ref_inside = surf->ref_inside, flip_normal;
   double *ref = surf->ref, *normal, angle, norm_n;
@@ -376,7 +383,7 @@ charge *panel;
 Changes the corner points so that they lie in the plane defined by the
 panel diagonals and any midpoint of an edge.
 */
-planarize(pq)
+int planarize(pq)
 charge *pq;
 {
   double origin[3], corner[3], delta[4][3], px, py, dx, dy, dz;
@@ -424,12 +431,12 @@ first moments vanish.  Calculation begins by projection into the
 coordinate system defined by the panel normal as the z-axis and
 edge02 as the x-axis.
 */
-centroid(pp, x2)
+void centroid(pp, x2)
 charge *pp;
 double x2;
 {
   double vertex1[3], vertex3[3];
-  double sum, dl, x1, y1, x3, y3, xc, yc;
+  double x1, y1, x3, y3, xc, yc;
   int i;
 
   /* Use vertex 0 as the origin. */
@@ -481,7 +488,7 @@ int If_Equal(vector1, vector2)
 }
 
 /* Calculates result_vector = vector1 X vector2. */
-Cross_Product(vector1, vector2, result_vector)
+void Cross_Product(vector1, vector2, result_vector)
   double vector1[], vector2[], result_vector[];
 {
   result_vector[XI] = vector1[YI]*vector2[ZI] - vector1[ZI]*vector2[YI];
@@ -519,7 +526,6 @@ double x, y, z, *pfd;
   double s914, s813, s411, s512, s1215;
   double fs, fd, fdsum;
   int okay, i, next;
-  struct edge *edge;
   double *corner;
 
   /* Put the evaluation point into this panel's coordinates. */
@@ -671,7 +677,7 @@ double x, y, z, *pfd;
 }
 
 
-dumpnums(flag, size)
+void dumpnums(flag, size)
 int flag, size;
 {
   double total;
@@ -719,18 +725,16 @@ local system, array S(15).  First initialize array
 Note that S(2)=S(6)=0 due to transfer above
 */
 
-ComputeMoments(pp)
+void ComputeMoments(pp)
 charge *pp;
 {
   int order=MAXORDER;
   int i, j, nside,  N, M, N1, M1, M2, MN1, MN2;
-  double dx, dy, dxdy, dydx, x, y, z, SI, *xp, *yp, *xpn, *ypn;
-  double ypp[3];
+  double dx, dy, dxdy, dydx, SI, *xp, *yp, *xpn, *ypn;
   static double *XP[4], *YP[4], **I; 
   static double CS[16] = { 0.0, 1.0, 1.0, 1.5, 1.5, 3.75, 1.0, 3.0, 
 			   1.5, 7.5, 1.5, 1.5, 3.75, 1.5, 7.5, 3.75 };
-  double *multi, sumc, sums, sign, **createBinom(), **createPmn();
-  int m, n, r, halfn, flrm, ceilm, numterms, rterms;
+  double **createBinom(), **createPmn();
   // local var made global - Enrico
   //static int maxorder = 0;
 
@@ -834,7 +838,7 @@ charge *pp;
 
 /* Debugging Print Routines follow. */
 
-dp(panel)
+void dp(panel)
 charge *panel;
 {
   int i;

@@ -37,6 +37,8 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 #include "mulGlobal.h"
 #include "zbufGlobal.h"
 
+#include <string.h>
+
 double black, white;		/* densities corresponding to shades */
 
 /*
@@ -223,7 +225,7 @@ double *q;
 char *file;
 int iter;
 {
-  int index, linecnt, header_found, type;
+  int index, linecnt, header_found;
   char str1[BUFSIZ], str2[BUFSIZ], str3[BUFSIZ], linein[BUFSIZ];
   double density;
   FILE *fp, *fopen();
@@ -307,10 +309,8 @@ int *numfaces, use_density;	/* use_density = TRUE => use q/A not q */
 charge *chglist;
 double *q;
 {
-  int i, j, dummy;
-  int autmom, autlev, numMom, numLev;
-  char infile[BUFSIZ];
-  double dot(), getPlane(), relperm;
+  int i;
+  double dot(), getPlane();
   charge *chgp;
   face *head, *tail, **faces;
   extern int x_, k_, q_iter, q_, rc_, rd_, rb_;
@@ -318,10 +318,8 @@ double *q;
   extern double axeslen;
   extern char *q_file;
   extern double black, white, linewd;
-  surface *surf_list, *input_surfaces();
-  ssystem *sys;
+  surface *input_surfaces();
   int qindex=1, cindex=1;
-  double tavg[3], lavg[3];
   extern ITER *kq_num_list;
 
   /* transfer info to face structs (a waste but saves wrtting new fnt end) */
@@ -430,12 +428,12 @@ line **head, **tail;
 int *numlines;
 FILE *fp;
 {
-  int flines = 0, falin = 0, fflag = 1, faflag = 1, getlines = 1, i, j;
+  int flines = 0, falin = 0, fflag = 1, faflag = 1, getlines = 1;
   int f_;		/* f_ == 1 => ignore face and fill info */
-  char linein[BUFSIZ], **chkp, *chk, *strtok(), *cp;
+  char linein[BUFSIZ], **chkp, *chk, *strtok();
   char readfile[BUFSIZ], tempc[BUFSIZ];
   double arrowsize, dotsize;
-  int temp, linewd;
+  int linewd;
   FILE *fpin, *fopen();
 
   f_ = 1;			/* hardwire to take fill/face info as
@@ -635,10 +633,10 @@ FILE *fp;
     ymax = MAX(ymax, lines[i]->from[1]);
   }
 
-  *lowx = minx-2;		/* note 2pnt offset and truncation */
-  *lowy = miny-2;
-  upx = xmax+2;
-  upy = ymax+2;
+  *lowx = (int)(minx-2);		/* note 2pnt offset and truncation */
+  *lowy = (int)(miny-2);
+  upx = (int)(xmax+2);
+  upy = (int)(ymax+2);
   fprintf(fp, "%%%%BoundingBox: %d %d %d %d\n", *lowx, *lowy, upx, upy);
 }
 
@@ -927,8 +925,8 @@ FILE *fp;
       cent[0] += faces[i]->c[j][0]; /* x coordinate sum */
       cent[1] += faces[i]->c[j][1]; /* y coordinate sum */
     }
-    mid[0] = cent[0]/(((double) faces[i]->numsides)); /* average x */
-    mid[1] = cent[1]/(((double) faces[i]->numsides)); /* average y */
+    mid[0] = (int) (cent[0]/(((double) faces[i]->numsides))); /* average x */
+    mid[1] = (int) (cent[1]/(((double) faces[i]->numsides))); /* average y */
     /* dump a label with associated garbage */
     fprintf(fp, "%%%%IncludeFont: Times-Roman\n");
     fprintf(fp, "/f1 /|______Times-Roman dup RF findfont def\n{\n");
@@ -954,8 +952,8 @@ FILE *fp;
     cent[0] += fac->c[j][0]; /* x coordinate sum */
     cent[1] += fac->c[j][1]; /* y coordinate sum */
   }
-  mid[0] = cent[0]/(((double) fac->numsides)); /* average x */
-  mid[1] = cent[1]/(((double) fac->numsides)); /* average y */
+  mid[0] = (int) (cent[0]/(((double) fac->numsides))); /* average x */
+  mid[1] = (int) (cent[1]/(((double) fac->numsides))); /* average y */
   /* dump a label with associated garbage */
   fprintf(fp, "%%%%IncludeFont: Times-Roman\n");
   fprintf(fp, "/f1 /|______Times-Roman dup RF findfont def\n{\n");
@@ -1194,8 +1192,8 @@ FILE *fp;
   /* put line number on midpoint of each line */
   for(i = 0; i < numlines; i++) {
     /* figure midpoint, truncate (truncation not really necessary) */
-    mid[0] = ((lines[i]->from)[0] + (lines[i]->to)[0])/2;
-    mid[1] = ((lines[i]->from)[1] + (lines[i]->to)[1])/2;
+    mid[0] = (int) (((lines[i]->from)[0] + (lines[i]->to)[0])/2);
+    mid[1] = (int) (((lines[i]->from)[1] + (lines[i]->to)[1])/2);
     /* dump a label with associated garbage */
     fprintf(fp, "%%%%IncludeFont: Times-Roman\n");
     fprintf(fp, "/f1 /|______Times-Roman dup RF findfont def\n{\n");
@@ -1297,13 +1295,12 @@ char **argv;
 int numfaces, numlines, argc, use_density;
 FILE *fp; 
 {
-  int i, j, f, lowx, lowy;
+  int i, f, lowx, lowy;
   extern int s_, n_, g_, c_, x_, q_, rk_, f_, m_; /* command line flags */
   extern double ***axes;
   extern double black, white;
   char linein[BUFSIZ];
-  double dot(), len, temp[2], xc, yc;
-  double x, y;
+  double dot();
   
   /* print the lines before the bounding box */
   fprintf(fp, "%%!PS-Adobe-2.0 EPSF-1.2\n");

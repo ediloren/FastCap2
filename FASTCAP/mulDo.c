@@ -43,11 +43,11 @@ static directops=0, upops=0, downops=0, evalops=0;
 /* 
 Compute the direct piece. 
 */
-mulDirect(sys)
+void mulDirect(sys)
 ssystem *sys;
 {
 int i, j, k, dsize, *is_dummy, *is_dielec;
-double pc, *p, *q, *qn, *pn, **mat;
+double *p, *q, *qn, **mat;
 cube *nextc;
 
 /* Assumes the potential vector has been zero'd!!!! */
@@ -93,12 +93,12 @@ cube *nextc;
 /*
 Block diagonal or Overlapped Preconditioner.
 */
-mulPrecond(sys, type)
+void mulPrecond(sys, type)
 ssystem *sys;
 int type;
 {
   int i, j, k, dsize, *is_dummy;
-  double pc, *p, *q, *qn, *pn, **mat;
+  double *p, *q, *qn, **mat;
   cube *nc;
 
   if(type == BD) {
@@ -151,7 +151,7 @@ int type;
 /* 
 Loop through upward pass. 
 */
-mulUp(sys)
+void mulUp(sys)
 ssystem *sys;
 {
 int i, j, k, l;
@@ -225,7 +225,7 @@ ssystem *sys;
 /* 
 Loop through downward pass. 
 */
-mulDown(sys)
+void mulDown(sys)
 ssystem *sys;
 {
   cube *nc;
