@@ -19,14 +19,6 @@
 
 #include "FCStructs.h"
 
-#define FC_NORMAL_END			0
-#define FC_USER_BREAK			-1
-#define FC_OUT_OF_MEMORY		-2
-#define FC_CANNOT_OPEN_FILE		-4
-#define FC_FILE_ERROR			-8
-#define FC_GENERIC_ERROR		-8192
-#define FC_STILL_RUNNING		-16384
-
 #define MAX_TITLE_LENGHT 64
 #define MAX_OUTPUT_TEXT_LEN 2048
 

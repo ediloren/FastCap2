@@ -1577,7 +1577,7 @@ Name **name_list;
   surface *surf_list, *input_surfaces();
   char infile[BUFSIZ], *ctime(), hostname[BUFSIZ];
   charge *read_panels(), *chglist;
-  long clock;
+  time_t clock;
   extern ITER *kill_num_list, *qpic_num_list, *kinp_num_list, *kq_num_list;
   extern char *kill_name_list, *qpic_name_list, *kinp_name_list;
   extern char *kq_name_list;

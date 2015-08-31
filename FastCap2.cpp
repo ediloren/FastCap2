@@ -23,7 +23,7 @@
 #include "FCStructs.h"
 
 // imported functions from FastCap
-extern "C" fastCapMain(int argc, char *argv[]);
+extern "C" void fastCapMain(int argc, char *argv[]);
 extern "C" void ufree();
 extern "C" void dfreeall();
 
@@ -116,7 +116,8 @@ BOOL CFastCapApp::InitInstance()
 	//  the specific initialization routines you do not need.
 
 #ifdef _AFXDLL
-	Enable3dControls();			// Call this when using MFC in a shared DLL
+	// no longer needed with VS2013
+//	Enable3dControls();			// Call this when using MFC in a shared DLL
 #else
 	Enable3dControlsStatic();	// Call this when linking to MFC statically
 #endif
@@ -320,8 +321,10 @@ BOOL CFastCapApp::parseCmdLine(int *argc, char ***argv, const char *commandStr)
 // Note that this routine is specialized to retrieve only strings
 int CFastCapApp::getSubstring(const char *buffer, char *substr, int *skip)
 {
-	int res, openPos, deltaClosePos, startPos;
-	char *openPosPtr, *closePosPtr, tmpStr[256];
+	int res, deltaClosePos, startPos;
+	unsigned int openPos;
+	const char *openPosPtr, *closePosPtr;
+	char tmpStr[256];
 
 	substr[0] = '\0';
 
@@ -424,6 +427,10 @@ UINT RunFCThread(LPVOID p)
 
 	fastCapMain(theApp->argc, theApp->argv);
 
+	// destroy previous matrices
+	theApp->m_clsCapMatrix.Clear();
+	theApp->m_clsCondNames.Clear();
+
 	//
 	// copy capacitance matrix into safe-array
 	//
@@ -433,8 +440,7 @@ UINT RunFCThread(LPVOID p)
 	// to deal with arrays containing anything but VARIANTs;
 	// See MS KB174576, HOWTO: Return Arrays from Server-Side Objects in ASP
 
-	// destroy previous matrix
-	theApp->m_clsCapMatrix.Clear();
+
 	// init capacitance matrix dimensions
 	numElements[0] = strctCapMatrix.m_lDim;
 	numElements[1] = strctCapMatrix.m_lDim;
@@ -457,8 +463,7 @@ UINT RunFCThread(LPVOID p)
 	// (before this change, the class CComBSTR, which encapsulates VT_BSTR,
 	// was used in the safe array)
 
-	// destroy previous matrix
-	theApp->m_clsCondNames.Clear();
+
 	// init conductor names array dimensions
 	numElements[0] = strctCapMatrix.m_lDim;
 	// create the safe-array...

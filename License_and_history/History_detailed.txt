@@ -1,6 +1,10 @@
 FastCap2 Detailed History
 =========================
 
+Porting Version 3.60, 2015/08/04
+- Ported under Visual Studio Community edition 2013 (supports MFC)
+- Ported to x64, while keeping also x32 support
+
 Porting Version 3.51, 2011/03/24
 - Fixed a bug about total execution time calculation, that did
   not consider the preconditioner set-up time 

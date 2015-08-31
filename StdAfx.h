@@ -23,6 +23,10 @@
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 
+// disable deprecation of standard C functions like strcpy(), where the compiler
+// suggest to use strcpy_s() instead
+#define _CRT_SECURE_NO_WARNINGS
+
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 #include <afxole.h>         // MFC OLE classes

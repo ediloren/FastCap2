@@ -253,5 +253,5 @@ void CMainFrame::OnHelp()
 	// and form full application path name
 	path += _T("\\FastCap2.chm::/WelcometoFastCap.htm");
 
-	HtmlHelp(NULL, path, HH_DISPLAY_TOPIC, 0);
+	::HtmlHelp(NULL, path, HH_DISPLAY_TOPIC, 0);
 }

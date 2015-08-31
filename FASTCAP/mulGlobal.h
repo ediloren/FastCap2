@@ -61,6 +61,10 @@ extern char *   realloc();
 #endif
 #endif
 
+// function prototype, needed for 64 bit version (otherwise ualloc() is considered a function
+// returning 'int', not 'char *'; this causes the addresses to be cut to 32 bits
+char *ualloc(unsigned int);
+
 #define VERSION 2.0
 
 /*********************************************************************** 

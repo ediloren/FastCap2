@@ -17,15 +17,6 @@
 
 #include "FCStructs.h"
 
-// defines used with FCOnClosing function defined in FastCapWindow.h/.cpp
-#define FC_NORMAL_END			0
-#define FC_USER_BREAK			-1
-#define FC_OUT_OF_MEMORY		-2
-#define FC_CANNOT_OPEN_FILE		-4
-#define FC_FILE_ERROR			-8
-#define FC_GENERIC_ERROR		-8192
-#define FC_STILL_RUNNING		-16384
-
 // maximum length of a conductor name
 #define FC_MAX_NAME_LEN		64
 

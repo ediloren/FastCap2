@@ -36,7 +36,7 @@ operation of Software or Licensed Program(s) by LICENSEE or its customers.
 #include "../FCWindow.h" // Enrico
 #include "mulGlobal.h"
 
-fastCapMain(argc, argv)
+void fastCapMain(argc, argv)
 int argc;
 char *argv[];
 {
@@ -97,7 +97,7 @@ char *argv[];
 
   /* print sw copyright info */          /* Enrico */
   viewprintf(stdout, "\nFastCap 2.0, (c) by M.I.T.\n");
-  viewprintf(stdout, "FastCap2 Windows porting and modifications, version 3.51\n    (c) 1998, 2011 by Enrico Di Lorenzo, www.fastfieldsolvers.com\n\n");
+  viewprintf(stdout, "FastCap2 Windows porting and modifications, version 3.6\n    (c) 1998, 2015 by Enrico Di Lorenzo, www.fastfieldsolvers.com\n\n");
 
   /* get the list of all panels in the problem */
   /* - many command line parameters having to do with the postscript

@@ -1,0 +1,205 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{db4287f2-de0a-4953-adf1-a16801461598}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{1bb87fb5-6edd-4867-abaa-e4f430a00550}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{5f6b171f-6bc3-45d4-b8f8-3e686849b317}</UniqueIdentifier>
+      <Extensions>ico;cur;bmp;dlg;rc2;rct;bin;cnt;rtf;gif;jpg;jpeg;jpe</Extensions>
+    </Filter>
+    <Filter Include="FastCap">
+      <UniqueIdentifier>{a740c67b-f944-4240-b0c4-77fb9256a988}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="FastCap2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FastCapDoc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FastCapView.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FastCapWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MainFrm.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RunDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StdAfx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UnicodeString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\blkDirect.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\calcp.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\capsolve.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\direct.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\electric.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\fastcap.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\input.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\mulDisplay.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\mulDo.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\mulGlobal.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\mulLocal.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\mulMats.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\mulMulti.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\mulSetup.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\patran.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\psMatDisplay.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\quickif.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\savemat_mod.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\uglyalloc.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\zbuf2fastcap.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\zbufInOut.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\zbufProj.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+    <ClCompile Include="fastcap\zbufSort.c">
+      <Filter>FastCap</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Midl Include="FastCap2.odl">
+      <Filter>Source Files</Filter>
+    </Midl>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="FastCap2.rc">
+      <Filter>Source Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="FastCap2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FastCapDoc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FastCapView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FastCapWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FCStructs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FCWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainFrm.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RunDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StdAfx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UnicodeString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fastcap\mulGlobal.h">
+      <Filter>FastCap</Filter>
+    </ClInclude>
+    <ClInclude Include="fastcap\mulStruct.h">
+      <Filter>FastCap</Filter>
+    </ClInclude>
+    <ClInclude Include="fastcap\patran.h">
+      <Filter>FastCap</Filter>
+    </ClInclude>
+    <ClInclude Include="fastcap\quickif.h">
+      <Filter>FastCap</Filter>
+    </ClInclude>
+    <ClInclude Include="fastcap\resusage.h">
+      <Filter>FastCap</Filter>
+    </ClInclude>
+    <ClInclude Include="fastcap\zbufGlobal.h">
+      <Filter>FastCap</Filter>
+    </ClInclude>
+    <ClInclude Include="fastcap\zbufStruct.h">
+      <Filter>FastCap</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\FastCap2.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\FastCap2Doc.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Toolbar.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+    <Text Include="License_and_history\History.txt" />
+    <Text Include="License_and_history\History_detailed.txt" />
+    <Text Include="License_and_history\license_for_sources_4.0.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="res\FastCap2.rc2">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="hlp\fastcap2.hhp" />
+    <CustomBuild Include="FastCap2.reg" />
+  </ItemGroup>
+</Project>
