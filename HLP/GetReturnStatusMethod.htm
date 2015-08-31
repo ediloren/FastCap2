@@ -1,0 +1,44 @@
+<!doctype html public "-//w3c//dtd html 4.0 frameset//en">
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="Author" content="Enrico Di Lorenzo">
+  <meta name="Generator" content="Enrico Di Lorenzo">
+  <meta name="Description" content="Help File">
+  <title>GetReturnStatus Method Reference</title>
+  <link href="helpstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<BODY>
+
+<H1>FastCap2Object.GetReturnStatus</H1>
+
+<div class="evident"><b>short </b>FastCap2Object<b>.GetReturnStatus()</b></div>
+
+<H2>Return Value</H2>
+<p>The method returns the return status of FastCap2.
+
+<p>Valid status values are:
+
+<p><code>
+FC_NORMAL_END&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp 0 <br>
+FC_USER_BREAK&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp -1 <br>
+FC_OUT_OF_MEMORY&nbsp&nbsp&nbsp&nbsp -2 <br>
+FC_CANNOT_OPEN_FILE&nbsp -4 <br>
+FC_FILE_ERROR&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp -8 <br>
+FC_GENERIC_ERROR&nbsp&nbsp&nbsp&nbsp -8192 <br>
+FC_STILL_RUNNING&nbsp&nbsp&nbsp&nbsp -16384 <br>
+</code>
+
+<H2>Parameters</H2>
+<p> None
+
+<H2>Remarks</H2>
+<p> Returns the reason why FastCap2 stopped execution. The reason could be normal end, user break or errors.
+
+<H2>See Also</H2>
+<p><a href="FastCapAutomationOverview.htm"> FastCap2 Automation Overview</a> 
+
+</body>
+</html>

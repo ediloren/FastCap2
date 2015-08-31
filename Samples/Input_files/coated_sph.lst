@@ -1,0 +1,9 @@
+* fastcap surface list file for two concentric spherical shells
+* - inner is a conductor surface
+* - outer is a dielectric/dielectric (coating/air) interface
+*
+* radius 1 shell is the conductor
+C sphere2.qui 2.0  0.0 0.0 0.0
+*
+* radius 2 shell is the dielectric interface - air on the outside
+D sphere_big2.qui 1.0 2.0  0.0 0.0 0.0  0.0 0.0 0.0 -

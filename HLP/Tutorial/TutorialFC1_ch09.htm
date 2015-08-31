@@ -1,0 +1,32 @@
+<!doctype html public "-//w3c//dtd html 4.0 frameset//en">
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="Author" content="Enrico Di Lorenzo">
+  <meta name="Generator" content="Enrico Di Lorenzo">
+  <meta name="Description" content="Help File">
+  <meta name="Version" content="050510">
+  <title>FastCap2 Tutorial</title>
+  <link href="helpstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<BODY>
+
+<H1>Define dielectric interfaces</H1>
+
+  <p>Dielectric interface panels are specified using the same syntax used for conductor panels. It is the list file that specifies if the panels must be treated as conductors or dielectric interfaces.
+  
+<ol>
+  <li>Load the sample file <i>coated_sph.lst</i> into FastModel. You should see two concentric spheres in the FastModel view.
+<p><img src="images/FC2DielSphere.png"> 
+  <li>Examine the list file in the FastCap2 View. 
+<p><img src="images/FC2ListFile2.png"> 
+  <p>The first non-comment line begins with a 'C' character. This line specifies that the file <i>sphere2.qui</i> is used to define a conductor. The conductor is surrounded by a dielectric medium whose dielectric constant is 2.0. Moreover, the coordinates of the panels described in the <i>sphere2.qui</i> file have a 3D offset of (0.0, 0.0, 0.0), that is, no offset.
+  <p>The second non-comment line begins with a 'D' character. This line specifies that the file <i>sphere_big2.qui</i> is used to define a dielectric interface. This is the outer shell containing the conductive sphere. The dielectric medium on one side of the interface has dielectric constant 1.0, while the medium on the other side has dielectric constant 2.0. The coordinates of the panels described in the <i>sphere_big2.qui</i> file have a 3D offset of (0.0, 0.0, 0.0), that is, no offset. In the end, the last triplet of numbers, together with the '-' sign, defines the reference point for the 'in' side of the interface. In this case, the command means that the point (0.0, 0.0, 0.0) lies in the region of space filled with dielectric medium with constant 2.0.
+  <li>Launch a FastCap simulation.
+  <li>Examine the result. The value for the capacitance should be 0.1478 nF, well within 1% of the 0.14835 nF value expected by Gauss's Law. 
+</ol>
+
+</body>
+</html>

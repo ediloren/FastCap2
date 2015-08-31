@@ -1,0 +1,42 @@
+*
+* capacitor example 
+*
+* this parallel plates capacitor is embedded in an homogeneous dielectric 
+* 
+* note that although the capacitance of a parallel-plate capacitor of 1mx1m
+* and separation distance of 0.1m can be approximately computed as e0/0.1F = 0.089nF,
+* this formula completely neglets stray field effects. 
+* From FastCap2, you get the real value of the capacitance, which includes a mutual
+* capacitance between the plates AND a stray capacitance towards infinity (zero potential).
+* For further details, see FastCap manual. 
+*
+* REMARK: you have to generate the plates and dielectric geometry, before being
+* able to lauch FastCap, using the cubegen_ command with the options specified
+* in the comments here below.
+*
+* Enrico Di Lorenzo, www.fastfieldsolvers.com, 2002/03/29
+
+* conductor to air interfaces
+*
+* conductor generated with
+* cubegen_ -xo-0.5 -xh1 -yh0.3 -zh1 -nx20 -ny3 -nz20 -naplate -t -b -pfl -pfr -pbr > plate.qui
+
+C plate.qui 1.0 0.0 0.0 0.0
+
+C plate.qui 1.0 0.0 0.1 0.0 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

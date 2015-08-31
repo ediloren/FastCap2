@@ -1,0 +1,63 @@
+<!doctype html public "-//w3c//dtd html 4.0 frameset//en">
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="Author" content="Enrico Di Lorenzo">
+  <meta name="Generator" content="Enrico Di Lorenzo">
+  <meta name="Description" content="Help File">
+  <meta name="Version" content="050510">
+  <title>FastCap2 Tutorial</title>
+  <link href="helpstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<BODY>
+
+<H1>Understand basic FastCap2 input file syntax</H1>
+
+
+<H2>Browse the input file</H2>
+
+<ol>
+  <li>If the FastCap2 View is not visible, bring it in foreground
+  <li>Examine the first line of the view. The line begins with a '0', then contains a description of the content of the file. Every FastCap2 file must begin with such a line.
+  <li>Examine the following lines. All lines begin with the letter 'T'. This means that the line describes a triangle. Then follows a conductor name, 'sphere', and a triplet of 3D coordinates, specifying the triangle corners, as highlighted in the following figure.
+  <p><img src="images/FC2Sphere1Text.png">
+  <li>Go to the end of file. Notice that there is no need of any end of file specifier.
+</ol>
+
+
+<H2>Add comments</H2>
+
+To add a comment, simply begin a line with a '*'. The line will be recognized as comment and highlighted in color.
+
+<ol>
+  <li>Add an asterisk '*' at the very beginning of lines 5, 6, 7, 8, as shown in the following figure (you can easily find the lines looking at the row counter on the status bar, which shows the current cursor position).
+  
+  <p><img src="images/FC2Sphere1Commented.png">
+ 
+  <li>Right click with the mouse on the FastCap2 view and from the pop-up menu choose <b>Update Model</b> 
+  <li>Examine the FastModel View. You should notice that four triangles disappeared from the sphere surface. If you cannot see it, try rotating the sphere.
+  <li>Remove the asterisks and update the model. The sphere shoud appear complete again.
+</ol>
+
+
+<H2>Add patches</H2>
+
+As 'T' keywords are used to specify triangular patches, the 'Q' keyword is used to describe a quadrilateral panel.
+
+<ol>
+  <li>Go to the end of the FastCap View
+  <li>Add the following line after the last 'T' statement 
+      <p><code>Q plane   -1 -1 0  1 -1 0  1 1 0  -1 1 0</code>
+
+  <p><img src="images/FC2SpherePlane.png">
+
+  <li>Right click with the mouse on the FastCap2 view and from the pop-up menu choose <b>Update Model</b> 
+  <li>Examine the FastModel View. You shoud see a quadrilateral plane cutting the sphere in two halves. 
+  <li>Delete or comment the last line you added and update the model. The plane should disappear.
+</ol>
+
+
+</body>
+</html>

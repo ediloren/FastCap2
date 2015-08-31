@@ -1,0 +1,54 @@
+// FastCap.odl : type library source for FastCap.exe
+
+// This file will be processed by the MIDL compiler to produce the
+// type library (FastCap.tlb).
+
+[ uuid(A51B7596-8D71-41A3-96BE-FD0A00B565FA), version(1.0) ]
+library FastCap
+{
+	importlib("stdole32.tlb");
+	importlib("stdole2.tlb");
+
+
+	//  Primary dispatch interface for CFastCapDoc
+	
+	[ uuid(4B8E95F2-2399-4D1D-BAB8-C18A09223D5E) ]
+	dispinterface IFastCap
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CFastCapDoc)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CFastCapDoc)
+			[id(1)] boolean IsRunning();
+			[id(2)] void ShowWindow();
+			[id(3)] boolean Quit();
+			[id(4)] VARIANT GetCapacitance();
+			[id(5)] VARIANT GetCondNames();
+			[id(6)] boolean Run(BSTR commandLine);
+			[id(7)] void Stop();
+			[id(8)] boolean SetEndCallback(IDispatch* callback, BSTR cbName);
+			[id(9)] boolean SetLogCallback(IDispatch* callback, BSTR cbName);
+			[id(10)] float GetSolveTime();
+			[id(11)] long GetSolveMemory();
+			[id(12)] short GetReturnStatus();
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CFastCapDoc
+	
+	[ uuid(1ECCFB33-710A-4B5C-9295-A503CA2D10E2) ]
+	coclass Document
+	{
+		[default] dispinterface IFastCap;
+	};
+
+	//{{AFX_APPEND_ODL}}
+	//}}AFX_APPEND_ODL}}
+};

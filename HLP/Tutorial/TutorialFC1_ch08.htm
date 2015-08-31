@@ -1,0 +1,64 @@
+<!doctype html public "-//w3c//dtd html 4.0 frameset//en">
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="Author" content="Enrico Di Lorenzo">
+  <meta name="Generator" content="Enrico Di Lorenzo">
+  <meta name="Description" content="Help File">
+  <meta name="Version" content="050510">
+  <title>FastCap2 Tutorial</title>
+  <link href="helpstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<BODY>
+
+<H1>Work with hierarchical input files (list files)</H1>
+
+  <p>Suppose that you would like to know the capacitance of a structure made up of two spheres, instead of one. 
+  <p>You could simply use an input file describing first one sphere and then the second one, maybe changing the conductor name (see <a href="TutorialFC1_ch03.htm">Understand basic FastCap2 input file syntax</a>) to distinguish between the two spheres.
+  <p>However, a simpler option to achieve the same result is to use a hierarchical input file.
+  
+<H2>Write and use a list file</H2>
+  
+<ol>
+  <li>Close any file open in FastModel, by selecting the FastCap2 View and then, from the main menu, <b>File->Close FastCap2 File</b>  
+  <li>In the FastCap2 View, type or copy and paste the following lines:
+  <p>
+<code>
+<br>*
+<br>* Hierarchical input file example
+<br>*
+<br>* the first sphere is centered at the origin
+<br>C sphere2.qui 1.0  0.0 0.0 0.0
+<br>* the second sphere is offset along the x axis
+<br>C sphere2.qui 1.0  2.0 0.0 0.0
+</code>  
+  <li>From the main menu, select <b>File->Save FastCap2 File As...</b>, name the file <i>hierarchical.lst</i> and save it in the same directory containing the sample file <i>sphere2.qui</i>.
+  <li>Click with the right mouse button on the FastCap2 View and select <b>Update Model</b>. You should see in the FastModel View a picture of the two spheres, like the one shown in the following figure:
+<p><img src="images/FC2SpheresHier.png">
+  <li>Launch a FastCap2 simulation, but this time put a tick mark near the <b>List File</b> label on the <b>Run Menu</b> dialog, as shown in the figure, to inform FastCap2 that it should process a hierarchical input file.
+<p><img src="images/FC2RunMenu3.png">
+  <li>Launch the simulation by clicking on the <b>Run</b> button.  
+  <li>Examine the result, reported here below.
+  <p>
+<code>
+<br>CAPACITANCE MATRIX, nanofarads
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2
+<br>sphere%GROUP1 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.2047&nbsp;&nbsp;&nbsp;&nbsp;-0.1284
+<br>sphere%GROUP2 2&nbsp;&nbsp;&nbsp;&nbsp;-0.1284&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.2047
+</code>
+  <p>The result is a 2x2 capacitance matrix, one row / column for each conductor. Note that, even if the conductor name inside the <i>sphere2.qui</i> file was always <i>sphere</i>, FastCap2 distinguished between the two conductors by appending a unique suffix to the name.
+</ol>
+
+<H2>Merge conductors</H2>
+
+<ol>
+  <li>You may have wanted to know the self capacitance of the whole structure. You can perform some computations to get it from the 2x2 capacitance matrix, or you can ask FastCap2 to consider both spheres as part of the same conductor. To do this, add a '+' at the end of the first conductor specification line, as shown in the figure. The '+' will merge the two input files in a single conductor.  
+<p><img src="images/FC2ListFile.png">
+  <li>Launch a FastCap2 simulation. 
+  <li>Examine the result. The capacitance value should be 0.1526 nF, which is exactly (0.2047 - 0.1284)*2, what you would get analitically from the previous 2x2 capacitance matrix.
+</ol>
+
+</body>
+</html>

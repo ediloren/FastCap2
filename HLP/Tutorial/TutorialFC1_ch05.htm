@@ -1,0 +1,230 @@
+<!doctype html public "-//w3c//dtd html 4.0 frameset//en">
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="Author" content="Enrico Di Lorenzo">
+  <meta name="Generator" content="Enrico Di Lorenzo">
+  <meta name="Description" content="Help File">
+  <meta name="Version" content="050510">
+  <title>FastCap2 Tutorial</title>
+  <link href="helpstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<BODY>
+
+<H1>Understand FastCap2 output</H1>
+
+<p>FastCap2 has produced a detailed output about the simulation you ran. Let's examine it.
+
+<H2>The preamble</H2>
+
+<code>
+<br>FastCap, (c) by M.I.T.
+<br>Windows porting and modifications, version 3.1
+<br>&nbsp;&nbsp;&nbsp;(c) 1998, 2004 by Enrico Di Lorenzo, www.fastfieldsolvers.com
+<br>&nbsp;
+<br>Running fastcap 2.0 (18Sep92)
+<br>&nbsp;&nbsp;Input: C:\Program Files\FastFieldSolvers\FastCap2\Samples\Input_files\sphere1.qui
+<br>&nbsp;&nbsp;Input surfaces:
+<br>&nbsp;&nbsp;&nbsp;GROUP1
+<br>&nbsp;&nbsp;&nbsp;&nbsp;C:\Program Files\FastFieldSolvers\FastCap2\Samples\Input_files\sphere1.qui, conductor
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title: `Sphere with radius 1.000000, refined up to depth 1<br>'
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;outer permittivity: 1
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of panels: 80
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of extra evaluation points: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;translation: (0 0 0)
+<br>&nbsp;&nbsp;Date: Wed May 18 18:21:58 2005
+</code>
+
+<p>The preamble summarizes the input file(s) information. In particular, 
+after the copyright notice, you find:
+<ul>
+
+  <li>The main input file name
+  <br>
+  <code>
+<br>&nbsp;&nbsp;Input: C:\Program Files\FastFieldSolvers\FastCap2\Samples\Input_files\sphere1.qui
+  </code>
+  
+  <li>The list of all input files containing actual panels. In our case, the main input file directly contains the geometric description of the triangular panels, so the file name is the same of the main one and we have only one group.
+  <br>
+  <code>
+<br>&nbsp;&nbsp;Input surfaces:
+<br>&nbsp;&nbsp;&nbsp;GROUP1
+<br>&nbsp;&nbsp;&nbsp;&nbsp;C:\Program Files\FastFieldSolvers\FastCap2\Samples\Input_files\sphere1.qui, conductor
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title: `Sphere with radius 1.000000, refined up to depth 1<br>'
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;outer permittivity: 1
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of panels: 80
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of extra evaluation points: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;translation: (0 0 0)
+  </code>
+  <p>Inside each group, there is some specific information.
+  
+  <ul>
+    <li>The group number.
+    <br>
+    <code>
+<br>&nbsp;&nbsp;&nbsp;GROUP1
+    </code>
+    <p>This is a sequential number used to distinguish different input files
+    
+    <li>The geometry file name
+    <br>
+    <code>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;C:\Program Files\FastFieldSolvers\FastCap2\Samples\Input_files\sphere1.qui, conductor
+    </code>
+    
+    <li>The title of the geometry file, that is the first line of the input file, with the beginning '0' stripped out
+    <br>
+    <code>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;title: `Sphere with radius 1.000000, refined up to depth 1    </code>
+    
+    <li>The permittivity of the dielectric medium surrounding the conductor
+    <br>
+    <code>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;outer permittivity: 1
+    </code>
+    
+    <li>The number of panels (either triangular or quadrangular) described in this geometry file
+    <br>
+    <code>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of panels: 80
+    </code>
+    
+    <li>The number of extra evaluation points
+    <br>
+    <code>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;number of extra evaluation points: 0
+    </code>
+    
+    <li>The global translation applied to all panel coordinates contained in the geometry file
+    <br>
+    <code>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;translation: (0 0 0)
+    </code>
+  </ul>
+  
+  <li>The time at which your simulation ran
+  <br>
+  <code>
+<br>&nbsp;&nbsp;Date: Wed May 18 18:21:58 2005
+  </code>
+</ul>
+
+<H2>The Summary</H2>
+
+<code>
+<br>INPUT SUMMARY
+<br>&nbsp;&nbsp;Expansion order: 2
+<br>&nbsp;&nbsp;Number of partitioning levels: 3
+<br>&nbsp;&nbsp;Overall permittivity factor: 1
+<br>&nbsp;&nbsp;Total number of panels: 80
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Number of conductor panels: 80
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Number of dielectric interface panels: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Number of thin conductor on dielectric interface panels: 0
+<br>&nbsp;&nbsp;Number of conductors: 1
+</code>
+
+  <p>The summary provides information about global parameters. In particular:
+  
+  <ul>
+    <li>The expansion order
+    <br>
+    <code>
+<br>&nbsp;&nbsp;Expansion order: 2
+    </code>
+    <p>This is the multipole expansion order selected in the <b>Run Menu</b> dialog. For normal geometries, you don't need to modify this parameter; in some cases, you can select 3 as expansion order to improve the precision of the results, but usually you get better results by further refining the input geometry. 
+    
+    <li>The number of partitioning levels
+    <br>
+    <code>
+<br>&nbsp;&nbsp;Number of partitioning levels: 3
+    </code>
+    <p>This is an internal parameter, automatically calculated by FastCap2. It is an indicator of the depth of the spatial subdivision of the input geometry volume. The greater is the overall geometry dimension / minimum patch area, the larger is the number of partitioning levels required to subdivide the space for simulation needs.
+    
+    <li>The overall permittivity factor
+    <br>
+    <code>
+<br>&nbsp;&nbsp;Overall permittivity factor: 1
+    </code>
+    <p>This is the overall permittivity factor selected in the <b>Run</b> form. This in an overall relative permittivity factor which multiplies all FastCap2 results. You'll see the effect of this parameter later in this tutorial. 
+    
+    <li>Total number of panels
+    <br>
+    <code>
+<br>&nbsp;&nbsp;Total number of panels: 80
+    </code>
+    <p>This is the total number of panels read from the input file(s). In this case, where the input file is unique, the total number of files is equal (of course) to the number of panels shown in the preamble. In case of hierarchical input files (the so-called <i>list files</i>), this figure will show the sum of the number of panels found in each input file. 
+    
+    <li>The number of conductor panels, dielectric interface panels and thin conductor panels
+    <br>
+    <code>
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Number of conductor panels: 80
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Number of dielectric interface panels: 0
+<br>&nbsp;&nbsp;&nbsp;&nbsp;Number of thin conductor on dielectric interface panels: 0    
+    </code>
+    <p>These lines detail the total number of panels, split according to their function. In this example we have no dielectric interface panels, since the sphere is embedded in an homogeneous medium. 
+    <br>The 'thin conductor on dielectric interface panels' are an old type of panels which have never been supported by FastCap2; you can safely ignore this line. 
+    
+    <li>The number of conductors
+    <br>
+    <code>
+<br>&nbsp;&nbsp;Number of conductors: 1
+    </code>
+    <p>This is the total number of conductors found in the input file(s).
+</ul>
+
+<H2>The simulation and the result</H2>
+
+<code>
+<br>No expansions at level 3 (lowest)
+<br>No expansions at level 2
+<br>Percentage of multiplies done by multipole: 0%
+<br>Warning: no multipole acceleration
+<br>&nbsp;
+<br>ITERATION DATA
+<br>Starting on column 1 (sphere%GROUP1)
+<br>1 2 3 
+<br>&nbsp;
+<br>CAPACITANCE MATRIX, nanofarads
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 
+<br>sphere%GROUP1 1     0.1058
+</code>
+
+  <p>The last part of the output provides information about the state of the simulation and the result. In particular:
+  
+  <ul>
+    <li>The expansion order
+    <br>
+    <code>
+<br>No expansions at level 3 (lowest)
+<br>No expansions at level 2
+<br>Percentage of multiplies done by multipole: 0%
+<br>Warning: no multipole acceleration
+    </code>
+    <p>This information regards the internal algorithm used by FastCap2. In this case, the problem is small, so FastCap2 has automatically decided not to use the multipole algorithm, because it gives a faster computation time but only for problems bigger than a threshold number of panels.
+    
+    <li>The iteration data
+    <br>
+    <code>
+<br>ITERATION DATA
+<br>Starting on column 1 (sphere%GROUP1)
+<br>1 2 3 
+    </code>
+    <p>This is the number of iterations required to reach convergence inverting the potential matrix to get the capacitance matrix. You can consider the number of iterations as an rough indicator of how well behaved the matrix is and so, indirectly, of how correctly discretized the input geometry is. You'll have a series of iterations for each conductor in your problem. In this case, having only one conductor, there is only one row.
+
+    <li>The result
+    <br>
+    <code>
+<br>CAPACITANCE MATRIX, nanofarads
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1 
+<br>sphere%GROUP1 1     0.1058
+    </code>
+    <p>This is the actual capacitance of our sphere, scaled to nanofarads.
+ </ul>
+
+<p><big><b>Congratulations! You have just completed your first capacitance extraction with FastCap2.
+
+</body>
+</html>

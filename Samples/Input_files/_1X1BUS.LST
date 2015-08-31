@@ -1,0 +1,21 @@
+*
+* 1x1 bus crossing problem with dielectric on lower conductors
+*
+* conductor to air interfaces
+C _1x1bus_files/cond_air_1x1.qui 1.0 0.0 0.0 0.0 +
+* 
+* conductor to dielectric interfaces
+C _1x1bus_files/cond_dielec_1x1.qui 7.5 0.0 0.0 0.0
+*
+* dielectric tops and bottoms
+D _1x1bus_files/dielec_topbot.neu 1.0 7.5 0.0 0.0 0.0 1.5 0.5 0.1 -
+D _1x1bus_files/dielec_topbot.neu 1.0 7.5 0.0 1.0 0.0 1.5 1.5 0.1 -
+D _1x1bus_files/dielec_topbot.neu 1.0 7.5 0.0 2.0 0.0 1.5 2.5 0.1 -
+*
+* dielectric sides
+D _1x1bus_files/dielec_sides.neu 1.0 7.5 0.5 0.0 0.0 1.5 0.5 0.1 -
+*
+* dielectric faces
+D _1x1bus_files/dielec_face.neu 1.0 7.5 0.0 0.0 0.0 1.5 1.5 0.5 -
+D _1x1bus_files/dielec_face.neu 1.0 7.5 0.0 3.0 0.0 1.5 1.5 0.5 -
+

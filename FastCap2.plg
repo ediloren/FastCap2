@@ -1,0 +1,613 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: FastCap2 - Win32 Release--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "C:\DOCUME~1\Nemo01\LOCALS~1\Temp\RSP31.bat" with contents
+[
+@echo off
+hhc.exe .\hlp\fastcap2.hhp
+if exist "hlp\fastcap2.chm" copy "hlp\fastcap2.chm" .\Release
+echo off
+]
+Creating command line "C:\DOCUME~1\Nemo01\LOCALS~1\Temp\RSP31.bat"
+Creating command line "midl.exe /nologo /D "NDEBUG" /tlb "Release/FastCap2.tlb" /mktyplib203 /o "FastCap2.midl.log" /win32 "C:\Documenti\Codice\FastCap351_110324\FastCap2.odl""
+Performing Custom Build Step on .\hlp\fastcap2.hhp
+Microsoft HTML Help Compiler 4.74.8702
+
+Compiling c:\Documenti\Codice\FastCap351_110324\hlp\FastCap2.chm
+
+FastCap2.hhc
+WelcometoFastCap.htm
+Tutorial\TutorialFC1_ch01.htm
+Tutorial\TutorialFC1_ch02.htm
+Tutorial\TutorialFC1_ch03.htm
+Tutorial\TutorialFC1_ch04.htm
+Tutorial\TutorialFC1_ch05.htm
+Tutorial\TutorialFC1_ch06.htm
+Tutorial\TutorialFC1_ch07.htm
+Tutorial\TutorialFC1_ch08.htm
+Tutorial\TutorialFC1_ch09.htm
+FastCapAutomationOverview.htm
+AutomationExamples.htm
+RunMethod.htm
+StopMethod.htm
+QuitMethod.htm
+ShowWindowMethod.htm
+GetCapacitanceMethod.htm
+GetCondNamesMethod.htm
+SetEndCallbackMethod.htm
+SetLogCallbackMethod.htm
+GetSolveTimeMethod.htm
+GetSolveMemoryMethod.htm
+GetReturnStatusMethod.htm
+IsRunningProperty.htm
+images\openicon.png
+images\FC2OpenSphere1.png
+images\FC2Sphere1.png
+images\FC2Sphere1Text.png
+images\FC2Sphere1Commented.png
+images\FC2SpherePlane.png
+images\launchfastcapicon.png
+images\FC2RunMenu.png
+images\FC2Sphere2.png
+images\FC2Sphere3.png
+images\FC2RunMenu2.png
+images\FC2SpheresHier.png
+images\FC2RunMenu3.png
+images\FC2ListFile.png
+images\FC2DielSphere.png
+images\FC2ListFile2.png
+helpstyle.css
+FastCap_User_Guide.pdf
+
+Compile time: 0 minutes, 1 second
+25 Topics
+91 Local links
+1 Internet link
+16 Graphics
+
+
+Created c:\Documenti\Codice\FastCap351_110324\hlp\FastCap2.chm, 1,004,177 bytes
+Compression decreased file by 1,212,028 bytes.
+        1 file(s) copied.
+Creating command line "rc.exe /l 0x410 /fo"Release/FastCap2.res" /i "Release" /d "NDEBUG" /d "_AFXDLL" "C:\Documenti\Codice\FastCap351_110324\FastCap2.rc"" 
+Creating temporary file "C:\DOCUME~1\Nemo01\LOCALS~1\Temp\RSP4B.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /Fp"Release/FastCap2.pch" /YX /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\Documenti\Codice\FastCap351_110324\FastCap2.cpp"
+"C:\Documenti\Codice\FastCap351_110324\FastCapDoc.cpp"
+"C:\Documenti\Codice\FastCap351_110324\FastCapView.cpp"
+"C:\Documenti\Codice\FastCap351_110324\FastCapWindow.cpp"
+"C:\Documenti\Codice\FastCap351_110324\MainFrm.cpp"
+"C:\Documenti\Codice\FastCap351_110324\RunDialog.cpp"
+"C:\Documenti\Codice\FastCap351_110324\UnicodeString.cpp"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\direct.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\electric.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\input.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\mulDo.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\mulGlobal.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\psMatDisplay.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\savemat_mod.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c"
+"C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c"
+]
+Creating command line "cl.exe @C:\DOCUME~1\Nemo01\LOCALS~1\Temp\RSP4B.tmp" 
+Creating temporary file "C:\DOCUME~1\Nemo01\LOCALS~1\Temp\RSP4C.tmp" with contents
+[
+/nologo /MD /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_AFXDLL" /Fp"Release/FastCap2.pch" /Yc"stdafx.h" /Fo"Release/" /Fd"Release/" /FD /c 
+"C:\Documenti\Codice\FastCap351_110324\StdAfx.cpp"
+]
+Creating command line "cl.exe @C:\DOCUME~1\Nemo01\LOCALS~1\Temp\RSP4C.tmp" 
+Creating temporary file "C:\DOCUME~1\Nemo01\LOCALS~1\Temp\RSP4D.tmp" with contents
+[
+Htmlhelp.lib /nologo /subsystem:windows /incremental:no /pdb:"Release/FastCap2.pdb" /machine:I386 /out:"Release/FastCap2.exe" 
+.\Release\FastCap2.obj
+.\Release\FastCapDoc.obj
+.\Release\FastCapView.obj
+.\Release\FastCapWindow.obj
+.\Release\MainFrm.obj
+.\Release\RunDialog.obj
+.\Release\StdAfx.obj
+.\Release\UnicodeString.obj
+.\Release\blkDirect.obj
+.\Release\calcp.obj
+.\Release\capsolve.obj
+.\Release\direct.obj
+.\Release\electric.obj
+.\Release\fastcap.obj
+.\Release\input.obj
+.\Release\mulDisplay.obj
+.\Release\mulDo.obj
+.\Release\mulGlobal.obj
+.\Release\mulLocal.obj
+.\Release\mulMats.obj
+.\Release\mulMulti.obj
+.\Release\mulSetup.obj
+.\Release\patran.obj
+.\Release\psMatDisplay.obj
+.\Release\quickif.obj
+.\Release\savemat_mod.obj
+.\Release\uglyalloc.obj
+.\Release\zbuf2fastcap.obj
+.\Release\zbufInOut.obj
+.\Release\zbufProj.obj
+.\Release\zbufSort.obj
+.\Release\FastCap2.res
+]
+Creating command line "link.exe @C:\DOCUME~1\Nemo01\LOCALS~1\Temp\RSP4D.tmp"
+<h3>Output Window</h3>
+Creating Type Library...
+FastCap2.odl
+oaidl.idl
+objidl.idl
+unknwn.idl
+wtypes.idl
+oaidl.acf
+Compiling resources...
+Compiling...
+StdAfx.cpp
+Compiling...
+FastCap2.cpp
+FastCapDoc.cpp
+FastCapView.cpp
+FastCapWindow.cpp
+MainFrm.cpp
+RunDialog.cpp
+UnicodeString.cpp
+blkDirect.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(80) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(83) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(197) : warning C4013: 'creat' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(206) : warning C4013: 'write' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(212) : warning C4013: 'close' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(184) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(184) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(237) : warning C4013: 'open' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(245) : warning C4013: 'read' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(224) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(224) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(339) : warning C4101: 'matrisiz' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(448) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(558) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(558) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(584) : warning C4013: 'abort' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(546) : warning C4101: 'top' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(546) : warning C4101: 'toq' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(800) : warning C4101: 'to' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(800) : warning C4101: 'cur_real' : unreferenced local variable
+calcp.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(86) : warning C4715: 'lowdex' : not all control paths return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\blkDirect.c(103) : warning C4715: 'uppdex' : not all control paths return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(150) : warning C4013: 'Cross_Product' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(152) : warning C4013: 'flip_normal' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(180) : warning C4013: 'planarize' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(182) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(182) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(182) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(182) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(196) : warning C4013: 'centroid' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(228) : warning C4013: 'ComputeMoments' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(283) : warning C4013: 'hack_path' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(327) : warning C4101: 'ctr_plus_n' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(327) : warning C4101: 'norm_minus' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(325) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(327) : warning C4101: 'norm_plus' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(327) : warning C4101: 'ctr_minus_n' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(432) : warning C4101: 'sum' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(432) : warning C4101: 'dl' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(665) : warning C4013: 'dp' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(522) : warning C4101: 'edge' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(733) : warning C4101: 'flrm' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(728) : warning C4101: 'ypp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(733) : warning C4101: 'rterms' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(733) : warning C4101: 'r' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(732) : warning C4101: 'sums' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(732) : warning C4101: 'sumc' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(733) : warning C4101: 'halfn' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(727) : warning C4101: 'x' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(727) : warning C4101: 'y' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(727) : warning C4101: 'z' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(732) : warning C4101: 'multi' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(733) : warning C4101: 'ceilm' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(733) : warning C4101: 'm' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(732) : warning C4101: 'sign' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(733) : warning C4101: 'n' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(733) : warning C4101: 'numterms' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(940) : warning C4013: 'multerms' undefined; assuming extern returning int
+capsolve.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(455) : warning C4716: 'centroid' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(490) : warning C4716: 'Cross_Product' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(833) : warning C4716: 'ComputeMoments' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\calcp.c(877) : warning C4716: 'dp' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(71) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(71) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(71) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(71) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(104) : warning C4013: 'want_this_iter' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(138) : warning C4013: 'gmres' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(163) : warning C4013: 'dump_ps_geometry' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(243) : warning C4013: 'computePsi' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(319) : warning C4013: 'mulDirect' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(324) : warning C4013: 'mulUp' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(338) : warning C4013: 'mulDown' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(345) : warning C4013: 'mulEval' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(355) : warning C4013: 'compute_electric_fields' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(460) : warning C4013: 'mulPrecond' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(485) : warning C4101: 'beta' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(663) : warning C4013: 'abort' undefined; assuming extern returning int
+direct.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\capsolve.c(726) : warning C4716: 'computePsi' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\direct.c(52) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\direct.c(52) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\direct.c(52) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\direct.c(52) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\direct.c(363) : warning C4101: 'k' : unreferenced local variable
+electric.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\electric.c(53) : warning C4101: 'h' : unreferenced local variable
+fastcap.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(83) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(83) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(83) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(83) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(111) : warning C4013: 'get_ps_file_base' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(112) : warning C4013: 'dump_ps_geometry' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(188) : warning C4013: 'mulMultiAlloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(197) : warning C4013: 'mulMatDirect' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(210) : warning C4013: 'olmulMatPrecond' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(228) : warning C4013: 'dumpnums' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(240) : warning C4013: 'mulMatUp' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(247) : warning C4013: 'mulMatDown' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(256) : warning C4013: 'mulMatEval' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(278) : warning C4013: 'capsolve' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(282) : warning C4013: 'mksCapDump' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\fastcap.c(376) : warning C4013: 'FCOnClosing' undefined; assuming extern returning int
+input.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(45) : warning C4013: 'isspace' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(134) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(136) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(163) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(163) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(511) : warning C4101: 'str' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(510) : warning C4101: 'temp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(510) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(801) : warning C4013: 'initcalcp' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(903) : warning C4101: 'group_name' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(902) : warning C4101: 'end_name' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(1237) : warning C4013: 'dumpConfig' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(1388) : warning C4013: '_chdir' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(1350) : warning C4101: 'num_surf' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(1463) : warning C4018: '<' : signed/unsigned mismatch
+C:\Documenti\Codice\FastCap351_110324\fastcap\input.c(1471) : warning C4018: '<' : signed/unsigned mismatch
+mulDisplay.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(43) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(57) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(83) : warning C4013: 'dischg' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(107) : warning C4013: 'dismat' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(180) : warning C4013: 'disfchg' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(259) : warning C4013: 'xyz2sphere' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(317) : warning C4013: 'multerms' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(510) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(495) : warning C4101: 'k' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(565) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(565) : warning C4101: 'k' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(636) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(857) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1065) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1065) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1075) : warning C4013: 'want_this_iter' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1171) : warning C4018: '>' : signed/unsigned mismatch
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1176) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1259) : warning C4013: 'strncpy' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1049) : warning C4101: 'rowdiag' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1054) : warning C4101: 'cname' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1365) : warning C4013: 'mulPrecond' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1367) : warning C4013: 'savemat_mod' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1339) : warning C4101: 'cp' : unreferenced local variable
+mulDo.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(155) : warning C4716: 'dismat' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(174) : warning C4716: 'dischg' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(195) : warning C4716: 'disfchg' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDisplay.c(1572) : warning C4716: 'chkDummy' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDo.c(50) : warning C4101: 'pn' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDo.c(50) : warning C4101: 'pc' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDo.c(106) : warning C4013: 'solve' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDo.c(101) : warning C4101: 'pn' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDo.c(101) : warning C4101: 'pc' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDo.c(162) : warning C4033: 'mulUp' must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulDo.c(235) : warning C4033: 'mulDown' must return a value
+mulGlobal.c
+mulLocal.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(152) : warning C4013: 'multerms' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(153) : warning C4013: 'costerms' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(163) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(163) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(163) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(163) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(168) : warning C4013: 'xyz2sphere' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(171) : warning C4013: 'evalLegendre' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(343) : warning C4101: 'k' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(343) : warning C4101: 'start' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(343) : warning C4101: 'kold' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulLocal.c(449) : warning C4101: 'start' : unreferenced local variable
+mulMats.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(73) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(73) : warning C4013: 'abort' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(80) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(80) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(80) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(193) : warning C4101: 'factor' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(192) : warning C4101: 'offset' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(195) : warning C4101: 'surf' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(194) : warning C4101: 'pc' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(350) : warning C4013: 'find_flux_density_row' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(456) : warning C4013: 'compressMat' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(461) : warning C4013: 'invert' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(462) : warning C4013: 'expandMat' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(300) : warning C4101: 'factor' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(298) : warning C4101: 'dp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(299) : warning C4101: 'surf' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(298) : warning C4101: 'mpc' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(296) : warning C4101: 'dindex' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(731) : warning C4013: 'multerms' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(735) : warning C4033: 'mulMatUp' must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(902) : warning C4101: 'k' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(902) : warning C4101: 'vects' : unreferenced local variable
+mulMulti.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMats.c(710) : warning C4716: 'find_flux_density_row' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(56) : warning C4013: 'costerms' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(56) : warning C4013: 'sinterms' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(158) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(159) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(235) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(235) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(289) : warning C4013: 'evalFacFra' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(307) : warning C4101: 'n' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(359) : warning C4101: 'start' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(556) : warning C4101: 'factorial' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(557) : warning C4101: 'start' : unreferenced local variable
+mulSetup.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(166) : warning C4715: 'iPwr' : not all control paths return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulMulti.c(187) : warning C4715: 'fact' : not all control paths return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(52) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(52) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(52) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(52) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(56) : warning C4013: 'placeq' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(58) : warning C4013: 'getrelations' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(60) : warning C4013: 'setPosition' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(61) : warning C4013: 'indexkid' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(65) : warning C4013: 'setExact' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(65) : warning C4013: 'multerms' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(74) : warning C4013: 'getnbrs' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(76) : warning C4013: 'linkcubes' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(78) : warning C4013: 'set_vector_masks' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(79) : warning C4013: 'setMaxq' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(81) : warning C4013: 'getAllInter' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(220) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(221) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(222) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(304) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(305) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(306) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(351) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(352) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(353) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(436) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(437) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(438) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(477) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(478) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(479) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(623) : warning C4013: 'abort' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(730) : warning C4033: 'getnbrs' must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(783) : warning C4101: 'kidc' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(950) : warning C4101: 'nc' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(949) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(950) : warning C4101: 'np' : unreferenced local variable
+patran.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(525) : warning C4716: 'getrelations' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(557) : warning C4716: 'setPosition' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(714) : warning C4716: 'setExact' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\mulSetup.c(787) : warning C4700: local variable 'cnt' used without having been initialized
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(92) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(92) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(92) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(92) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(111) : warning C4013: 'input' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(113) : warning C4013: 'grid_equiv_check' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(123) : warning C4013: 'fill_patch_patch_table' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(125) : warning C4013: 'assign_conductor' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(129) : warning C4013: 'assign_names' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(90) : warning C4101: 'corner1' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(90) : warning C4101: 'corner0' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(90) : warning C4101: 'corner3' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(90) : warning C4101: 'corner2' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(177) : warning C4013: 'file_title' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(180) : warning C4013: 'summary_data' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(183) : warning C4013: 'node_data' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(186) : warning C4013: 'element_data' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(189) : warning C4013: 'grid_data' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(192) : warning C4013: 'patch_data' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(195) : warning C4013: 'CFEG_table' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(198) : warning C4013: 'name_data' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(199) : warning C4013: 'waste_line' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(538) : warning C4013: 'if_same_coord' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(522) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(623) : warning C4013: 'if_same_grid' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(688) : warning C4013: 'depth_search' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(788) : warning C4013: 'getConductorNum' undefined; assuming extern returning int
+psMatDisplay.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(209) : warning C4716: 'input' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(223) : warning C4716: 'waste_line' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(235) : warning C4716: 'file_title' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(254) : warning C4716: 'summary_data' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(275) : warning C4716: 'node_data' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(307) : warning C4716: 'element_data' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(339) : warning C4716: 'grid_data' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(373) : warning C4716: 'patch_data' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(445) : warning C4716: 'CFEG_table' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(512) : warning C4716: 'name_data' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(559) : warning C4716: 'grid_equiv_check' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(638) : warning C4716: 'fill_patch_patch_table' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(703) : warning C4716: 'assign_conductor' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(732) : warning C4716: 'depth_search' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\patran.c(940) : warning C4716: 'assign_names' : must return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\psMatDisplay.c(107) : warning C4013: 'copyBody' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\psMatDisplay.c(157) : warning C4013: 'dump_line_as_ps' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\psMatDisplay.c(233) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\psMatDisplay.c(234) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\psMatDisplay.c(281) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\psMatDisplay.c(281) : warning C4013: 'sbrk' undefined; assuming extern returning int
+quickif.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(93) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(93) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(93) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(93) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(257) : warning C4101: 'prev_name' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(259) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(257) : warning C4101: 'cur_name2' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(297) : warning C4101: 'cp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(296) : warning C4101: 'cond' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(303) : warning C4101: 'cname' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\quickif.c(296) : warning C4101: 'i' : unreferenced local variable
+savemat_mod.c
+uglyalloc.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c(154) : warning C4013: 'free' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c(210) : warning C4018: '>=' : signed/unsigned mismatch
+C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c(175) : warning C4101: 'p' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c(287) : warning C4101: 'p' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c(342) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c(403) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c(424) : warning C4013: 'realloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c(424) : warning C4047: '=' : 'char *' differs in levels of indirection from 'int '
+zbuf2fastcap.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\uglyalloc.c(438) : warning C4715: 'drealloc' : not all control paths return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(103) : warning C4013: 'initFaces' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(110) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(112) : warning C4013: 'getAdjGraph' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(121) : warning C4013: 'image' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(122) : warning C4013: 'flatten' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(123) : warning C4013: 'makePos' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(124) : warning C4013: 'scale2d' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(126) : warning C4013: 'dumpCycles' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(127) : warning C4013: 'dumpFaceText' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(132) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(135) : warning C4013: 'dumpPs' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(59) : warning C4101: 'cur_chg' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(57) : warning C4101: 'temp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(55) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(55) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(58) : warning C4101: 'pnt' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbuf2fastcap.c(55) : warning C4101: 'k' : unreferenced local variable
+zbufInOut.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(158) : warning C4013: 'want_this_iter' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(232) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(235) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(226) : warning C4101: 'type' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(355) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(355) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(324) : warning C4101: 'lavg' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(324) : warning C4101: 'tavg' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(321) : warning C4101: 'surf_list' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(310) : warning C4101: 'dummy' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(322) : warning C4101: 'sys' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(311) : warning C4101: 'autlev' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(311) : warning C4101: 'autmom' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(310) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(313) : warning C4101: 'relperm' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(312) : warning C4101: 'infile' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(311) : warning C4101: 'numLev' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(311) : warning C4101: 'numMom' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(435) : warning C4101: 'cp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(438) : warning C4101: 'temp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(433) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(433) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(638) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(639) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(640) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(641) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(930) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(931) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(957) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(958) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(1197) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(1198) : warning C4244: '=' : conversion from 'double ' to 'int ', possible loss of data
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(1306) : warning C4101: 'x' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(1305) : warning C4101: 'temp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(1306) : warning C4101: 'y' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(1305) : warning C4101: 'xc' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(1300) : warning C4101: 'j' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(1305) : warning C4101: 'len' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufInOut.c(1305) : warning C4101: 'yc' : unreferenced local variable
+zbufProj.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(63) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(91) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(169) : warning C4101: 'costh' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(167) : warning C4101: 'alpha' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(169) : warning C4101: 'theta' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(167) : warning C4101: 'tvec1' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(169) : warning C4101: 'sinth' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(432) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(432) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufProj.c(494) : warning C4101: 'l' : unreferenced local variable
+zbufSort.c
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(158) : warning C4013: 'viewprintf' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(161) : warning C4013: 'FCExit' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(184) : warning C4101: 'margin' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(184) : warning C4101: 'margin2' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(184) : warning C4101: 'margin1' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(245) : warning C4101: 'sfrom' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(247) : warning C4101: 'temp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(245) : warning C4101: 'sto' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(536) : warning C4013: 'ualloc' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(536) : warning C4013: 'sbrk' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(758) : warning C4013: 'dump_face' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(760) : warning C4013: 'dumpCorners' undefined; assuming extern returning int
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(525) : warning C4101: 'alpha_origin' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(521) : warning C4101: 'temp1' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(526) : warning C4101: 'all_pos' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(519) : warning C4101: 'maxfac' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(519) : warning C4101: 'minfac' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(525) : warning C4101: 'alpha_x' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(523) : warning C4101: 'avg' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(518) : warning C4101: 'maxref' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(518) : warning C4101: 'minref' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(526) : warning C4101: 'all_neg' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(522) : warning C4101: 'margin1' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(514) : warning C4101: 'olap' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(936) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(964) : warning C4101: 'numcycle' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(964) : warning C4101: 'cycled' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(964) : warning C4101: 'i' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(964) : warning C4101: 'cyclei' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(965) : warning C4101: 'fp' : unreferenced local variable
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(173) : warning C4715: 'whichSide' : not all control paths return a value
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(531) : warning C4700: local variable 'i' used without having been initialized
+C:\Documenti\Codice\FastCap351_110324\fastcap\zbufSort.c(998) : warning C4700: local variable 'i' used without having been initialized
+Linking...
+
+
+
+<h3>Results</h3>
+FastCap2.exe - 0 error(s), 407 warning(s)
+</pre>
+</body>
+</html>

@@ -1,0 +1,45 @@
+*
+* capacitor example 
+*
+* this parallel plates capacitor is embedded in a non-homogeneous dielectric 
+* 
+* REMARK: you have to generate the plates and dielectric geometry, before being
+* able to lauch FastCap, using the cubegen_ command with the options specified
+* in the comments here below.
+*
+* Enrico Di Lorenzo, www.fastfieldsolvers.com, 2002/03/29
+*
+
+* conductor to air interfaces
+*
+* conductor generated with
+* cubegen_ -xo-0.5 -xh1 -yh0.3 -zh1 -nx20 -ny3 -nz20 -naplate -t -b -pfl -pfr -pbr > plate.qui
+
+* note that now the dielectric constant of the medium surrounding the first conductor is 3.0
+
+C plate.qui 3.0 0.0 0.0 0.0
+
+C plate.qui 1.0 0.0 0.1 0.0 
+
+* dielectric to air interfaces
+*
+* dielectric interface generated with
+* cubegen_ -xo-0.5 -xh1 -yh0.03 -zh1 -nx20 -ny3 -nz20 -nadiel -pbl > diel.qui
+
+* note that the coordinates (0.0, 0.015, 0.5) identify a reference point
+* inside the dielectric region of constant 3.0; see the FastCap manual 
+* for further details 
+
+D diel.qui 1.0 3.0 0.0 0.0 0.0 0.0 0.015 0.5 -
+
+
+
+
+
+
+
+
+
+
+
+

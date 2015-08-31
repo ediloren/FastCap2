@@ -1,0 +1,47 @@
+<!doctype html public "-//w3c//dtd html 4.0 frameset//en">
+<html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="Author" content="Enrico Di Lorenzo">
+  <meta name="Generator" content="Enrico Di Lorenzo">
+  <meta name="Description" content="Help File">
+  <meta name="Version" content="050510">
+  <title>FastCap2 Tutorial</title>
+  <link href="helpstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+<BODY>
+
+<H1>Refine the geometry to achieve greater accuracy</H1>
+
+
+<H2>The capacitance of a sphere</H2>
+
+  <p>The sphere is a geometrical object for which a closed-form formula for the calculation of capacitance exists. By Gauss's law, a conducting sphere with one meter radius in free space has a capacitance of 4&pi;&epsilon;<SUB>0</SUB> Farad, that is, about 0.111265 nF.
+  <p>By comparing this result with FastCap2's, which is 0.1058 nF, we have about 5% error in the capacitance value. FastCap2's declared accuracy is 1%, but only provided with a suitable input discretization. 
+
+<H2>A refined sphere</H2>
+
+<ol>
+  <li>Load in FastModel the input file named <i>sphere2.qui</i>, which is located in the same directory of <i>sphere1.qui</i>. 
+  <li>Examine the sphere in the FastModel panel. You'll see that this is a more refined model of a sphere. 
+  <li>Launch FastCap2 on the new input file, just like you did with the previous file. 
+</ol>
+
+<p><img src="images/FC2Sphere2.png">
+
+<H2>Checking the result</H2>
+
+<ol>
+  <li>Look at the result at the end of FastCap2's output window. The calculated capacitance is 0.1098 nF, which is within 1% of the correct value of 0.111265 nF.
+  <li>In this particular case, the correct value of the capacitance was known beforehand trough an analytical formula. But how, in general, the user can be sure to have reached 1% accuracy in the results? To answer this question, load the file <i>sphere3.qui</i>, which is located in the same directory of <i>sphere1.qui</i> and <i>sphere2.qui</i>, into FastModel. 
+  <li>Examine the sphere in the FastModel panel. You'll see that this is an even more refined model of a sphere. 
+  <li>Launch FastCap2 on the new input file, just like you did with the previous files.  
+  <li>Check the new result, which is 0.1109 nF, even closer to 0.111265 nF. However, what is important here is that the capacitance calculated with the file <i>sphere3.qui</i> is within 1% of the capacitance calculated with the file <i>sphere2.qui</i>. This means that we have reached convergence, even if we had not known that the correct result was 0.111265 nF.
+</ol>
+
+<p><img src="images/FC2Sphere3.png">
+
+</body>
+</html>
