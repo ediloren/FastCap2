@@ -70,14 +70,14 @@ charge *charges;
 					   kids for each cube. */
 #endif
 
-  getnbrs(sys);			/* Get all the nearest neighbors. At bot level
+  //getnbrs(sys);			/* Get all the nearest neighbors. At bot level
 				   add as nearest nbrs cubes in exact block. */
-  linkcubes(sys);		/* Make linked-lists of direct, multis, and
+  //linkcubes(sys);		/* Make linked-lists of direct, multis, and
 				   locals to do at each level. */
-  set_vector_masks(sys);	/* set up sys->is_dummy and sys->is_dielec */
-  setMaxq(sys);                 /* Calculates the max # chgs in cubes treated
+  //set_vector_masks(sys);	/* set up sys->is_dummy and sys->is_dielec */
+  //setMaxq(sys);                 /* Calculates the max # chgs in cubes treated
 				   exactly, and over lowest level cubes. */
-  getAllInter(sys);		/* Get the interaction lists at all levels. */
+  //getAllInter(sys);		/* Get the interaction lists at all levels. */
 
   return(sys);
 }
@@ -563,7 +563,8 @@ psuedo-adaptive scheme.  Also get the pointer to the appropriate section
 of the charge and potential vector.  Uses the eval vector for the potential
 coeffs at the lowest level.  Also index the lowest level cubes.
 */
-static indexkid(sys, dad, pqindex, pcindex)
+//static indexkid(sys, dad, pqindex, pcindex)
+//indexkid(sys, dad, pqindex, pcindex)
 ssystem *sys;
 cube *dad;
 int *pqindex, *pcindex;
