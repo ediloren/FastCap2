@@ -57,7 +57,7 @@ charge *charges;
   getrelations(sys);		/* Get all the prnts and kids for each cube. */
 
   setPosition(sys);		/* Figures out position of cube center. */
-  indexkid(sys, sys->cubes[0][0][0][0], &qindex, &cindex); 
+  //indexkid(sys, sys->cubes[0][0][0][0], &qindex, &cindex); 
 				/* Index chgs and cubes. */
 
 #if ADAPT == ON
@@ -563,8 +563,7 @@ psuedo-adaptive scheme.  Also get the pointer to the appropriate section
 of the charge and potential vector.  Uses the eval vector for the potential
 coeffs at the lowest level.  Also index the lowest level cubes.
 */
-//static indexkid(sys, dad, pqindex, pcindex)
-//indexkid(sys, dad, pqindex, pcindex)
+static indexkid(sys, dad, pqindex, pcindex)
 ssystem *sys;
 cube *dad;
 int *pqindex, *pcindex;
