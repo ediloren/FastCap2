@@ -53,7 +53,7 @@ struct tms timestuff;
 /* define macros for time and resident memory usage checks */
 
 static double dtime = 0.0;
-static long stime, utime;
+//static long stime, utime;
 
 #ifdef NOTOTHER
 

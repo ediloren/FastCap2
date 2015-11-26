@@ -57,7 +57,7 @@ charge *charges;
   getrelations(sys);		/* Get all the prnts and kids for each cube. */
 
   setPosition(sys);		/* Figures out position of cube center. */
-  indexkid(sys, sys->cubes[0][0][0][0], &qindex, &cindex); 
+  //indexkid(sys, sys->cubes[0][0][0][0], &qindex, &cindex); 
 				/* Index chgs and cubes. */
 
 #if ADAPT == ON
@@ -70,14 +70,14 @@ charge *charges;
 					   kids for each cube. */
 #endif
 
-  getnbrs(sys);			/* Get all the nearest neighbors. At bot level
-				   add as nearest nbrs cubes in exact block. */
-  linkcubes(sys);		/* Make linked-lists of direct, multis, and
-				   locals to do at each level. */
-  set_vector_masks(sys);	/* set up sys->is_dummy and sys->is_dielec */
-  setMaxq(sys);                 /* Calculates the max # chgs in cubes treated
-				   exactly, and over lowest level cubes. */
-  getAllInter(sys);		/* Get the interaction lists at all levels. */
+  //getnbrs(sys);			/* Get all the nearest neighbors. At bot level
+	//			   add as nearest nbrs cubes in exact block. */
+  //linkcubes(sys);		/* Make linked-lists of direct, multis, and
+	//			   locals to do at each level. */
+  //set_vector_masks(sys);	/* set up sys->is_dummy and sys->is_dielec */
+  //setMaxq(sys);                 /* Calculates the max # chgs in cubes treated
+	//			   exactly, and over lowest level cubes. */
+  //getAllInter(sys);		/* Get the interaction lists at all levels. */
 
   return(sys);
 }
@@ -97,7 +97,7 @@ charge *charges;
   - this routine is still called to set automatic levels if ADAPT is OFF,
      ie even when the calculation is not adaptive, so results can be compared
 */
-static int placeq(flag, sys, charges)
+int placeq(flag, sys, charges)
 int flag;			/* ON => set depth automatically */
 ssystem *sys;
 charge *charges;
